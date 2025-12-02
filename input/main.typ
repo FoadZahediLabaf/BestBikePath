@@ -6,7 +6,7 @@
 #show: polimi-thesis.with(
   title: "Best Bike Paths",
   subtitle: "Requirements Analysis and Specification Document",
-  author: "Foad Zahedi Labefi\nLorenzo Fiamingo\nAlexander Fox",
+  author: "Foad Zahedi Labaf\nLorenzo Fiamingo\nAlexander Fox",
   advisor: "",
   coadvisor: "",
   tutor: "",

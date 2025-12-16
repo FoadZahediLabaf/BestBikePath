@@ -28,20 +28,12 @@ The application securely stores this information to allow its users to revisit t
 Best Bike Paths also allows users to publicly share these paths, allowing others to choose recommended bike paths based on their overall quality.
 BBP’s ultimate goal is to offer its users a valuable tool that streamlines the process of cataloging their bike trips and cultivates a community of bikers by allowing them to share their experiences.
 
-
 == Purpose
-#lorem(30)
 
 === Goals
-#lorem(30)
-```pintora
-activityDiagram
-  start
-  :Action 1;
-  -> Hey there;
-  :Action 2;
-  end
-```
+G1: Registered users want to automatically record bike path data while they are biking.
+G2: Registered users want to manually insert bike paths by specifying streets and status.
+G3: Registered users want to approve or reject obstacles detected by the system.
 
 == Scope
 #lorem(30)

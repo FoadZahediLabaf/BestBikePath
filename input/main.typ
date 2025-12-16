@@ -62,23 +62,18 @@ WP3: Accelerometer and gyroscope collects device motion data.GPS collects device
 WP4: GPS collects device location data.
 \
 WP5: Street infrastructure changes over time (new streets are built, existing streets are upgraded, downgraded, or decommissioned).
-
 \
-WP6:Path conditions change over time due to natural degradation, weather, or maintenance.
-
+WP6: Path conditions change over time due to natural degradation, weather, or maintenance.
 \
-WP7:The user starts and stops biking.
-
+WP7: The user starts and stops biking.
 \
-WP8:The user velocity changes.
-
+WP8: The user velocity changes.
 \
-WP9:The user encounters an obstacle.
-
+WP9: The user encounters an obstacle.
 \
-WP10:Stoplight changes color.
+WP10: Stoplight changes color.
 \
-WP11:The user's device’s internet connection changes over time.
+WP11: The user's device’s internet connection changes over time.
 
 
 

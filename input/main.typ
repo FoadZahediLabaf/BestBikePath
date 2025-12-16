@@ -32,23 +32,127 @@ BBP’s ultimate goal is to offer its users a valuable tool that streamlines the
 
 === Goals
 G1: Registered users want to automatically record bike path data while they are biking.
+\
 G2: Registered users want to manually insert bike paths by specifying streets and status.
+\
 G3: Registered users want to approve or reject obstacles detected by the system.
+\
 G4: Registered users want to manually record an obstacle while they are biking.
+\
 G5: Registered users want to retrieve all the collected data of their personal bike paths.
+\
 G6: Registered users want to be able to share their recorded bike paths with the community.
+\
 G7: Registered users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available.
+\
 G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other registered users and ranked based on quality.
+\
 G9: The users want the paths to be ranked based on compatible speed limits, average path status, and data freshness.
 
 == Scope
 #lorem(30)
 
 === World Phenomena
-#lorem(30)
+WP1: The user decides to take a bike trip
+\
+WP2: Weather conditions change over time
+\
+WP3: Accelerometer and gyroscope collects device motion data.GPS collects device location data.
+\
+WP4: GPS collects device location data.
+\
+WP5: Street infrastructure changes over time (new streets are built, existing streets are upgraded, downgraded, or decommissioned).
+
+\
+WP6:Path conditions change over time due to natural degradation, weather, or maintenance.
+
+\
+WP7:The user starts and stops biking.
+
+\
+WP8:The user velocity changes.
+
+\
+WP9:The user encounters an obstacle.
+
+\
+WP10:Stoplight changes color.
+\
+WP11:The user's device’s internet connection changes over time.
+
+
+
+
+
 
 === Shared Phenomena
 #lorem(30)
+SP1: The user creates an account. (World controlled)
+\
+SP2:
+\
+SP3:
+\
+SP4:
+\
+SP5:
+\
+SP6:
+\
+SP7:
+\
+SP8:
+\
+SP9:
+\
+SP10:
+\
+SP11:
+\
+SP12:
+\
+SP13:
+\
+SP14:
+\
+SP15:
+\
+SP16:
+\
+SP17:
+\
+SP18:
+SP19:
+SP20:
+SP21:
+\
+SP22:
+\
+SP23:
+\
+SP24:
+\
+SP25:
+\
+SP26:
+
+
+#figure(
+  caption: [Mapping between goals and phenomena],
+  table(
+    columns: 3,
+    [], [Shared Phenomena], [World Phenomena],
+    [*G1*], [W1],  [],
+    [*G2*], [],  [],
+    [*G3*], [],  [],
+    [*G4*], [],  [],
+    [*G5*], [],  [],
+    [*G6*], [],  [],
+    [*G7*], [],  [],
+    [*G8*], [],  [],
+    [*G9*], [],  [],
+  )
+)
 
 == Definitions, Acronyms, Abbreviations
 #lorem(30)

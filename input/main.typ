@@ -53,9 +53,9 @@ G9: The users want the paths to be ranked based on compatible speed limits, aver
 #lorem(30)
 
 === World Phenomena
-WP1: The user decides to take a bike trip
+WP1: The user decides to take a bike trip.
 \
-WP2: Weather conditions change over time
+WP2: Weather conditions change over time.
 \
 WP3: Accelerometer and gyroscope collects device motion data.GPS collects device location data.
 \

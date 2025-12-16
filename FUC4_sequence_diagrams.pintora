@@ -1,0 +1,34 @@
+sequenceDiagram
+  User -> App: Open recorded trip(tripId)
+  activate App
+
+  App -> Database: Retrieve trip and sensor data(tripId)
+  activate Database
+  Database -> App: Trip data and samples
+  deactivate Database
+
+  App -> ObstacleDetector: Detect candidate obstacles
+  activate ObstacleDetector
+  ObstacleDetector -> App: Candidate obstacles by segment
+  deactivate ObstacleDetector
+
+  loop For each candidate obstacle
+    App -> User: Request confirmation (segment, obstacle)
+    alt Confirm obstacle
+      User -> App: Confirm
+      App -> Database: Store validated obstacle
+    else Reject obstacle
+      User -> App: Reject
+      App -> Database: Mark false detection
+    end
+  end
+
+  opt Trip is publishable
+    App -> GlobalData: Update aggregated path info
+    activate GlobalData
+    GlobalData -> App: Update success
+    deactivate GlobalData
+  end
+
+  App -> User: Validation completed
+  deactivate App

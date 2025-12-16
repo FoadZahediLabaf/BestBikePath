@@ -86,55 +86,39 @@ WP11:The user's device’s internet connection changes over time.
 
 
 === Shared Phenomena
-#lorem(30)
-SP1: The user creates an account. (World controlled)
+
+*World Controlled*
 \
-SP2:
+SP1: The user creates an account.
 \
-SP3:
+SP2: The user signs in and out of their account.
 \
-SP4:
+SP3: The user deletes their account.
 \
-SP5:
+SP4: The user starts, stops and pauses the recording of the bike path.
 \
-SP6:
+SP5: The user selects or inserts street segments of a bike path.
 \
-SP7:
+SP6: The user sets the status of the path.
 \
-SP8:
+SP7: The user sets the privacy of the path.
 \
-SP9:
+SP8: The user confirms or rejects obstacles by the system.
 \
-SP10:
+SP9: The user manually adds an obstacle.
 \
-SP11:
+SP10: The user deletes one of their bike paths.
 \
-SP12:
+SP11: The user selects a starting point and a destination when browsing community bike paths.
 \
-SP13:
+SP12: The users choose which path in the proposed routes should be followed.
 \
-SP14:
+SP13: GPS provides the location samples.
 \
-SP15:
+SP14: Accelerometer and gyroscope share motion data with the system.
 \
-SP16:
-\
-SP17:
-\
-SP18:
-SP19:
-SP20:
-SP21:
-\
-SP22:
-\
-SP23:
-\
-SP24:
-\
-SP25:
-\
-SP26:
+SP15: External services provide meteorological information.
+
 
 
 #figure(

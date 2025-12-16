@@ -119,6 +119,29 @@ SP14: Accelerometer and gyroscope share motion data with the system.
 \
 SP15: External services provide meteorological information.
 
+*Machine Controlled*
+\
+SP16: The system records GPS and sensor data during a user’s trip.
+\
+SP17: The system displays the travelled path.
+\
+SP18: The system displays the selected path to follow. 
+\
+SP19: The system displays a notification to the user after detecting a possible obstacle.
+\
+SP20:The system displays the current travel time and additional statistics about the trip while recording
+\
+SP21:The system pauses the recording when the user slows down. 
+\
+SP22:The system collects weather data from the weather API when recording stops.
+\
+SP23:The system displays  the user’s personal bike paths in their  history. 
+\
+SP24:The system displays ranked community bike paths between a chosen origin and destination.
+\
+SP25:The system shows detailed information for any selected path.
+\
+SP26:The system alerts the user when a selected path contains incompatible streets for biking. 
 
 
 #figure(

@@ -75,7 +75,14 @@ struct ContentView: View {
 //                                .containerRelativeFrame(.horizontal) { (l, _) in l*2/5 }
 
                             ForEach(appModel.userPaths) { path in
-                                PathMap(path)
+                                Button {
+                                    appModel.userSelectedPath = path
+                                    appModel.displayUserPath(path)
+                                    appModel.presentedRootModal = .userPath
+                                } label: {
+                                    PathMap(path)
+                                        .allowsHitTesting(false)
+                                }
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                                     .aspectRatio(3/2, contentMode: .fill)
                                     .containerRelativeFrame(.horizontal) { (l, _) in l*3/5 }
@@ -186,6 +193,13 @@ struct ContentView: View {
             .presentationDetents([.medium, .large])
             .presentationBackgroundInteraction(.enabled(upThrough: .medium))
             .interactiveDismissDisabled()
+        }
+        .sheet(isPresented: appModel.isPresentingRootModal(.userPath)) {
+            NavigationStack {
+                UserPathView()
+                    .toolbarTitleDisplayMode(.inlineLarge)
+            }
+            .presentationDetents([.medium, .large])
         }
     }
 

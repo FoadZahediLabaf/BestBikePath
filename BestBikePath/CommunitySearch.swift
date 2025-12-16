@@ -212,6 +212,19 @@ struct CommunitySearch: View {
                         .disabled(appModel.mapItems.count < 2)
                         .animation(.default, value: appModel.mapItems.count)
                     } else {
+                        Button("Confirm", systemImage: "checkmark") {
+                            guard let selectedPath = appModel.selectedPath else { return }
+                            appModel.userSelectedPath = selectedPath
+                            appModel.displayUserPath(selectedPath)
+                            appModel.presentedRootModal = .userPath
+                        }
+                        .fontWeight(.semibold)
+                        .buttonStyle(.glassProminent)
+                    }
+                }
+
+                if appModel.communityResultPaths != nil {
+                    ToolbarItem(placement: .cancellationAction) {
                         Button(role: .cancel) {
                             appModel.cleanMap()
                             selectedDetent = .medium

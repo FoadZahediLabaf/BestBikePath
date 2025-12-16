@@ -34,6 +34,9 @@ BBP’s ultimate goal is to offer its users a valuable tool that streamlines the
 G1: Registered users want to automatically record bike path data while they are biking.
 G2: Registered users want to manually insert bike paths by specifying streets and status.
 G3: Registered users want to approve or reject obstacles detected by the system.
+G4: Registered users want to manually record an obstacle while they are biking.
+G5: Registered users want to retrieve all the collected data of their personal bike paths.
+G6: Registered users want to be able to share their recorded bike paths with the community.
 
 == Scope
 #lorem(30)

@@ -37,6 +37,9 @@ G3: Registered users want to approve or reject obstacles detected by the system.
 G4: Registered users want to manually record an obstacle while they are biking.
 G5: Registered users want to retrieve all the collected data of their personal bike paths.
 G6: Registered users want to be able to share their recorded bike paths with the community.
+G7: Registered users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available.
+G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other registered users and ranked based on quality.
+G9: The users want the paths to be ranked based on compatible speed limits, average path status, and data freshness.
 
 == Scope
 #lorem(30)

@@ -19,7 +19,15 @@
 #show: mainmatter.with()
 
 = Introduction
-#lorem(100)
+
+== Purpose
+Biking is an immensely beneficial activity, providing both physical and mental benefits. To encourage more people to take up this activity, it is crucial to provide them with the necessary tools to enhance their experience. 
+Best Bike Paths aims to make biking a more rewarding experience by providing an intuitive software application that automatically records the paths that users take while exploring the world around them. 
+This app is able to automatically record these paths by accessing the various sensors and GPS of the user’s device, but also allows its users to manually add these paths.
+The application securely stores this information to allow its users to revisit their trips and track their progress as they increase their proficiency in this sport. 
+Best Bike Paths also allows users to publicly share these paths, allowing others to choose recommended bike paths based on their overall quality.
+BBP’s ultimate goal is to offer its users a valuable tool that streamlines the process of cataloging their bike trips and cultivates a community of bikers by allowing them to share their experiences.
+
 
 == Purpose
 #lorem(30)

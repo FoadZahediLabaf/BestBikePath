@@ -256,20 +256,43 @@ The user navigates to the browsing page and enters a starting point and destinat
 
 
 *Authenticated Users press start button before biking* \
-While on the home page, the user presses the Start Recording button. The app displays the path recording page, consisting of a map, a timer, and a start button. If the user presses the start button the system begins the timelapse, and displays a Stop button, a pause button and relevant information regarding the trip, such as the covered distance, current speed, average speed and top speed.
+While on the home page, the user presses the Start Recording button. The app displays the path recording page, consisting of a map, a timer, and a start button. If the user presses the start button the system begins the time-lapse, and displays a Stop button, a pause button and relevant information regarding the trip, such as the covered distance, current speed, average speed and top speed.
 
 *Authenticated User pauses recording* \
 While a trip recording is in progress, the user temporarily stops biking and selects the option to pause the recording.
 The system suspends the collection of GPS and sensor data and stops the trip timer. 
 When the user decides to resume biking, the user selects the resume option. The system continues the recording, continues collecting GPS and sensor data, and updates the trip statistics accordingly until the trip is stopped or paused again.
 
-*System detects obstacles and asks for the Authenticated User’s confirmation*
+*System detects obstacles and asks for the Authenticated User’s confirmation* \
 While biking, the user encounters an obstacle and rides over it. The device records vibrations and speed changes via the gyroscope and accelerometer, recognizing the obstacle. The system displays a timed alert to give users the opportunity to confirm the presence of the obstacle. 
 The user may either confirm or reject the detected obstacle. If the user ignores the alert, after a certain amount of time the app will silently accept and add the obstacle to the path data.
 
 *Manual Path Recording * \
 After navigating to the page dedicated to the manual creation of bike paths, the authenticated user specifies a starting point and destination of the path. The system displays the map and allows the user to define the bike path by selecting the streets and segments composing the route.
 Before saving the bike path, the user selects a status to associate with the path. The system stores the path in the user’s personal history, making it available for later review and optional publication.
+
+*Authenticated User adds an obstacle while biking* \
+While biking, the user encounters an obstacle and rides near it without the system detecting it. The user therefore decides to notify the presence of this obstacle and opens the BBP application, presses the “Add Obstacle” button, and closes the app.
+The system records the obstacle and adds it to the current path information. 
+
+*Authenticated User stops at a red light* \
+While biking, the user encounters a red light and stops. The system registers the sudden change in the bike’s velocity and pauses the recording. The user quickly opens the application on their device and sees that the time-lapse has paused. After putting away their device, the stoplight turns green, and the user resumes biking. The system recognizes that the bike has started to move and therefore resumes the time-lapse.
+
+*Authenticated User stops biking and stops recording* \
+After having reached their destination, the user opens the BBP application, which is currently recording the path that they have taken up to this point. The user presses a button to stop the recording. The application prompts the user for confirmation to terminate the recording. After the user selects the “Confirm” option, the system ends the recording and adds the bike path to the database.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal history management")
+
+*Authenticated User visits their history page* \
+After the authenticated user opens the BBP application on their device, they navigate to their history page, where they can view a list of all the paths that they’ve travelled (organized by chronological order). Each path shows a limited amount of information, such as the beginning and destination of the trip, the date when the trip was taken, and the total duration.
+There is also an option to select a specific path to view additional information, such as a visual representation of the path traveled, average speed, meteorological information, and the obstacles encountered along the trail, as well as a button that makes the information about that path public.
+
+*Authenticated User deletes a bike path* \
+After opening the BBP app on their device and navigating to their history page, the user notices that a bike path was added by mistake. To remove it, the user selects the path to open its dedicated page, where they can find the button that allows them to delete the bike path. The system asks for confirmation before permanently removing it from the database. After confirming the action, the system deletes it and updates the user’s history page.
+
+*Authenticated User toggles bike path privacy state* \
+After navigating to their history page, the user selects a bike path that is currently private and presses the button that allows the system to make the information about it public. Following this action, the system updates both the path status within the database and the user’s history view. The user then presses the button again after changing his mind, causing another update of the UI. The system subsequently makes the information associated with the path private.
+
 
 === Class Diagram
 

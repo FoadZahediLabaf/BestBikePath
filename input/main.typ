@@ -209,9 +209,20 @@ Obstacles can be automatically detected through the device’s motion sensors or
 *D*: Domain Assumption \
 *UC*: Use Case
 
-
+== Version History
+ - Version 1.0: 23/12/2025
 == Reference Documents
-#lorem(30)
+The following reference materials were used for the preparation of this document:
+- The specification for the 2025/26 Requirement Engineering and Design Project for the Software Engineering II course.
+- The WeBeep slides of the Software Engineering II course.
+- Requirements and Specification Documents from previous years
+- European Union, *General Data Protection Regulation (EU) 2016/679*, 2016.
+- #link("https://www.iso.org/standard/75405.html")[ISO/IEC, *ISO/IEC/IEEE 24748-8:2019 Systems and software engineering -- Life cycle management*, 2019].
+- #link("https://developer.apple.com/design/human-interface-guidelines")[Apple Inc., *Apple Human Interface Guidelines*, online documentation].
+- #link("https://m3.material.io")[Google LLC, *Material Design Guidelines*, online documentation].
+- #link("https://developer.apple.com/documentation/coremotion")[Apple Inc., *Core Motion Framework Documentation*, online documentation].
+- #link("https://developer.apple.com/documentation/corelocation")[Apple Inc., *Core Location Framework Documentation*, online documentation].
+- #link("https://developer.apple.com/documentation/weatherkit/")[Apple Inc., *WeatherKit Framework Documentation*, online documentation].
 
 == Document Structure
 #lorem(100)

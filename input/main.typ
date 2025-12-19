@@ -51,7 +51,7 @@ G9: The users want the paths to be ranked based on compatible speed limits, aver
 The purpose of this application is to provide relevant and accurate information about bike paths. In order to do this, BBP offers a wide array of functionalities, such as the ability to collect information about the followed paths, either by allowing users to manually insert the data or through an automated recording function that interacts with the GPS and sensors of the device on which the app resides. The collected information will be securely stored in a remote database, and can optionally be made publicly available.
 Users will be able to access and manage their stored information through the app.
 This data can then be used by the BBP app to further develop its recommendation system, which will suggest bike paths based on the evaluations provided by other users or computed by the system.
-This application is primarily intended for authenticated users who, once authenticated within the system, will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unauthenticated users to partially access its functionalities, mainly the ability to browse publicly available bike paths.
+This application is primarily intended for registered users who, once authenticated within the system, will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unauthenticated users to partially access its functionalities, mainly the ability to browse publicly available bike paths.
 To enable automatic recordings of bike paths, the BBP application accesses the device’s GPS interface to determine the user’s exact location while biking, as well as other sensor interfaces to collect more relevant information associated with the travelled path. The app will also access an external API for the collection of meteorological data.
 This application is therefore intended to run on a mobile device equipped with GPS, motion sensors, and internet connectivity for the automatic collection and the remote storage of data in the system’s database.
 
@@ -87,60 +87,34 @@ WP11: The user's device’s internet connection changes over time.
 
 === Shared Phenomena
 
-*World Controlled*
-\
-SP1: The user creates an account.
-\
-SP2: The user signs in and out of their account.
-\
-SP3: The user deletes their account.
-\
-SP4: The user starts, stops and pauses the recording of the bike path.
-\
-SP5: The user selects or inserts street segments of a bike path.
-\
-SP6: The user sets the status of the path.
-\
-SP7: The user sets the privacy of the path.
-\
-SP8: The user confirms or rejects obstacles by the system.
-\
-SP9: The user manually adds an obstacle.
-\
-SP10: The user deletes one of their bike paths.
-\
-SP11: The user selects a starting point and a destination when browsing community bike paths.
-\
-SP12: The users choose which path in the proposed routes should be followed.
-\
-SP13: GPS provides the location samples.
-\
-SP14: Accelerometer and gyroscope share motion data with the system.
-\
+*World Controlled* \
+SP1: The user creates an account. \
+SP2: The user signs in and out of their account. \
+SP3: The user deletes their account. \
+SP4: The user starts, stops and pauses the recording of the bike path. \
+SP5: The user selects or inserts street segments of a bike path. \
+SP6: The user sets the status of the path. \
+SP7: The user sets the privacy of the path. \
+SP8: The user confirms or rejects obstacles by the system. \
+SP9: The user manually adds an obstacle. \
+SP10: The user deletes one of their bike paths. \
+SP11: The user selects a starting point and a destination when browsing community bike paths. \
+SP12: The users choose which path in the proposed routes should be followed. \
+SP13: GPS provides the location samples. \
+SP14: Accelerometer and gyroscope share motion data with the system. \
 SP15: External services provide meteorological information.
 
-*Machine Controlled*
-\
-SP16: The system records GPS and sensor data during a user’s trip.
-\
-SP17: The system displays the travelled path.
-\
-SP18: The system displays the selected path to follow. 
-\
-SP19: The system displays a notification to the user after detecting a possible obstacle.
-\
-SP20: The system displays the current travel time and additional statistics about the trip while recording
-\
-SP21: The system pauses the recording when the user slows down. 
-\
-SP22: The system collects weather data from the weather API when recording stops.
-\
-SP23: The system displays  the user’s personal bike paths in their  history. 
-\
-SP24: The system displays ranked community bike paths between a chosen origin and destination.
-\
-SP25: The system shows detailed information for any selected path.
-\
+*Machine Controlled* \
+SP16: The system records GPS and sensor data during a user’s trip. \
+SP17: The system displays the travelled path. \
+SP18: The system displays the selected path to follow.  \
+SP19: The system displays a notification to the user after detecting a possible obstacle. \
+SP20: The system displays the current travel time and additional statistics about the trip while recording. \
+SP21: The system pauses the recording when the user slows down.  \
+SP22: The system collects weather data from the weather API when recording stops. \
+SP23: The system displays  the user’s personal bike paths in their  history.  \
+SP24: The system displays ranked community bike paths between a chosen origin and destination. \
+SP25: The system shows detailed information for any selected path. \
 SP26: The system alerts the user when a selected path contains incompatible streets for biking. 
 
 

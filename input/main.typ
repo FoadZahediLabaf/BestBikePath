@@ -51,7 +51,7 @@ G9: The users want the paths to be ranked based on compatible speed limits, aver
 The purpose of this application is to provide relevant and accurate information about bike paths. In order to do this, BBP offers a wide array of functionalities, such as the ability to collect information about the followed paths, either by allowing users to manually insert the data or through an automated recording function that interacts with the GPS and sensors of the device on which the app resides. The collected information will be securely stored in a remote database, and can optionally be made publicly available.
 Users will be able to access and manage their stored information through the app.
 This data can then be used by the BBP app to further develop its recommendation system, which will suggest bike paths based on the evaluations provided by other users or computed by the system.
-This application is primarily intended for registered users who, once authenticated within the system, will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unauthenticated users to partially access its functionalities, mainly the ability to browse publicly available bike paths.
+This application is primarily intended for authenticated users who, once authenticated within the system, will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unauthenticated users to partially access its functionalities, mainly the ability to browse publicly available bike paths.
 To enable automatic recordings of bike paths, the BBP application accesses the device’s GPS interface to determine the user’s exact location while biking, as well as other sensor interfaces to collect more relevant information associated with the travelled path. The app will also access an external API for the collection of meteorological data.
 This application is therefore intended to run on a mobile device equipped with GPS, motion sensors, and internet connectivity for the automatic collection and the remote storage of data in the system’s database.
 
@@ -238,7 +238,13 @@ After the user confirms this action, the system deletes the account and all rela
 A user, after some time, decides to use the Best Bike Paths app again and opens it. After tapping the sign-in button, the app presents a modal. The authenticated user is prompted to insert an email, which the app uses to discern if the user is new and should create a new account or, if already taken, to log in. After the user inserts an email belonging to an account, the app shows a password box. If the password is wrong, the app reports the error.  After inserting the correct password, the modal is dismissed and the user is redirected to the home view. 
 
 *Authenticated user signs out of their account* \
-When the user selects the sign-out button, the app signs the user out of their account, redirecting them to the home page, where he can browse community bike paths. However, the user will now have to perform the log-in to access the full functionalities of the application.
+An authenticated user presses the sign-out button. The app signs the user out of their account, redirecting them to the home page, where he can browse community bike paths. However, the user will now have to perform the log-in to access the full functionalities of the application.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Permission management")
+
+*System asks permission to use a device capabilities (GPS case)* \
+The authenticated user decides to record his first ride and taps the Start Recording button. A modal explaining why the app must access location data is displayed. The modal contains accept and cancel buttons. If the user selects the Cancel option, the modal is dismissed and the user remains on the home screen. If the  user selects the Accept option, the system presents the dialog requesting permission to access the location. If the user grants permission, the view to record the bike path is presented, otherwise the user remains in the home, and the next time this capability would be needed, he will be required to give permission through the device’s system settings app.
+The same flow of events will be replicated wherever other capabilities are required by the application.
 
 === Class Diagram
 

@@ -164,6 +164,11 @@ SP26: The system alerts the user when a selected path contains incompatible stre
 == Definitions, Acronyms, Abbreviations
 
 === Definitions
+*User*: Term used to indicate both authenticated and unauthenticated individuals who interact with the application. These individuals can be distinguished between registered and unregistered users.
+
+*Registered User*: User who has a BBP account and is authenticated. A registered user has full access to the functionalities offered by the application.
+
+*Unregistered User*: Users who do not have a BBP account, or who have an account but aren't currently authenticated within the system. These users have limited access to the application's functionalities.
 
 *Bike Path*: A bike path is a collection of information associated with a specific route. This information may refer to a single user trip and, in that case, includes performance-related data describing the user’s ride, as well as qualitative information about the route itself.  
 The term bike path is also used to indicate the aggregated information derived from multiple user-specific bike paths that follow the same route. This information will therefore exclude individual performance data and primarily consists of aggregated data describing the overall quality of the route.
@@ -179,6 +184,8 @@ The accelerometer is responsible for measuring the acceleration of the user duri
 *Obstacle*: An obstacle is a physical irregularity located along a bike path that may negatively affect the safety of cyclists.
 Obstacles can be automatically detected through the device’s motion sensors or manually reported by the user, and are used by the system to assess and compute the overall quality of the path.
 
+*SMTP Server*: An SMTP server, or email service provider, is an external system responsible for sending transactional emails on behalf of the application.
+
 *History Page*: A user’s history page is a section of the user’s profile that displays a list of previously recorded bike trips and allows the user to access detailed information about each trip.
 
 
@@ -187,6 +194,7 @@ Obstacles can be automatically detected through the device’s motion sensors or
 *API*: Application Programming Interface \
 *BBP*: Best Bike Paths \
 *CPU*: Central Processing Unit \
+*CTA*: Call To Action \
 *EU*: European Union \
 *GDPR*: General Data Protection Regulation \
 *GPS*: Global Positioning System \
@@ -198,6 +206,7 @@ Obstacles can be automatically detected through the device’s motion sensors or
 *JWT*: JSON Web Token \
 *REST*: Representational State Transfer \
 *SQL*: Structured Query Language \
+*SMTP*: Simple Mail Transfer Protocol \
 *TLS*: Transport Layer Security \
 *Wi-Fi*: Wireless Fidelity \
 
@@ -236,10 +245,16 @@ The following reference materials were used for the preparation of this document
 6. *References*: reference to documents or tools used for writing this document.
 
 = Overall Description
-#lorem(30)
 
 == Product Perspective
-Here we include scenarios and further details on the shared phenomena and a domain model (class diagrams and state diagrams)
+
+=== Scenarios
+
+*Account management*
+
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+=== Class Diagram
 
 ```pintora
 classDiagram

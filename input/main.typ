@@ -29,21 +29,21 @@ Best Bike Paths also allows users to publicly share these paths, allowing others
 BBP’s ultimate goal is to offer its users a valuable tool that streamlines the process of cataloging their bike trips and cultivates a community of bikers by allowing them to share their experiences.
 
 === Goals
-G1: Registered users want to automatically record bike path data while they are biking.
+G1: Authenticated users want to automatically record bike path data while they are biking.
 \
-G2: Registered users want to manually insert bike paths by specifying streets and status.
+G2: Authenticated users want to manually insert bike paths by specifying streets and status.
 \
-G3: Registered users want to approve or reject obstacles detected by the system.
+G3: Authenticated users want to approve or reject obstacles detected by the system.
 \
-G4: Registered users want to manually record an obstacle while they are biking.
+G4: Authenticated users want to manually record an obstacle while they are biking.
 \
-G5: Registered users want to retrieve all the collected data of their personal bike paths.
+G5: Authenticated users want to retrieve all the collected data of their personal bike paths.
 \
-G6: Registered users want to be able to share their recorded bike paths with the community.
+G6: Authenticated users want to be able to share their recorded bike paths with the community.
 \
-G7: Registered users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available.
+G7: Authenticated users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available.
 \
-G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other registered users and ranked based on quality.
+G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other authenticated users and ranked based on quality.
 \
 G9: The users want the paths to be ranked based on compatible speed limits, average path status, and data freshness.
 
@@ -51,7 +51,7 @@ G9: The users want the paths to be ranked based on compatible speed limits, aver
 The purpose of this application is to provide relevant and accurate information about bike paths. In order to do this, BBP offers a wide array of functionalities, such as the ability to collect information about the followed paths, either by allowing users to manually insert the data or through an automated recording function that interacts with the GPS and sensors of the device on which the app resides. The collected information will be securely stored in a remote database, and can optionally be made publicly available.
 Users will be able to access and manage their stored information through the app.
 This data can then be used by the BBP app to further develop its recommendation system, which will suggest bike paths based on the evaluations provided by other users or computed by the system.
-This application is primarily intended for registered users who, once authenticated within the system, will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unregistered users to partially access its functionalities, mainly the ability to browse publicly available bike paths.
+This application is primarily intended for authenticated users who, once authenticated within the system, will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unauthenticated users to partially access its functionalities, mainly the ability to browse publicly available bike paths.
 To enable automatic recordings of bike paths, the BBP application accesses the device’s GPS interface to determine the user’s exact location while biking, as well as other sensor interfaces to collect more relevant information associated with the travelled path. The app will also access an external API for the collection of meteorological data.
 This application is therefore intended to run on a mobile device equipped with GPS, motion sensors, and internet connectivity for the automatic collection and the remote storage of data in the system’s database.
 
@@ -164,11 +164,11 @@ SP26: The system alerts the user when a selected path contains incompatible stre
 == Definitions, Acronyms, Abbreviations
 
 === Definitions
-*User*: Term used to indicate both authenticated and unauthenticated individuals who interact with the application. These individuals can be distinguished between registered and unregistered users.
+*User*: Term used to indicate both authenticated and unauthenticated individuals who interact with the application. These individuals can be distinguished between authenticated and unauthenticated users.
 
-*Registered User*: User who has a BBP account and is authenticated. A registered user has full access to the functionalities offered by the application.
+*Authenticated User*: User who are authenticated in their BBP account. An authenticated user has full access to the functionalities offered by the application.
 
-*Unregistered User*: Users who do not have a BBP account, or who have an account but aren't currently authenticated within the system. These users have limited access to the application's functionalities.
+*Unauthenticated User*: Users who do not have a BBP account, or who have an account but aren't currently authenticated within the system. These users have limited access to the application's functionalities.
 
 *Bike Path*: A bike path is a collection of information associated with a specific route. This information may refer to a single user trip and, in that case, includes performance-related data describing the user’s ride, as well as qualitative information about the route itself.  
 The term bike path is also used to indicate the aggregated information derived from multiple user-specific bike paths that follow the same route. This information will therefore exclude individual performance data and primarily consists of aggregated data describing the overall quality of the route.
@@ -250,9 +250,21 @@ The following reference materials were used for the preparation of this document
 
 === Scenarios
 
-*Account management*
-
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+*Unauthenticated user signs up an account* \
+The user, after downloading the Best Bike Paths app, opens it on their device. Since the user is anonymous the app displays a content unavailable view explaining what the user is missing, since they’re not logged in, and a CTA to sign in. The user decides to create an account in order to take full advantage of the app’s capabilities. After tapping the sign-in button, the app presents a modal. The user is prompted to insert an email, which the app uses to discern if the user is new and should create a new account or, if already taken, to log in. The user inserts their email and the app verifies the email is not used by another account.  The app then displays a verify-email page where the user has to insert a one-time code sent to their email. After correctly inserting the code, the app displays a page with a name, password and password-confirmation text fields.  After inserting the new requested data, the modal is dismissed and the user is redirected to the home view.
+
+*Authenticated User deletes their account* \
+An authenticated user opens the BBP application and accesses their personal profile settings.
+The user selects the option to delete their account. The system informs the user that deleting the account will permanently remove all data associated with the user, including personal profile information, recorded trips, and any bike paths previously published by the user.
+After the user confirms this action, the system deletes the account and all related data from the database and terminates the user session.
+
+*Unauthenticated user signs into their account* \
+A user, after some time, decides to use the Best Bike Paths app again and opens it. After tapping the sign-in button, the app presents a modal. The authenticated user is prompted to insert an email, which the app uses to discern if the user is new and should create a new account or, if already taken, to log in. After the user inserts an email belonging to an account, the app shows a password box. If the password is wrong, the app reports the error.  After inserting the correct password, the modal is dismissed and the user is redirected to the home view. 
+
+*Authenticated user signs out of their account* \
+When the user selects the sign-out button, the app signs the user out of their account, redirecting them to the home page, where he can browse community bike paths. However, the user will now have to perform the log-in to access the full functionalities of the application.
 
 === Class Diagram
 

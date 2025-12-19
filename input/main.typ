@@ -240,11 +240,36 @@ A user, after some time, decides to use the Best Bike Paths app again and opens 
 *Authenticated user signs out of their account* \
 An authenticated user presses the sign-out button. The app signs the user out of their account, redirecting them to the home page, where he can browse community bike paths. However, the user will now have to perform the log-in to access the full functionalities of the application.
 
-#heading(level: 4, numbering: none,  outlined: false,  "Permission management")
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
 *System asks permission to use a device capabilities (GPS case)* \
 The authenticated user decides to record his first ride and taps the Start Recording button. A modal explaining why the app must access location data is displayed. The modal contains accept and cancel buttons. If the user selects the Cancel option, the modal is dismissed and the user remains on the home screen. If the  user selects the Accept option, the system presents the dialog requesting permission to access the location. If the user grants permission, the view to record the bike path is presented, otherwise the user remains in the home, and the next time this capability would be needed, he will be required to give permission through the device’s system settings app.
 The same flow of events will be replicated wherever other capabilities are required by the application.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Biking Activity")
+
+*Authenticated User searches for a path* \
+The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths and selects it. The user is presented with the option to start the automatic recording function or to simply follow the path without recording. Once the user selects one of the options, they will be redirected to a page displaying the map of the path, a timer, and other metrics
+
+*Unauthenticated User searches for a path* \
+The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths, selects and is redirected to a page displaying the map of the path, a timer, and other metrics
+
+
+*Authenticated Users press start button before biking* \
+While on the home page, the user presses the Start Recording button. The app displays the path recording page, consisting of a map, a timer, and a start button. If the user presses the start button the system begins the timelapse, and displays a Stop button, a pause button and relevant information regarding the trip, such as the covered distance, current speed, average speed and top speed.
+
+*Authenticated User pauses recording* \
+While a trip recording is in progress, the user temporarily stops biking and selects the option to pause the recording.
+The system suspends the collection of GPS and sensor data and stops the trip timer. 
+When the user decides to resume biking, the user selects the resume option. The system continues the recording, continues collecting GPS and sensor data, and updates the trip statistics accordingly until the trip is stopped or paused again.
+
+*System detects obstacles and asks for the Authenticated User’s confirmation*
+While biking, the user encounters an obstacle and rides over it. The device records vibrations and speed changes via the gyroscope and accelerometer, recognizing the obstacle. The system displays a timed alert to give users the opportunity to confirm the presence of the obstacle. 
+The user may either confirm or reject the detected obstacle. If the user ignores the alert, after a certain amount of time the app will silently accept and add the obstacle to the path data.
+
+*Manual Path Recording * \
+After navigating to the page dedicated to the manual creation of bike paths, the authenticated user specifies a starting point and destination of the path. The system displays the map and allows the user to define the bike path by selecting the streets and segments composing the route.
+Before saving the bike path, the user selects a status to associate with the path. The system stores the path in the user’s personal history, making it available for later review and optional publication.
 
 === Class Diagram
 

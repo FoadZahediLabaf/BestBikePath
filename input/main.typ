@@ -210,8 +210,11 @@ Obstacles can be automatically detected through the device’s motion sensors or
 *UC*: Use Case
 
 == Version History
- - Version 1.0: 23/12/2025
+ 
+- Version 1.0: #datetime.today().display("[day]/[month]/[year]")
+
 == Reference Documents
+
 The following reference materials were used for the preparation of this document:
 - The specification for the 2025/26 Requirement Engineering and Design Project for the Software Engineering II course.
 - The WeBeep slides of the Software Engineering II course.

@@ -57,10 +57,6 @@ This application is therefore intended to run on a mobile device equipped with G
 
 
 
-
-== Scope
-#lorem(30)
-
 === World Phenomena
 WP1: The user decides to take a bike trip.
 \
@@ -166,7 +162,17 @@ SP26: The system alerts the user when a selected path contains incompatible stre
 )
 
 == Definitions, Acronyms, Abbreviations
-#lorem(30)
+
+=== Acronyms
+*API*: Application Programming Interface \
+*BBP*: Best Bike Paths \
+*CPU*: Central Processing Unit \
+*EU*: European Union \
+*GDPR*: General Data Protection Regulation \
+*GPS*: Global Positioning System \
+*HTTPS*: HyperText Transfer Protocol Secure \
+*ISO* : International Organization for Standardization \
+*IEC*: International Electrotechnical Commission
 
 == Reference Documents
 #lorem(30)

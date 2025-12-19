@@ -6,7 +6,7 @@
 #show: polimi-thesis.with(
   title: "Best Bike Paths",
   subtitle: "Requirements Analysis and Specification Document",
-  author: "Foad Zahedi Labaf\nLorenzo Fiamingo\nAlexander Fox",
+  author: "Foad Zahedi Labaf\nLorenzo Fiamingo\nAlexander Gabriel Fox",
   advisor: "",
   coadvisor: "",
   tutor: "",
@@ -28,8 +28,6 @@ The application securely stores this information to allow its users to revisit t
 Best Bike Paths also allows users to publicly share these paths, allowing others to choose recommended bike paths based on their overall quality.
 BBP’s ultimate goal is to offer its users a valuable tool that streamlines the process of cataloging their bike trips and cultivates a community of bikers by allowing them to share their experiences.
 
-== Purpose
-
 === Goals
 G1: Registered users want to automatically record bike path data while they are biking.
 \
@@ -48,6 +46,17 @@ G7: Registered users want to enrich the data of their bike paths with relevant s
 G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other registered users and ranked based on quality.
 \
 G9: The users want the paths to be ranked based on compatible speed limits, average path status, and data freshness.
+
+== Scope
+The purpose of this application is to provide relevant and accurate information about bike paths. In order to do this, BBP offers a wide array of functionalities, such as the ability to collect information about the followed paths, either by allowing users to manually insert the data or through an automated recording function that interacts with the GPS and sensors of the device on which the app resides. The collected information will be securely stored in a remote database, and can optionally be made publicly available.
+Users will be able to access and manage their stored information through the app.
+This data can then be used by the BBP app to further develop its recommendation system, which will suggest bike paths based on the evaluations provided by other users or computed by the system.
+This application is primarily intended for registered users who, once authenticated within the system, will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unregistered users to partially access its functionalities, mainly the ability to browse publicly available bike paths.
+To enable automatic recordings of bike paths, the BBP application accesses the device’s GPS interface to determine the user’s exact location while biking, as well as other sensor interfaces to collect more relevant information associated with the travelled path. The app will also access an external API for the collection of meteorological data.
+This application is therefore intended to run on a mobile device equipped with GPS, motion sensors, and internet connectivity for the automatic collection and the remote storage of data in the system’s database.
+
+
+
 
 == Scope
 #lorem(30)

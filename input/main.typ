@@ -451,13 +451,13 @@ The termination of the recording, which is manually performed by the user, can o
 left to right direction
 hide empty description
 [*] --> Recording_Active: User is biking
-Recording_Active --> Recording_Paused : Velocity drops below threshold
-Recording_Paused --> Recording_Active : Velocity rises above threshold
-Recording_Active --> Canceled : Sensor / GPS failure or inaccurate data
-Recording_Paused --> Canceled : Sensor / GPS failure or inaccurate data
-Recording_Paused --> [*] : User stops the recording
+Recording_Active --> Recording_Paused : Velocity drops\nbelow threshold
+Recording_Paused --> Recording_Active : Velocity rises\nabove threshold
+Recording_Active --> Canceled : Sensor / GPS failure\nor inaccurate data
+Recording_Paused --> Canceled : Sensor / GPS failure\nor inaccurate data
+Recording_Paused --> [*] : User stops\nthe recording
 note on link
-handled by End Recording use case
+handled by\nEnd Recording use case
 end note
 note left of Recording_Active
 - Collect GPS data

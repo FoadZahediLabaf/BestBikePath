@@ -391,12 +391,12 @@ hide empty description
 [*] --> ManualInsertion
 
 AutomaticRecording --> Completed : End Recording
-ManualInsertion --> Completed: Data Inserted
+ManualInsertion --> Completed: Manual Insertion
 
 Completed --> Deleted : Delete Path
 
 state Completed {
-       state Publication {
+       state Privacy {
         [*] --> Private
         Private --> Public : Publish
         Public --> Private : Unpublish

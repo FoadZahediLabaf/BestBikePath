@@ -828,7 +828,7 @@ Finally, the inability to connect to external services, specifically for retriev
 While the system doesn’t offer any emergency-related service, the system should still guarantee a relatively high availability percentage to allow both unauthenticated and authenticated users to access its services.
 An appropriate target should be the standard 99%, which corresponds to 3.65 days of downtime per year.
 
-[Further details will be provided in the corresponding Design Document]
+_Further details will be provided in the corresponding Design Document_
 
 === Security
 The application must ensure the protection of the users’ sensitive data. This should be guaranteed by hashing passwords and using a secure, encrypted connection to prevent man-in-the-middle attacks. 
@@ -839,14 +839,14 @@ All noise-filtering operations should happen on the client-side to reduce server
 While automatic recording is active, GPS data should be encrypted on the user’s device and eliminated from the user’s device when the data transfer is completed.
 On the server, location data must be stored securely and encrypted according to server-side policies.\
 
-[Further details will be provided in the corresponding Design Document]
+_Further details will be provided in the corresponding Design Document_
 
 === Maintainability
 The system should be implemented using design patterns that promote scalability, reusability, and maintainability of its components.
 Any maintenance activities should be scheduled in a way that minimizes their impact on users as much as possible.
 
+_Further details will be provided in the corresponding Design Document_
 
-[Further details will be provided in the corresponding Design Document]
 === Portability
 The application should be able to run on the main mobile operating systems, specifically Android and iOS. The app should be supported by mobile devices, like smartphones and tablets, as long as they  respect the hardware limitations outlined in Section 3.4.2. 
 

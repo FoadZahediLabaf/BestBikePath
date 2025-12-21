@@ -420,9 +420,9 @@ The bike path can optionally enter the “Deleted” state, where the bike path 
 left to right direction
 hide empty description
 [*] --> AutomaticRecording
-[*] --> ManualInsertion
+[*] --> ManualInserting
 AutomaticRecording --> Completed : End Recording
-ManualInsertion --> Completed: Manual Insertion
+ManualInserting --> Completed: Manual Insertion
 Completed --> Deleted : Delete Path
 state Completed {
        state Privacy {

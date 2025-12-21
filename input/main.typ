@@ -387,6 +387,7 @@ This state diagram describes the evolution of a user’s account. Initially, the
 If the user decides to log-out, they will move back into the “Registered” state and will have to complete the sign-in process again. If the user deletes their account, all the data associated with the user will be deleted from the database and their session will be terminated and will thus move to the initial state.
 
 #let accountStateDiagram = ```plantuml
+left to right direction
 hide empty description
 state Unauthenticated{
     state Registered 
@@ -447,6 +448,7 @@ When the user resumes biking, the system detects the movement and resumes the re
 The termination of the recording, which is manually performed by the user, can only occur when the user has stopped. If any errors occur during this process, they must be effectively handled by the system.
 
 #let automaticRecordingStateDiagram = ```plantuml
+left to right direction
 hide empty description
 [*] --> Recording_Active: User is biking
 Recording_Active --> Recording_Paused : Velocity drops below threshold

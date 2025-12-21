@@ -408,7 +408,7 @@ Authenticated --> Unregistered : Delete account
 #pagebreak()
 *Path Life-Cycle*
 
-The state machine diagram describes the different states in which a path can be in during its lifecycle. The lifecycle of a bike path can begin in two ways:
+The state machine diagram describes the different states in which a path can be in during its life-cycle. The life-cycle of a bike path can begin in two ways:
 Automatic recording: the device starts the recording of a new bike path when it senses that the user is currently biking
 Manual Insertion: the user manually adds a new bike path by specifying relevant details such as the start, the street names along the route, the destination, and the status.
 After the user confirms the completion of the bike path, the system saves it to the database.
@@ -523,11 +523,10 @@ The system should be able to detect an obstacle by using data collected from the
 *End Recording*
 The automatic path recording is manually terminated at the user’s discretion. When the user selects “End Recording”, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and to set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
 
-*Bike Path search and Ranking*
-the system allows users, both authenticated and unauthenticated, to search for bike paths by specifying an origin and a destination.
-When multiple paths are available, the system computes a score for each path and presents the results ranked according to their quality and reliability, both as a list and on a map. After selecting a path, the user is redirected to a page displaying the route on a map, along with a timer and performance-related statistics.
-If the user is authenticated, they are also given the option to record the selected path.
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
+*Manual Insertion*
+The system allows users to manually insert a path by selecting a starting point, destination, and intermediary stops connecting the two points. Once the user selects a quality and privacy status for the path, the system will store it in the database.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
@@ -541,20 +540,24 @@ The system allows users to access a detailed view of their travelled paths. Afte
 *Personal Trip Deletion*
 The system allows users to delete their previously recorded paths from their personal history. When a path is deleted, the system removes all the data associated with it from the database, ensuring that it is no longer accessible to any user.
 
-*Manual Trip Recording *
-The system allows users to manually insert a path by selecting a starting point, destination, and intermediary stops connecting the two points. Once the user selects a quality and privacy status for the path, the system will store it in the database.
-
-
-
-#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
-
-#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
-
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+*Bike Path search and Ranking*
+the system allows users, both authenticated and unauthenticated, to search for bike paths by specifying an origin and a destination.
+When multiple paths are available, the system computes a score for each path and presents the results ranked according to their quality and reliability, both as a list and on a map. After selecting a path, the user is redirected to a page displaying the route on a map, along with a timer and performance-related statistics.
+If the user is authenticated, they are also given the option to record the selected path.
 
 
 == User Characteristics
-Here we include anything that is relevant to clarify their needs.
+
+=== Unauthenticated User
+Users who haven’t created an account or logged in yet, and who don’t have a valid, non-expired authentication token, will still be able to access the application but will be restricted from using certain functionalities that require user authentication. 
+More specifically, an unauthenticated user can look up bike paths (by inserting a starting point and a destination), the system-computed path evaluation, and is also able to activate the “path following” feature, with which the system displays a map of the selected path that they chose to follow. However, any information regarding the travelled path will not be recorded by the system; once the trip ends, no data associated with it is saved in the database. 
+
+=== Authenticated User
+An authenticated user possesses a valid access token for authentication. Authenticated users have full access to the functionalities provided by the BBP application, including those offered to unauthenticated users. 
+Authenticated users can automatically record travelled bike paths, but the system also collects relevant trip data and will occasionally prompt the user for confirmation of encountered obstacles. Completed trips will be stored by the system and can be viewed by the user in the corresponding section of their personal profile page. These users will also be able to optionally publish them, allowing the system to use this information to assess the quality of the bike path and enabling recommendations to other users. 
+authenticated users are also capable of manually inserting new bike paths by specifying the streets, obstacles, and status associated with the path.
 
 == Assumptions, Dependencies And Constraints
 Here we include domain assumptions

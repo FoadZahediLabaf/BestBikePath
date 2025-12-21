@@ -425,6 +425,12 @@ The system should be able to detect an obstacle by using data collected from the
 *End Recording*
 The automatic path recording is manually terminated at the user’s discretion. When the user selects “End Recording”, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and to set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
 
+*Bike Path search and Ranking*
+the system allows users, both authenticated and unauthenticated, to search for bike paths by specifying an origin and a destination.
+When multiple paths are available, the system computes a score for each path and presents the results ranked according to their quality and reliability, both as a list and on a map. After selecting a path, the user is redirected to a page displaying the route on a map, along with a timer and performance-related statistics.
+If the user is authenticated, they are also given the option to record the selected path.
+
+
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
 *Publish/Unpublish Paths*
@@ -433,6 +439,13 @@ The system also allows the user to revert previously published paths back to “
 
 *View Detailed Path Information*
 The system allows users to access a detailed view of their travelled paths. After choosing this option, the system will display relevant information related to the path, such as a map of the route, the total duration, the active biking time, the date of the recording, the average speed, the top speed, the encountered obstacles, the status, and, when available, relevant meteorological information.
+
+*Personal Trip Deletion*
+The system allows users to delete their previously recorded paths from their personal history. When a path is deleted, the system removes all the data associated with it from the database, ensuring that it is no longer accessible to any user.
+
+*Manual Trip Recording *
+The system allows users to manually insert a path by selecting a starting point, destination, and intermediary stops connecting the two points. Once the user selects a quality and privacy status for the path, the system will store it in the database.
+
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")

@@ -99,18 +99,27 @@ SP26: The system alerts the user when a selected path contains incompatible stre
 #figure(
   caption: [Mapping between goals and phenomena],
   table(
-    columns: 3,
-    [], [Shared Phenomena], [World Phenomena],
-    [*G1*], [W1],  [],
-    [*G2*], [],  [],
-    [*G3*], [],  [],
-    [*G4*], [],  [],
-    [*G5*], [],  [],
-    [*G6*], [],  [],
-    [*G7*], [],  [],
-    [*G8*], [],  [],
-    [*G9*], [],  [],
-  )
+  columns: 3,
+  [], [Shared Phenomena], [World Phenomena],
+  [*G1*], [SP2, SP4, SP7, SP13, SP14, SP16, SP17, SP20, SP21],
+          [WP1, WP3, WP4, WP7, WP8, WP11],
+  [*G2*], [SP2, SP5, SP6, SP7, SP17],
+          [WP5],
+  [*G3*], [SP2, SP8, SP19],
+          [WP9],
+  [*G4*], [SP2, SP4, SP9],
+          [WP7, WP9],
+  [*G5*], [SP2, SP23, SP25],
+          [],
+  [*G6*], [SP2, SP7, SP24, SP25],
+          [],
+  [*G7*], [SP2, SP13, SP14, SP15, SP20, SP22, SP25],
+          [WP2, WP3, WP4, WP8],
+  [*G8*], [SP11, SP12, SP18, SP24, SP25],
+          [WP5, WP6],
+  [*G9*], [SP18, SP26],
+          [WP5, WP6, WP10],
+)
 )
 
 == Definitions, Acronyms, Abbreviations
@@ -610,7 +619,7 @@ _Network on iOS, NetworkMonitor on Android_
 The app uses these services to monitor the network in order to make the UI respond to connectivity changes.
 
 *Best Bike Paths Backend* \
-The app will communicate with the Best Bike Paths backend, through a REST API, in order to sync user accounts, and store and retrieve user and community paths. The backend communicated with other external or internal components (e.g., SMTP Server, Database, etc.).
+The app will communicate with the Best Bike Paths backend, through a REST API, in order to sync user accounts, and store and retrieve user and community paths. The backend communicates with other external or internal components (e.g., SMTP Server, Database, etc.).
 
 === Communication Interfaces
 
@@ -633,7 +642,7 @@ All communication with back-end services must be authenticated and authorized, b
 - Bearer token-based authentication
 - Throttling and Rate Limiting
 
-
+#pagebreak()
 == Functional Requirements
 
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
@@ -806,6 +815,7 @@ The app may depend on external services (e.g., SMTP Server, Google Maps on Andro
 *Offline Operation* \
 In the absence of network connectivity the app should be able to store the information locally and sync them once the connection it’s available again.
 
+#pagebreak()
 == Software System Attributes
 
 === Reliability

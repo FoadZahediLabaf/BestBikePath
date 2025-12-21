@@ -753,6 +753,7 @@ The following table provides the ideal maximum duration for each operation under
   caption: [Maximum Operation Duration]
 )
 
+#pagebreak()
 == Design Constraints
 
 === Standards Compliance
@@ -771,6 +772,28 @@ The Best Bike Paths application must comply with the following standards and gui
 - ISO/IEC/IEEE 24748-8 (Agile) to establish a formal Life cycle management framework for the application development process.
 
 === Hardware Limitations
+
+*Minimum Deployment Versions* \
+To ensure access to modern platform-specific API, guarantee compatibility with recent device capabilities, and maintain ongoing operating system support, the application limits its deployment targets to N and N-1 major OS versions. As of Q4 2025, the current resulting minimum supported versions are:
+- iOS 18
+- Android 15 (minimum deployment target for Google Play store from 2025)
+These constraints ensure that the application runs only on devices that offer sufficient processing power and updated security features.
+
+*Minimum Technical Specifications* \
+The application is designed assuming at least the following device characteristics, derived from the full Android 15 system recommended requirements:
+- CPU: 64-bit Quad-core or higher.
+- RAM: minimum of 4 GB of device RAM.
+- Storage: minimum of 32 GB.
+- Display: HD+ (720p) or better.
+
+*Sensors* \
+We can assume the presence of the following sensors for the mobile app, but their unavailability properly should be handled:
+- GPS module
+- Accelerometer
+- Gyroscope
+
+*Internet connection* \
+The mobile device must be able to connect to the internet (the app should also be capable of handling interruptions of network access).
 
 === Any Other Constraint
 
@@ -799,3 +822,5 @@ Remember to check if we have time to add automatic mode cancellation (by user or
 
 
 #show: backmatter.with()
+
+

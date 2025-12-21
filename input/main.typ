@@ -46,9 +46,9 @@ G6: Authenticated users want to be able to share their recorded bike paths with 
 \
 G7: Authenticated users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available.
 \
-G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other authenticated users and ranked based on quality.
+G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other authenticated users and ranked based on quality and data freshness.
 \
-G9: The users want the paths to be ranked based on compatible speed limits, average path status, and data freshness.
+G9: The users want to ride along paths compatible with bikes.
 
 == Scope
 The purpose of this application is to provide relevant and accurate information about bike paths. In order to do this, BBP offers a wide array of functionalities, such as the ability to collect information about the followed paths, either by allowing users to manually insert the data or through an automated recording function that interacts with the GPS and sensors of the device on which the app resides. The collected information will be securely stored in a remote database, and can optionally be made publicly available.
@@ -663,9 +663,27 @@ All communication with back-end services must be authenticated and authorized, b
 
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
 
+*R1*: The system shall allow an unauthenticated user to create an account. \
+*R2:* The system shall allow an unauthenticated user to sign into the app. \
+*R3*: The system shall allow an authenticated user to sign out from the app. \
+*R4*: The system shall allow an authenticated user to delete their account.
+
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
+*R5*: The system shall request the user’s permission to use a device capability. \
+*R6*: The system shall properly handle user permission denial.
+
+
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+*Start Recording* \
+*R7*: The system shall allow the authenticated user to start the automatic recording mode of a bike path. \
+*R8*: The system shall use the GPS to track the user’s real-time position during the trip. \
+*R9*: The system shall use the device’s sensors to collect information about obstacles along the path and the speed of the user. \
+*R10*: The system shall display the current trip data (current duration time, map of the path, average speed, top speed, weather conditions, distance covered) while the user is biking. \
+*R11*: The system shall prompt the user for confirmation of a detected obstacle while biking. \
+*R12:* The system shall allow the authenticated user to insert an obstacle manually. \
+
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 

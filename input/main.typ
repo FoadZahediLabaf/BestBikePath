@@ -606,26 +606,50 @@ The device will also need a stable and reliable connection to the internet to ma
 
 === Software Interfaces
 
-The Best Bike Paths application interacts with the following software services and system components:
-- *OS Motion Services* \ 
- _CoreMotion on iOS, SensorManager on Android_ \
- The app uses native motion frameworks to access data from the available onboard hardware (Accelerometer and Gyroscope) and to detect user activity changes.
-- *OS Location Services* \ 
- _CoreLocation on iOS, Fused Location Provider on Android_ \
- The app uses native location frameworks to determine the device’s geographic location.
-- *Mapping and Routing Services* \
- _Apple Maps MapKit on iOS, Google Maps SDK on Android_ \
- The app uses mapping and routing frameworks in order to display maps, calculate paths, geocoding (and reverse geocoding) locations.
-- *Weather Services* \
- _WeatherKit on iOS, OpenWeatherMap API on Android_ \
- The app can use weather frameworks or api to enrich trips with weather data.
-- *Network State Monitoring Services*
- _Network on iOS, NetworkMonitor on Android_
- The app uses these services to monitor the network in order to make the UI respond to connectivity changes.
-Best Bike Paths Backend
+*OS Motion Services* \ 
+_CoreMotion on iOS, SensorManager on Android_ \
+The app uses native motion frameworks to access data from the available onboard hardware (Accelerometer and Gyroscope) and to detect user activity changes.
+
+*OS Location Services* \ 
+_CoreLocation on iOS, Fused Location Provider on Android_ \
+The app uses native location frameworks to determine the device’s geographic location.
+
+*Mapping and Routing Services* \
+_Apple Maps MapKit on iOS, Google Maps SDK on Android_ \
+The app uses mapping and routing frameworks in order to display maps, calculate paths, geocoding (and reverse geocoding) locations.
+
+*Weather Services* \
+_WeatherKit on iOS, OpenWeatherMap API on Android_ \
+The app can use weather frameworks or api to enrich trips with weather data.
+
+*Network State Monitoring Services* \
+_Network on iOS, NetworkMonitor on Android_
+The app uses these services to monitor the network in order to make the UI respond to connectivity changes.
+
+*Best Bike Paths Backend* \
 The app will communicate with the Best Bike Paths Backend, through a REST API, in order to sync user accounts, and store and retrieve user and community paths.
 
 === Communication Interfaces
+
+*Network Connectivity Requirements* \
+The system requires one or more of the following active network interfaces:
+- Wi-Fi (IEEE 802.11)
+- Cellular Data Network (3G / 4G / 5G)
+When no network interface is available, the application continues to operate in offline mode, storing data locally, and when the connectivity is restored synchronizes with backend services.
+
+
+*Communication Protocols* \
+- HTTPS Protocol, to communicate with the backend
+
+*Data Exchange Formats* \
+- JSON, to use with the backend REST API.
+
+*Authentication and Security* \
+All communication with back-end services must be authenticated and authorized, by using:
+- TLS (Transport Layer Security) encryption
+- Bearer token-based authentication
+- Throttling and Rate Limiting
+
 
 == Functional Requirements
 Definition of use case diagrams, use cases and associated sequence/activity diagrams, and mapping on requirements

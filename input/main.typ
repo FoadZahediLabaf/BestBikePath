@@ -581,13 +581,28 @@ BBP relies on external mapping and meteorological services, whose terms of use a
 *D8*: No major changes in traffic conditions or speed limits occur during the time required to finish a trip.\
 
 = Specific Requirements
-Here we include more details on all aspects in Section 2 if they can be useful for the development team.
 
 == External Interface Requirements
 
 === User Interfaces
 
+Best Bike Paths will be an app for mobile devices (iOS and Android). 
+The User Interface will be optimized for touch screens and will follow their platform device guidelines (Human Interface Guidelines for iOS and Material Design for Android). Compliance with these standards ensures a consistent user experience and facilitates the implementation of accessibility best practices.
+User interaction occurs through touch input, gestures, and native UI components.
+Since the app relies on motion and location device features, the interface will include UI elements to request permission to interact with these device capabilities, following the platform specific guidelines.
+
+`TODO: - Insert images from prototype`
+
 === Hardware Interfaces
+
+To ensure the user makes the most of the app's capabilities, the user’s device should be equipped with the following hardware components (the app should handle their unavailability properly):
+- Gyroscope, to detect the device orientation
+- Accelerometer, to detect device movements
+- GPS module, to detect the device location
+
+The device will also need a stable and reliable connection to the internet to make the app work properly. When no network interface is available, the application continues to operate in offline mode, storing data locally, and when connectivity is restored synchronizes with backend services.
+
+`CHECK IF WE INSERTED THIS AS REQUIREMENTs IN SECTION 3.2`
 
 === Software Interfaces
 

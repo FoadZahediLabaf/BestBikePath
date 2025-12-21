@@ -319,6 +319,7 @@ abstract class BikePath {
 
 class AutomaticBikePath {
   obstaclesCount: Int
+  distance: Double
   performance: Performance?
   weather: Weather?
   computeStatus(): BikePathStatus

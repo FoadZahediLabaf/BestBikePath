@@ -100,7 +100,7 @@ SP26: The system alerts the user when a selected path contains incompatible stre
   caption: [Mapping between goals and phenomena],
   table(
   columns: 3,
-  [], [Shared Phenomena], [World Phenomena],
+  table.header([], [*Shared Phenomena*], [*World Phenomena*]),
   [*G1*], [SP2, SP4, SP7, SP13, SP14, SP16, SP17, SP20, SP21],
           [WP1, WP3, WP4, WP7, WP8, WP11],
   [*G2*], [SP2, SP5, SP6, SP7, SP17],

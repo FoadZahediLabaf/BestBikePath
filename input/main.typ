@@ -3,6 +3,7 @@
 
 #show raw.where(lang: "pintora"): it => pintorita.render(it.text)
 
+
 #show: polimi-thesis.with(
   title: "Best Bike Paths",
   subtitle: "Requirements Analysis and Specification Document",
@@ -293,8 +294,19 @@ After opening the BBP app on their device and navigating to their history page, 
 *Authenticated User toggles bike path privacy state* \
 After navigating to their history page, the user selects a bike path that is currently private and presses the button that allows the system to make the information about it public. Following this action, the system updates both the path status within the database and the user’s history view. The user then presses the button again after changing his mind, causing another update of the UI. The system subsequently makes the information associated with the path private.
 
-
 === Class Diagram
+
+The diagram models the main entities of the Best Bike Path application.
+A `User` represent the account of an authenticated user, that can create and own multiple `BikePath` objects.
+
+`BikePath` represents a single bike ride made by a user. It's an abstract class containing common route information, such as date, visibility, and route structure. \
+It is specialized into two class: 
+- `AutomaticBikePath`, which is recorded by the device in automatic recording mode and may include `Performance` and `Weather` object that holds corresponding data, road quality status.
+- `ManualBikePath`, whose locations and road quality status is directly assigned by the user.
+
+The road path is represented by an ordered array of `Location`s, which are used by map services to reconstruct the path and reverse geocode street names and directions.
+
+The quality of a bike path is expressed through the `BikePathStatus` enumeration, either computed automatically or set manually.
 
 ```pintora
 classDiagram
@@ -313,9 +325,9 @@ classDiagram
   }
 
   class AutomaticBikePath {
+    obstaclesCount: Int
     performance: Performance?
     weather: Weather?
-    obstaclesCount: Int
 
     computeStatus() -> BikePathStatus
   }
@@ -325,7 +337,6 @@ classDiagram
   }
 
   class Performance {
-    distance: Double
     averageSpeed: Double
     peakSpeed: Double
   }

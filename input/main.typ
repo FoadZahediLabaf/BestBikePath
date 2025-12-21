@@ -247,7 +247,7 @@ An authenticated user presses the sign-out button. The app signs the user out of
 The authenticated user decides to record his first ride and taps the Start Recording button. A modal explaining why the app must access location data is displayed. The modal contains accept and cancel buttons. If the user selects the Cancel option, the modal is dismissed and the user remains on the home screen. If the  user selects the Accept option, the system presents the dialog requesting permission to access the location. If the user grants permission, the view to record the bike path is presented, otherwise the user remains in the home, and the next time this capability would be needed, he will be required to give permission through the device’s system settings app.
 The same flow of events will be replicated wherever other capabilities are required by the application.
 
-#heading(level: 4, numbering: none,  outlined: false,  "Biking Activity")
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
 *Authenticated User searches for a path* \
 The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths and selects it. The user is presented with the option to start the automatic recording function or to simply follow the path without recording. Once the user selects one of the options, they will be redirected to a page displaying the map of the path, a timer, and other metrics
@@ -255,6 +255,7 @@ The user navigates to the browsing page and enters a starting point and destinat
 *Unauthenticated User searches for a path* \
 The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths, selects and is redirected to a page displaying the map of the path, a timer, and other metrics
 
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
 *Authenticated Users press start button before biking* \
 While on the home page, the user presses the Start Recording button. The app displays the path recording page, consisting of a map, a timer, and a start button. If the user presses the start button the system begins the time-lapse, and displays a Stop button, a pause button and relevant information regarding the trip, such as the covered distance, current speed, average speed and top speed.
@@ -268,10 +269,6 @@ When the user decides to resume biking, the user selects the resume option. The 
 While biking, the user encounters an obstacle and rides over it. The device records vibrations and speed changes via the gyroscope and accelerometer, recognizing the obstacle. The system displays a timed alert to give users the opportunity to confirm the presence of the obstacle. 
 The user may either confirm or reject the detected obstacle. If the user ignores the alert, after a certain amount of time the app will silently accept and add the obstacle to the path data.
 
-*Manual Path Recording * \
-After navigating to the page dedicated to the manual creation of bike paths, the authenticated user specifies a starting point and destination of the path. The system displays the map and allows the user to define the bike path by selecting the streets and segments composing the route.
-Before saving the bike path, the user selects a status to associate with the path. The system stores the path in the user’s personal history, making it available for later review and optional publication.
-
 *Authenticated User adds an obstacle while biking* \
 While biking, the user encounters an obstacle and rides near it without the system detecting it. The user therefore decides to notify the presence of this obstacle and opens the BBP application, presses the “Add Obstacle” button, and closes the app.
 The system records the obstacle and adds it to the current path information. 
@@ -282,7 +279,13 @@ While biking, the user encounters a red light and stops. The system registers th
 *Authenticated User stops biking and stops recording* \
 After having reached their destination, the user opens the BBP application, which is currently recording the path that they have taken up to this point. The user presses a button to stop the recording. The application prompts the user for confirmation to terminate the recording. After the user selects the “Confirm” option, the system ends the recording and adds the bike path to the database.
 
-#heading(level: 4, numbering: none,  outlined: false,  "Personal history management")
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+*Manual Path Recording * \
+After navigating to the page dedicated to the manual creation of bike paths, the authenticated user specifies a starting point and destination of the path. The system displays the map and allows the user to define the bike path by selecting the streets and segments composing the route.
+Before saving the bike path, the user selects a status to associate with the path. The system stores the path in the user’s personal history, making it available for later review and optional publication.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
 *Authenticated User visits their history page* \
 After the authenticated user opens the BBP application on their device, they navigate to their history page, where they can view a list of all the paths that they’ve travelled (organized by chronological order). Each path shows a limited amount of information, such as the beginning and destination of the trip, the date when the trip was taken, and the total duration.
@@ -374,7 +377,57 @@ classDiagram
 ```
 
 == Product Functions
-Here we include the most important requirements
+
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+*User Account Sign-up* \
+The system allows users to create a personal account by providing their credentials and accepting applicable terms and privacy notices. The system shall validate input data as possible and prevent account duplication.
+
+*User Account Sign-in* \
+The system allows unauthenticated users to access their personal account by providing their credentials.
+
+*User Account Sign-in* \
+The system allows authenticated users to sign out of their personal account.
+ 
+*User Account Deletion* \
+The system allows authenticated users to delete their personal account.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+*Permissions Management* \
+The system shall request and manage the permissions required to get the proper access level to the device services necessary for the correct functioning of the application.
+Permission requests to comply with the target platform guidelines shall be issued only when the related functionality is required and shall clearly inform the user about the purpose of each requested permission.
+The system shall request the following permissions:
+- Location Services, including background location access, to enable ride tracking;
+- Motion sensors (accelerometer and gyroscope), to support bike activity detection and obstacle identification;
+- Notifications, including support for Live Activities where available, to inform the user about ride status and obstacle confirmation events.
+The system shall handle cases in which permissions are denied or revoked by disabling dependent functionalities and notifying the user of the resulting limitations.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+*Manual Control* \
+The system shall allow the user to start a recording by pressing a dedicated button before biking. 
+Once the ride recording starts or resumes, the system should start tracking the user path and allow the user to pause the recording by pressing a dedicated button.
+Once the ride recording pauses, the system should pause to track the user path and allow the user to resume or stop the recording by pressing a dedicated button.
+Once the ride recording stops, the system should stop tracking the user path and allow the user to review the collected information and set the path’s privacy status.
+
+*Automatic Activity Detection* \
+The system should be capable of recognizing if the user is biking, by using sensor data. The platform provides frameworks capable of providing the current user motion activity (`CNMotionActivityManager` on iOS, and `ActivityRecognitionClient` on Android). 
+Based on the detected change in the user current activity (whether is biking or not), the system takes an action. If we are in record mode, the system should resume or pause the recording. If we are not in record mode, the system should suggest the user to start a new recording session.
+
+*Manual Obstacle Reporting* \
+The system shall allow the user to report the presence of an obstacle by pressing a dedicated button.
+
+*Automatic Obstacle Detection* \
+The system should be able to detect an obstacle by using data collected from the device's sensors, and prompt the user for confirmation.
+
+
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+
 
 == User Characteristics
 Here we include anything that is relevant to clarify their needs.

@@ -757,6 +757,19 @@ The following table provides the ideal maximum duration for each operation under
 
 === Standards Compliance
 
+The Best Bike Paths application must comply with the following standards and guidelines:
+
+*Platform Design Guidelines*
+- Apple Human Interface Guidelines (iOS)
+- Google Material Design (Android)
+
+*Privacy and Data Protection Requirements*
+- GDPR (EU General Data Protection Regulation) for handling user data
+- Compliance with licensing and usage requirements of any third-party service (e.g., Google Maps API)
+
+*Development Requirements*
+- ISO/IEC/IEEE 24748-8 (Agile) to establish a formal Life cycle management framework for the application development process.
+
 === Hardware Limitations
 
 === Any Other Constraint

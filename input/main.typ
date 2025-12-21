@@ -648,7 +648,6 @@ All communication with back-end services must be authenticated and authorized, b
 *R5*: The system shall request the user’s permission to use a device capability. \
 *R6*: The system shall properly handle user permission denial.
 
-
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
 *Start Recording* \
@@ -679,10 +678,11 @@ All communication with back-end services must be authenticated and authorized, b
 *R23:*The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops, and a status.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
-*User Bike Path List*
-*R24*: The system shall display a list of the user’s previously recorded paths in chronological order when accessing their history page. \
 
-User Bike Path Detail
+*User Bike Path List* \
+*R24*: The system shall display a list of the user’s previously recorded paths in chronological order when accessing their history page.
+
+*User Bike Path Detail* \
 *R25*: The system shall display all the collected data of a personal path when the user visits its dedicated page. \
 *R26*: The system shall allow the user to set the privacy status of the path. \
 *R27*: The system shall allow the user to delete their personal bike paths.

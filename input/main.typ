@@ -422,14 +422,10 @@ The system shall allow the user to report the presence of an obstacle by pressin
 *Automatic Obstacle Detection* \
 The system should be able to detect an obstacle by using data collected from the device's sensors, and prompt the user for confirmation.
 
-
-
-
-*Automatic Pause/Resume*
-While biking, the system continuously monitors the speed of the user’s device. When this value drops below a certain threshold, the system temporarily stops collecting information from the GPS and other sensors to maintain an accurate knowledge base about the current path. When the user resumes biking and the speed surpasses a certain threshold, the system resumes the automatic collection of data.
-
 *End Recording*
 The automatic path recording is manually terminated at the user’s discretion. When the user selects “End Recording”, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and to set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
 *Publish/Unpublish Paths*
 The system allows users to publish their paths. When the user presses the “Publish” button, the system updates the privacy status of the selected path in the database, marking it as “Public”. Once the path is made public, it becomes visible and accessible to other users. 

@@ -665,20 +665,37 @@ All communication with back-end services must be authenticated and authorized, b
 *R15*: The system shall stop collecting sensor data once the authenticated user selects “Stop Recording”. \
 *R16*: The system shall compute the status for the recorded path based on the frequency of obstacles. \
 *R17*: The system shall store the path and its associated status in the authenticated user’s personal history. \
-*R18:* The system shall cancel the recording if the accuracy of the GPS data drops under a certain threshold (over 10 meters for more than 15 seconds). \
+*R18*: The system shall cancel the recording if the accuracy of the GPS data drops under a certain threshold (over 10 meters for more than 15 seconds). \
 
-*Pause and resume* \
-*R19:* The system shall automatically pause recording when the authenticated user stops biking. \
-*R20:* The system shall automatically resume recording when the authenticated user starts biking. \
-*R21:* The system shall allow the user to manually pause the recording. \
-*R22:* The system shall allow the user to manually resume the recording. \
+*Pause and Resume* \
+*R19*: The system shall automatically pause recording when the authenticated user stops biking. \
+*R20*: The system shall automatically resume recording when the authenticated user starts biking. \
+*R21*: The system shall allow the user to manually pause the recording. \
+*R22*: The system shall allow the user to manually resume the recording.
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
+*R23:*The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops, and a status.
+
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+*User Bike Path List*
+*R24*: The system shall display a list of the user’s previously recorded paths in chronological order when accessing their history page. \
+
+User Bike Path Detail
+*R25*: The system shall display all the collected data of a personal path when the user visits its dedicated page. \
+*R26*: The system shall allow the user to set the privacy status of the path. \
+*R27*: The system shall allow the user to delete their personal bike paths.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+*R28*: The system shall allow the user to browse publicly available bike paths, by specifying the start and destination. \
+*R29*: The system shall show the user the matching paths, sorting them by their system-computed quality score (calculated based on the public user path instances). \
+*R30*: The system shall display for each path the route map along with the system-computed quality score. \
+*R31*: The system should display an alert badge if a path contains incompatible roads for biking. \
+*R32*: The system shall allow the user to select  a path as the suggested route for a new automatic mode registration session.
+
+
 
 === Use Case Diagram
 

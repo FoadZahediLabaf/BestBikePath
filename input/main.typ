@@ -32,22 +32,14 @@ Best Bike Paths also allows users to publicly share these paths, allowing others
 BBP’s ultimate goal is to offer its users a valuable tool that streamlines the process of cataloging their bike trips and cultivates a community of bikers by allowing them to share their experiences.
 
 === Goals
-G1: Authenticated users want to automatically record bike path data while they are biking.
-\
-G2: Authenticated users want to manually insert bike paths by specifying streets and status.
-\
-G3: Authenticated users want to approve or reject obstacles detected by the system.
-\
-G4: Authenticated users want to manually record an obstacle while they are biking.
-\
-G5: Authenticated users want to retrieve all the collected data of their personal bike paths.
-\
-G6: Authenticated users want to be able to share their recorded bike paths with the community.
-\
-G7: Authenticated users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available.
-\
-G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other authenticated users and ranked based on quality and data freshness.
-\
+G1: Authenticated users want to automatically record bike path data while they are biking. \
+G2: Authenticated users want to manually insert bike paths by specifying streets and status. \
+G3: Authenticated users want to approve or reject obstacles detected by the system. \
+G4: Authenticated users want to manually record an obstacle while they are biking. \
+G5: Authenticated users want to retrieve all the collected data of their personal bike paths. \
+G6: Authenticated users want to be able to share their recorded bike paths with the community. \
+G7: Authenticated users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available. \
+G8: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other authenticated users and ranked based on quality and data freshness. \
 G9: The users want to ride along paths compatible with bikes.
 
 == Scope
@@ -58,35 +50,18 @@ This application is primarily intended for authenticated users who, once authent
 To enable automatic recordings of bike paths, the BBP application accesses the device’s GPS interface to determine the user’s exact location while biking, as well as other sensor interfaces to collect more relevant information associated with the travelled path. The app will also access an external API for the collection of meteorological data.
 This application is therefore intended to run on a mobile device equipped with GPS, motion sensors, and internet connectivity for the automatic collection and the remote storage of data in the system’s database.
 
-
-
 === World Phenomena
-WP1: The user decides to take a bike trip.
-\
-WP2: Weather conditions change over time.
-\
-WP3: Accelerometer and gyroscope collects device motion data.GPS collects device location data.
-\
-WP4: GPS collects device location data.
-\
-WP5: Street infrastructure changes over time (new streets are built, existing streets are upgraded, downgraded, or decommissioned).
-\
-WP6: Path conditions change over time due to natural degradation, weather, or maintenance.
-\
-WP7: The user starts and stops biking.
-\
-WP8: The user velocity changes.
-\
-WP9: The user encounters an obstacle.
-\
-WP10: Stoplight changes color.
-\
+WP1: The user decides to take a bike trip. \
+WP2: Weather conditions change over time. \
+WP3: Accelerometer and gyroscope collects device motion data.GPS collects device location data. \
+WP4: GPS collects device location data. \
+WP5: Street infrastructure changes over time (new streets are built, existing streets are upgraded, downgraded, or decommissioned). \
+WP6: Path conditions change over time due to natural degradation, weather, or maintenance. \
+WP7: The user starts and stops biking. \
+WP8: The user velocity changes. \
+WP9: The user encounters an obstacle. \
+WP10: Stoplight changes color. \
 WP11: The user's device’s internet connection changes over time.
-
-
-
-
-
 
 === Shared Phenomena
 
@@ -682,7 +657,21 @@ All communication with back-end services must be authenticated and authorized, b
 *R9*: The system shall use the device’s sensors to collect information about obstacles along the path and the speed of the user. \
 *R10*: The system shall display the current trip data (current duration time, map of the path, average speed, top speed, weather conditions, distance covered) while the user is biking. \
 *R11*: The system shall prompt the user for confirmation of a detected obstacle while biking. \
-*R12:* The system shall allow the authenticated user to insert an obstacle manually. \
+*R12*: The system shall allow the authenticated user to insert an obstacle manually. \
+
+*Stop Recording* \
+*R13*: The system shall allow the authenticated user to manually stop the automatic recording of a bike path. \ 
+*R14*: The system shall stop collecting GPS data once the authenticated user selects “Stop Recording”. \
+*R15*: The system shall stop collecting sensor data once the authenticated user selects “Stop Recording”. \
+*R16*: The system shall compute the status for the recorded path based on the frequency of obstacles. \
+*R17*: The system shall store the path and its associated status in the authenticated user’s personal history. \
+*R18:* The system shall cancel the recording if the accuracy of the GPS data drops under a certain threshold (over 10 meters for more than 15 seconds). \
+
+*Pause and resume* \
+*R19:* The system shall automatically pause recording when the authenticated user stops biking. \
+*R20:* The system shall automatically resume recording when the authenticated user starts biking. \
+*R21:* The system shall allow the user to manually pause the recording. \
+*R22:* The system shall allow the user to manually resume the recording. \
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")

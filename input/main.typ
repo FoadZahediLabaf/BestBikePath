@@ -330,7 +330,7 @@ abstract class BikePath {
   date: Date
   isPublic: Bool
   locations: Location[*]
-  ' hasHighways(): Bool
+  ' hasHighways(): Bool (removed since it comes from MapKit)
 }
 
 class AutomaticBikePath {

@@ -163,6 +163,7 @@ Obstacles can be automatically detected through the device’s motion sensors or
 
 *SMTP Server*: An SMTP server, or email service provider, is an external system responsible for sending transactional emails on behalf of the application.
 
+*Status*: Term used to indicate the overall estimate of a path's quality, which can be either manually specified by the user 
 *History Page*: A user’s history page is a section of the user’s profile that displays a list of previously recorded bike trips and allows the user to access detailed information about each trip.
 
 
@@ -652,7 +653,50 @@ All communication with back-end services must be authenticated and authorized, b
 
 
 == Functional Requirements
-Definition of use case diagrams, use cases and associated sequence/activity diagrams, and mapping on requirements
+
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+=== Use Case Diagram
+
+=== Use Cases
+
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+=== Use Cases
+
+=== Sequence Diagrams
+
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
 == Performance Requirements
 

@@ -301,6 +301,7 @@ The user navigates to the browsing page and enters a starting point and destinat
 *Unauthenticated User searches for a path* \
 The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths, selects and is redirected to a page displaying the map of the path, a timer, and other metrics
 
+#pagebreak()
 === Class Diagram
 
 The diagram models the main entities of the Best Bike Path application.
@@ -329,7 +330,7 @@ abstract class BikePath {
   date: Date
   isPublic: Bool
   locations: Location[*]
-  hasHighways(): Bool
+  ' hasHighways(): Bool
 }
 
 class AutomaticBikePath {

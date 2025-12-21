@@ -520,29 +520,29 @@ The system shall allow the user to report the presence of an obstacle by pressin
 *Automatic Obstacle Detection* \
 The system should be able to detect an obstacle by using data collected from the device's sensors, and prompt the user for confirmation.
 
-*End Recording*
+*End Recording* \
 The automatic path recording is manually terminated at the user’s discretion. When the user selects “End Recording”, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and to set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
-*Manual Insertion*
+*Manual Insertion* \
 The system allows users to manually insert a path by selecting a starting point, destination, and intermediary stops connecting the two points. Once the user selects a quality and privacy status for the path, the system will store it in the database.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
-*Publish/Unpublish Paths*
+*Publish/Unpublish Paths* \
 The system allows users to publish their paths. When the user presses the “Publish” button, the system updates the privacy status of the selected path in the database, marking it as “Public”. Once the path is made public, it becomes visible and accessible to other users. 
 The system also allows the user to revert previously published paths back to “Private”. The process is analogous to the previous one, triggering an update in the database to reflect the new privacy status.
 
-*View Detailed Path Information*
+*View Detailed Path Information* \
 The system allows users to access a detailed view of their travelled paths. After choosing this option, the system will display relevant information related to the path, such as a map of the route, the total duration, the active biking time, the date of the recording, the average speed, the top speed, the encountered obstacles, the status, and, when available, relevant meteorological information.
 
-*Personal Trip Deletion*
+*Personal Trip Deletion* \
 The system allows users to delete their previously recorded paths from their personal history. When a path is deleted, the system removes all the data associated with it from the database, ensuring that it is no longer accessible to any user.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
-*Bike Path search and Ranking*
+*Bike Path search and Ranking* \
 the system allows users, both authenticated and unauthenticated, to search for bike paths by specifying an origin and a destination.
 When multiple paths are available, the system computes a score for each path and presents the results ranked according to their quality and reliability, both as a list and on a map. After selecting a path, the user is redirected to a page displaying the route on a map, along with a timer and performance-related statistics.
 If the user is authenticated, they are also given the option to record the selected path.
@@ -551,6 +551,7 @@ If the user is authenticated, they are also given the option to record the selec
 == User Characteristics
 
 === Unauthenticated User
+
 Users who haven’t created an account or logged in yet, and who don’t have a valid, non-expired authentication token, will still be able to access the application but will be restricted from using certain functionalities that require user authentication. 
 More specifically, an unauthenticated user can look up bike paths (by inserting a starting point and a destination), the system-computed path evaluation, and is also able to activate the “path following” feature, with which the system displays a map of the selected path that they chose to follow. However, any information regarding the travelled path will not be recorded by the system; once the trip ends, no data associated with it is saved in the database. 
 
@@ -562,12 +563,22 @@ authenticated users are also capable of manually inserting new bike paths by spe
 == Assumptions, Dependencies And Constraints
 
 === Regulatory policies
+
 BBP collects and processes user location data, motion sensor data, and information about road conditions such as obstacles and segment status. This information must be handled in full compliance with the General Data Protection Regulation (GDPR), ensuring that personal and location data are stored securely and used only for the purposes of trip recording, path recommendation, and community-based path evaluation.
 Users should grant permission for the application to access location services, motion sensors, and notifications on their devices.
 Furthermore, any publishable information contributed by users becomes visible to the community and must be treated as user-generated content, respecting applicable regulations on data sharing and responsibility.
 BBP relies on external mapping and meteorological services, whose terms of use and licensing policies must also be respected.
+
 === Domain assumptions
 
+*D1*: Users have internet access when interacting with online services provided by BBP. \
+*D2*: The road network in the real world is correctly represented in the external map provider used by BBP. \
+*D3*: The GPS provides an accuracy measurement along with the location data. \
+*D4*: Sensors on the users’ devices, when available, operate correctly. \
+*D5*: Meteorological services provide accurate weather information for specific locations and time intervals \
+*D6*: Users’ devices have sufficient resources (battery, storage and processing capability) for BBP to work properly. \
+*D7*: Users’ device timestamps are sufficiently accurate to correlate collected trip data with meteorological information. \
+*D8*: No major changes in traffic conditions or speed limits occur during the time required to finish a trip.\
 
 = Specific Requirements
 Here we include more details on all aspects in Section 2 if they can be useful for the development team.

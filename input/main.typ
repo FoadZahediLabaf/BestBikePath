@@ -321,7 +321,7 @@ class AutomaticBikePath {
   obstaclesCount: Int
   performance: Performance?
   weather: Weather?
-  computeStatus() : BikePathStatus
+  computeStatus(): BikePathStatus
 }
 
 class ManualBikePath {
@@ -759,7 +759,7 @@ The following table provides the ideal maximum duration for each operation under
     [GPS sampling interval], [≤ 3s],
     [Sensor sampling interval], [≤ 0.1s],
   ),
-  caption: [Maximum Operation Duration]
+  caption: [Maximum duration of operations]
 )
 
 #pagebreak()

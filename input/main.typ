@@ -300,7 +300,7 @@ The diagram models the main entities of the Best Bike Path application.
 A `User` represent the account of an authenticated user, that can create and own multiple `BikePath` objects.
 
 `BikePath` represents a single bike ride made by a user. It's an abstract class containing common route information, such as date, visibility, and route structure. \
-It is specialized into two class: 
+It can be specialized into two class: 
 - `AutomaticBikePath`, which is recorded by the device in automatic recording mode and may include `Performance` and `Weather` object that holds corresponding data, road quality status.
 - `ManualBikePath`, whose locations and road quality status is directly assigned by the user.
 

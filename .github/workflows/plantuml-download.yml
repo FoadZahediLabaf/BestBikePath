@@ -1,0 +1,37 @@
+name: Update PlantUML Diagrams
+
+on:
+  push:
+    paths:
+      - '**/*.typ'
+  workflow_dispatch:
+
+jobs:
+  update-diagrams:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+          
+
+      - name: Download Script
+        run: wget https://raw.githubusercontent.com/lorenzofiamingo/typst-plantuml/main/tools/plantuml-download.py
+          
+      - name: Download Diagrams
+        run: python plantuml-download.py .
+        
+      - name: Commit and Push
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          rm plantuml-download.py
+          git add .
+          git commit -m "chore: Update PlantUML diagrams [skip ci]" || echo "No changes to commit"
+          git push

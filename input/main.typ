@@ -729,7 +729,29 @@ All communication with back-end services must be authenticated and authorized, b
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
+#pagebreak()
 == Performance Requirements
+
+Regarding the performance analysis of our system, the BBP application must ensure a satisfactory user experience. To achieve this, the system must provide the user with the requested data within an adequate period of time, specifically when interacting directly with the UI. 
+The system must also ensure that more computationally intensive back-end operations don’t reduce the responsiveness of the application, especially when computing aggregated quality scores and displaying one or more alternative paths on a map to the user.
+While biking, the app must periodically collect GPS and sensor data to guarantee a high degree of accuracy of the followed route (within 10 meters of the actual position of the user), while also maintaining a relatively low level of battery consumption and CPU usage.
+The following table provides the ideal maximum duration for each operation under normal load conditions.
+
+#figure(
+  table(
+    columns: 2,
+    table.header([*Operation*], [*Maximum duration*]),
+    [Page loading], [≤ 2s],
+    [Map rendering (single path)], [≤ 3s],
+    [Map rendering (multiple paths)], [≤ 5s],
+    [User sign-in / sign-up], [≤ 2s],
+    [Database update (profile update)], [≤ 2s],
+    [Database update (path saving)], [≤ 3s],
+    [GPS sampling interval], [≤ 3s],
+    [Sensor sampling interval], [≤ 0.1s],
+  ),
+  caption: [Maximum Operation Duration]
+)
 
 == Design Constraints
 

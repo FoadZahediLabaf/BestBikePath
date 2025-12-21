@@ -560,12 +560,13 @@ If the user is authenticated, they are also given the option to record the selec
 === Unauthenticated User
 
 Users who haven’t created an account or logged in yet, and who don’t have a valid, non-expired authentication token, will still be able to access the application but will be restricted from using certain functionalities that require user authentication. 
-More specifically, an unauthenticated user can look up bike paths (by inserting a starting point and a destination), the system-computed path evaluation, and is also able to activate the “path following” feature, with which the system displays a map of the selected path that they chose to follow. However, any information regarding the travelled path will not be recorded by the system; once the trip ends, no data associated with it is saved in the database. 
+More specifically, an unauthenticated user can look up community bike paths (by inserting a starting point and a destination), which will be displayed on a map, and their system-computed path ranking.
 
 === Authenticated User
 An authenticated user possesses a valid access token for authentication. Authenticated users have full access to the functionalities provided by the BBP application, including those offered to unauthenticated users. 
 Authenticated users can automatically record travelled bike paths, but the system also collects relevant trip data and will occasionally prompt the user for confirmation of encountered obstacles. Completed trips will be stored by the system and can be viewed by the user in the corresponding section of their personal profile page. These users will also be able to optionally publish them, allowing the system to use this information to assess the quality of the bike path and enabling recommendations to other users. 
-authenticated users are also capable of manually inserting new bike paths by specifying the streets, obstacles, and status associated with the path.
+These users are also able to browse bike paths and optionally select one to follow before activating the automatic recording functionality.
+Authenticated users are also capable of manually inserting new bike paths by specifying the streets, obstacles, and status associated with the path.
 
 == Assumptions, Dependencies And Constraints
 

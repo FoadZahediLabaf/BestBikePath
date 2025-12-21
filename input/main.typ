@@ -820,14 +820,35 @@ In the absence of network connectivity the app should be able to store the infor
 == Software System Attributes
 
 === Reliability
+When interacting with the application outside of biking, the system should ensure access to its main functionalities even during serious failures. To guarantee this, the system must be implemented with fault-tolerance mechanisms that allow its components to degrade gracefully.
+Regarding the automatic recording functionality, the system must ensure that any failures due to GPS and motion-sensor malfunctions or imprecise and conflicting data do not lead to application crashes and loss of data. This unfinished path information must therefore be durable, consistent, and recoverable. To ensure these properties, the data must be reliably stored on the user’s device using mechanisms that reduce any risk of corruption and that allow recovery when possible.
+Finally, the inability to connect to external services, specifically for retrieving meteorological data, must be appropriately handled.
 
 === Availability
+While the system doesn’t offer any emergency-related service, the system should still guarantee a relatively high availability percentage to allow both unauthenticated and authenticated users to access its services.
+An appropriate target should be the standard 99%, which corresponds to 3.65 days of downtime per year.
+
+[Further details will be provided in the corresponding Design Document]
 
 === Security
+The application must ensure the protection of the users’ sensitive data. This should be guaranteed by hashing passwords and using a secure, encrypted connection to prevent man-in-the-middle attacks. 
+Network requests related to authentication-protected features should always be accompanied by a valid JWT, which will be verified by the server.
+The system should also employ mechanisms that protect the database against SQL injections.
+GPS data can be collected once the user gives explicit permission when prompted and only when the user enables automatic recording.
+All noise-filtering operations should happen on the client-side to reduce server load and minimize exposure of sensitive data on the network.
+While automatic recording is active, GPS data should be encrypted on the user’s device and eliminated from the user’s device when the data transfer is completed.
+On the server, location data must be stored securely and encrypted according to server-side policies.\
+
+[Further details will be provided in the corresponding Design Document]
 
 === Maintainability
+The system should be implemented using design patterns that promote scalability, reusability, and maintainability of its components.
+Any maintenance activities should be scheduled in a way that minimizes their impact on users as much as possible.
 
+
+[Further details will be provided in the corresponding Design Document]
 === Portability
+The application should be able to run on the main mobile operating systems, specifically Android and iOS. The app should be supported by mobile devices, like smartphones and tablets, as long as they  respect the hardware limitations outlined in Section 3.4.2. 
 
 = Formal Analysis Using Alloy
 

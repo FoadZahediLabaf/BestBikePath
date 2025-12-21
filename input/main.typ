@@ -247,14 +247,6 @@ An authenticated user presses the sign-out button. The app signs the user out of
 The authenticated user decides to record his first ride and taps the Start Recording button. A modal explaining why the app must access location data is displayed. The modal contains accept and cancel buttons. If the user selects the Cancel option, the modal is dismissed and the user remains on the home screen. If the  user selects the Accept option, the system presents the dialog requesting permission to access the location. If the user grants permission, the view to record the bike path is presented, otherwise the user remains in the home, and the next time this capability would be needed, he will be required to give permission through the device’s system settings app.
 The same flow of events will be replicated wherever other capabilities are required by the application.
 
-#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
-
-*Authenticated User searches for a path* \
-The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths and selects it. The user is presented with the option to start the automatic recording function or to simply follow the path without recording. Once the user selects one of the options, they will be redirected to a page displaying the map of the path, a timer, and other metrics
-
-*Unauthenticated User searches for a path* \
-The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths, selects and is redirected to a page displaying the map of the path, a timer, and other metrics
-
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
 *Authenticated Users press start button before biking* \
@@ -296,6 +288,14 @@ After opening the BBP app on their device and navigating to their history page, 
 
 *Authenticated User toggles bike path privacy state* \
 After navigating to their history page, the user selects a bike path that is currently private and presses the button that allows the system to make the information about it public. Following this action, the system updates both the path status within the database and the user’s history view. The user then presses the button again after changing his mind, causing another update of the UI. The system subsequently makes the information associated with the path private.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+*Authenticated User searches for a path* \
+The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths and selects it. The user is presented with the option to start the automatic recording function or to simply follow the path without recording. Once the user selects one of the options, they will be redirected to a page displaying the map of the path, a timer, and other metrics
+
+*Unauthenticated User searches for a path* \
+The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths, selects and is redirected to a page displaying the map of the path, a timer, and other metrics
 
 === Class Diagram
 
@@ -403,7 +403,6 @@ The system shall request the following permissions:
 - Notifications, including support for Live Activities where available, to inform the user about ride status and obstacle confirmation events.
 The system shall handle cases in which permissions are denied or revoked by disabling dependent functionalities and notifying the user of the resulting limitations.
 
-#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
@@ -424,9 +423,27 @@ The system shall allow the user to report the presence of an obstacle by pressin
 The system should be able to detect an obstacle by using data collected from the device's sensors, and prompt the user for confirmation.
 
 
+
+
+*Automatic Pause/Resume*
+While biking, the system continuously monitors the speed of the user’s device. When this value drops below a certain threshold, the system temporarily stops collecting information from the GPS and other sensors to maintain an accurate knowledge base about the current path. When the user resumes biking and the speed surpasses a certain threshold, the system resumes the automatic collection of data.
+
+*End Recording*
+The automatic path recording is manually terminated at the user’s discretion. When the user selects “End Recording”, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and to set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
+
+*Publish/Unpublish Paths*
+The system allows users to publish their paths. When the user presses the “Publish” button, the system updates the privacy status of the selected path in the database, marking it as “Public”. Once the path is made public, it becomes visible and accessible to other users. 
+The system also allows the user to revert previously published paths back to “Private”. The process is analogous to the previous one, triggering an update in the database to reflect the new privacy status.
+
+*View Detailed Path Information*
+The system allows users to access a detailed view of their travelled paths. After choosing this option, the system will display relevant information related to the path, such as a map of the route, the total duration, the active biking time, the date of the recording, the average speed, the top speed, the encountered obstacles, the status, and, when available, relevant meteorological information.
+
+
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
 
 == User Characteristics

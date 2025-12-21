@@ -1,6 +1,8 @@
 #import "@local/polimi:1.0.0": *
+#import "@local/plantuml:0.1.0"
 #import "@preview/pintorita:0.1.4"
 
+#show raw.where(lang: "plantuml"): it => image(plantuml.path(it.text))
 #show raw.where(lang: "pintora"): it => pintorita.render(it.text)
 
 
@@ -375,6 +377,37 @@ classDiagram
   AutomaticBikePath "0..1" *-- "1" Performance
   AutomaticBikePath "0..1" *-- "1" Weather
 ```
+=== State Diagrams
+*Account Life-Cycle*
+
+This state diagram describes the evolution of a user’s account. Initially, the user doesn’t possess a BBP account and is therefore unauthenticated and unregistered. Once the user follows the necessary steps for signing up, they will have a dedicated account to which they have to still sign in. After completing the sign-in process, they will obtain the necessary access tokens for verifying their identity within the system and will thus be authenticated.
+If the user decides to log-out, they will move back into the “Registered” state and will have to complete the sign-in process again. If the user deletes their account, all the data associated with the user will be deleted from the database and their session will be terminated and will thus move to the initial state.
+
+*Path Life-Cycle*
+
+```plantuml
+hide empty description
+[*] --> AutomaticRecording
+[*] --> ManualInsertion
+
+AutomaticRecording --> Completed : End Recording
+ManualInsertion --> Completed: Data Inserted
+
+Completed --> Deleted : Delete Path
+
+state Completed {
+       state Publication {
+        [*] --> Private
+        Private --> Public : Publish
+        Public --> Private : Unpublish
+    }
+}
+
+Deleted --> [*]
+```
+
+*Automatic Recording*
+
 
 == Product Functions
 

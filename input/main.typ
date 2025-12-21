@@ -444,22 +444,24 @@ Deleted --> [*]
 
 The state diagram describes the recording process of a bike path as the user is biking and the device automatically records the followed route.
 When the user stops biking, the device’s sensors detect a sudden drop in velocity. When the system reads this information, it concludes that the user is no longer biking and therefore temporarily pauses the recording. This prevents the collection of inaccurate trip statistics, such as the final calculation of the average speed or the total active biking time. Pausing is also necessary for avoiding possible incorrect obstacle detections and for maintaining a “smooth” recorded route. It also helps with conserving battery power.
+The user can also optionally pause and resume the recording at their discretion.
 When the user resumes biking, the system detects the movement and resumes the recording once the velocity reaches a threshold that indicates that the user is currently biking.
 The termination of the recording, which is manually performed by the user, can only occur when the user has stopped. If any errors occur during this process, they must be effectively handled by the system.
 
 #let automaticRecordingStateDiagram = ```plantuml
-left to right direction
 hide empty description
-[*] --> Recording_Active: User is biking
-Recording_Active --> Recording_Paused : Velocity drops\nbelow threshold
-Recording_Paused --> Recording_Active : Velocity rises\nabove threshold
-Recording_Active --> Canceled : Sensor / GPS failure\nor inaccurate data
-Recording_Paused --> Canceled : Sensor / GPS failure\nor inaccurate data
-Recording_Paused --> [*] : User stops\nthe recording
+[*] --> RecordingActive: User is biking
+RecordingActive --> RecordingPaused : Velocity drops\nbelow threshold
+RecordingActive --> RecordingPaused : User pauses recording
+RecordingPaused --> RecordingActive : Velocity rises\nabove threshold
+RecordingPaused --> RecordingActive : User resumes recording
+RecordingActive --> Canceled : Sensor / GPS failure\nor inaccurate data
+RecordingPaused --> Canceled : Sensor / GPS failure\nor inaccurate data
+RecordingPaused --> [*] : User stops recording
 note on link
-handled by\nEnd Recording use case
+End Recording use case
 end note
-note left of Recording_Active
+note left of RecordingActive
 - Collect GPS data
 - Update trip metrics
 end note

@@ -610,7 +610,7 @@ _Network on iOS, NetworkMonitor on Android_
 The app uses these services to monitor the network in order to make the UI respond to connectivity changes.
 
 *Best Bike Paths Backend* \
-The app will communicate with the Best Bike Paths Backend, through a REST API, in order to sync user accounts, and store and retrieve user and community paths.
+The app will communicate with the Best Bike Paths backend, through a REST API, in order to sync user accounts, and store and retrieve user and community paths. The backend communicated with other external or internal components (e.g., SMTP Server, Database, etc.).
 
 === Communication Interfaces
 
@@ -797,6 +797,15 @@ The mobile device must be able to connect to the internet (the app should also b
 
 === Any Other Constraint
 
+*Permission and user consent* \
+The system’s functionality is constrained by user-granted permissions (e.g., location, motion sensors), the app should be able to disable dependent features and provide appropriate fallbacks or user feedback.
+
+*Dependency on Third-Party Services* \
+The app may depend on external services (e.g., SMTP Server, Google Maps on Android, host services for Backend). Any outages, API policy changes, or rate limits imposed by these providers may impact performance or functionality of the app.
+
+*Offline Operation* \
+In the absence of network connectivity the app should be able to store the information locally and sync them once the connection it’s available again.
+
 == Software System Attributes
 
 === Reliability
@@ -810,7 +819,6 @@ The mobile device must be able to connect to the internet (the app should also b
 === Portability
 
 = Formal Analysis Using Alloy
-This section should include a brief presentation of the main objectives driving the formal modeling activity, as well as a description of the model itself, what can be proved with it, and why what is proved is important given the problem at hand. To show the soundness and correctness of the model, this section can show some worlds obtained by running it, and/or the results of the checks performed on meaningful assertions.
 
 = Effort Spent
 In this section you will include information about the number of hours each

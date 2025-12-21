@@ -560,7 +560,14 @@ Authenticated users can automatically record travelled bike paths, but the syste
 authenticated users are also capable of manually inserting new bike paths by specifying the streets, obstacles, and status associated with the path.
 
 == Assumptions, Dependencies And Constraints
-Here we include domain assumptions
+
+=== Regulatory policies
+BBP collects and processes user location data, motion sensor data, and information about road conditions such as obstacles and segment status. This information must be handled in full compliance with the General Data Protection Regulation (GDPR), ensuring that personal and location data are stored securely and used only for the purposes of trip recording, path recommendation, and community-based path evaluation.
+Users should grant permission for the application to access location services, motion sensors, and notifications on their devices.
+Furthermore, any publishable information contributed by users becomes visible to the community and must be treated as user-generated content, respecting applicable regulations on data sharing and responsibility.
+BBP relies on external mapping and meteorological services, whose terms of use and licensing policies must also be respected.
+=== Domain assumptions
+
 
 = Specific Requirements
 Here we include more details on all aspects in Section 2 if they can be useful for the development team.

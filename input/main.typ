@@ -163,7 +163,8 @@ Obstacles can be automatically detected through the device’s motion sensors or
 
 *SMTP Server*: An SMTP server, or email service provider, is an external system responsible for sending transactional emails on behalf of the application.
 
-*Status*: Term used to indicate the overall estimate of a path's quality, which can be either manually specified by the user 
+*Status*: Term used to indicate the overall assessment of a path's quality, which can be either manually specified by the user or computed by the system based on the frequency of obstacles along the path.
+
 *History Page*: A user’s history page is a section of the user’s profile that displays a list of previously recorded bike trips and allows the user to access detailed information about each trip.
 
 
@@ -271,8 +272,8 @@ The system records the obstacle and adds it to the current path information.
 *Authenticated User stops at a red light* \
 While biking, the user encounters a red light and stops. The system registers the sudden change in the bike’s velocity and pauses the recording. The user quickly opens the application on their device and sees that the time-lapse has paused. After putting away their device, the stoplight turns green, and the user resumes biking. The system recognizes that the bike has started to move and therefore resumes the time-lapse.
 
-*Authenticated User stops biking and stops recording* \
-After having reached their destination, the user opens the BBP application, which is currently recording the path that they have taken up to this point. The user presses a button to stop the recording. The application prompts the user for confirmation to terminate the recording. After the user selects the “Confirm” option, the system ends the recording and adds the bike path to the database.
+*Authenticated User stops biking and stop recording* \
+After having reached their destination, the user opens the BBP application, which is currently recording the path that they have taken up to this point. The user presses a button to stop the recording. The application prompts the user for confirmation to terminate the recording. After the user selects the “Confirm” option, the system ends the recording and shows a recap of the trip, allowing the user to review the collected and to set the privacy status of the path. After user confirmation, the system displays the user's personal history page.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
@@ -314,70 +315,74 @@ The road path is represented by an ordered array of `Location`s, which are used 
 
 The quality of a bike path is expressed through the `BikePathStatus` enumeration, either computed automatically or set manually.
 
-```pintora
-classDiagram
-  class User {
-    email: String
-    password: String
-    paths: [BikePath]
-  }
+#let classDiagram =```plantuml
+class User {
+  paths: BikePath[*]
+}
 
-  class BikePath {
-    <<abstract>>
-    date: Date
-    isPublic: Bool
-    locations: [Location]
-    hasHighways: Bool
-  }
+class EmailPasswordCredential {
+  email: String {unique}
+  passwordHash: String
+}
 
-  class AutomaticBikePath {
-    obstaclesCount: Int
-    performance: Performance?
-    weather: Weather?
+abstract class BikePath {
+  date: Date
+  isPublic: Bool
+  locations: Location[*]
+  hasHighways(): Bool
+}
 
-    computeStatus() -> BikePathStatus
-  }
+class AutomaticBikePath {
+  obstaclesCount: Int
+  performance: Performance?
+  weather: Weather?
+  computeStatus() : BikePathStatus
+}
 
-  class ManualBikePath {
-    status: BikePathStatus
-  }
+class ManualBikePath {
+  status: BikePathStatus
+}
 
-  class Performance {
-    averageSpeed: Double
-    peakSpeed: Double
-  }
+class Performance {
+  averageSpeed: Double
+  peakSpeed: Double
+}
 
-  class Weather {
-    temperature: Double
-    humidity: Double
-    windSpeed: Double
-  }
+class Weather {
+  temperature: Double
+  humidity: Double
+  windSpeed: Double
+}
 
-  class Location {
-    latitude: Double
-    longitude: Double
-  }
+class Location {
+  latitude: Double
+  longitude: Double
+}
 
-  class BikePathStatus {
-    <<enumeration>>
-    excellent
-    good
-    fair
-    poor
-    impassable
-  }
+enum BikePathStatus {
+  excellent
+  good
+  fair
+  poor
+  impassable
+}
 
-  %% Associations / multiplicities
-  BikePath "*" <-- "1" User
+' Associations / multiplicities
+User "1" *-- "1" EmailPasswordCredential
+BikePath "*" <-- "1" User
+BikePath "1" *-- "1..*" Location
 
-  BikePath "1" *-- "1..*" Location
-  
-  BikePath <|-- AutomaticBikePath
-  BikePath <|-- ManualBikePath
+BikePath <|-- AutomaticBikePath
+BikePath <|-- ManualBikePath
 
-  AutomaticBikePath "0..1" *-- "1" Performance
-  AutomaticBikePath "0..1" *-- "1" Weather
+AutomaticBikePath "1" *-- "0..1" Performance
+AutomaticBikePath "1" *-- "0..1" Weather
 ```
+#figure(
+  classDiagram,
+  kind: image,
+  caption: [App Class Diagram]
+)
 
 #pagebreak()
 === State Diagrams
@@ -422,7 +427,7 @@ left to right direction
 hide empty description
 [*] --> AutomaticRecording
 [*] --> ManualInserting
-AutomaticRecording --> Completed : End Recording
+AutomaticRecording --> Completed : Stop Recording
 ManualInserting --> Completed: Manual Insertion
 Completed --> Deleted : Delete Path
 state Completed {
@@ -460,7 +465,7 @@ RecordingActive --> Canceled : Sensor / GPS failure\nor inaccurate data
 RecordingPaused --> Canceled : Sensor / GPS failure\nor inaccurate data
 RecordingPaused --> [*] : User stops recording
 note on link
-End Recording use case
+Stop Recording use case
 end note
 note left of RecordingActive
 - Collect GPS data
@@ -521,8 +526,8 @@ The system shall allow the user to report the presence of an obstacle by pressin
 *Automatic Obstacle Detection* \
 The system should be able to detect an obstacle by using data collected from the device's sensors, and prompt the user for confirmation.
 
-*End Recording* \
-The automatic path recording is manually terminated at the user’s discretion. When the user selects “End Recording”, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and to set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
+*Stop Recording* \
+The automatic path recording is manually terminated at the user’s discretion. When the user selects “Stop Recording”, the system prompts the user for confirmation. After user confirmation, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and to set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
@@ -728,6 +733,8 @@ In this section you will include information about the number of hours each
 group member has worked for this document.
 
 = References
+
+Remember to check if we have time to add automatic mode cancellation (by user or by connectivity)
 
 
 #show: backmatter.with()

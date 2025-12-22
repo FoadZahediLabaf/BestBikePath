@@ -1536,43 +1536,39 @@ deactivate Frontend
 #pagebreak()
 *UC10 Stop Recording*
 #let stopRecordingSequenceDiagram = ```plantuml
+autonumber
 actor User
 boundary "BBP App" as App
-control "GPS/Sensor" as Sensors
+participant "GPS/Sensors" as Sensors
 database "Database" as DB
-boundary "Weather API" as API
-activate User
-activate App
-activate Sensors
-
+participant "Weather API" as API
 
 User -> App: Select "Stop Recording"
-App -> User: Request for confirmation
-User --> App: Confirmation
+App -> User: Request confirmation
+User --> App: Confirm
+
 App -> Sensors: Stop collecting data
-
-
 Sensors --> App: Confirmation
-deactivate Sensors
 
+App -> App: Compute path statistics
 
-App -> API: Meteorological data request
-App → App: Compute path statistics
-alt Meteorological data available
-    activate API
+opt Weather enrichment enabled
+  App -> API: Meteorological data request
+  alt Meteorological data available
     API --> App: Meteorological data
-else Meteorological data unavailable
+  else Meteorological data unavailable
     API --> App: Data unavailable
-    deactivate API
+  end
 end
 
-
-activate DB
 App -> DB: Save path data
-DB --> App: Path data saved
-deactivate DB
-
-App --> User: Profile page
+alt Storage error
+  DB --> App: Error
+  App --> User: Show error
+else Success
+  DB --> App: Path data saved
+  App --> User: Profile page
+end
 
 ```
 #figure(

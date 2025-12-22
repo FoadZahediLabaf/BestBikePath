@@ -1577,51 +1577,7 @@ end
   caption: [Stop Recording Sequence Diagram]
 )
 #pagebreak()
-*UC11 Automatic Pause and Resume of Recording*
-#let AutomaticPauseAndResumeRecording = ```plantuml
-actor User
-boundary "BBP App" as App
-control "GPS" as GPS
-control "Sensor" as Sensor
 
-activate User
-activate Sensor
-activate GPS
-activate App
-User -\ Sensor: Bike slows down
-Sensor -\ App: Velocity decrease detected
-
-App -> GPS: Pause data collection
-GPS --> App: data collection paused
-
-deactivate GPS
-
-opt User visually confirms pause
-User -> App: Open application
-
-App --> User: Paused indicator
-User -\ App: Close application
-
-end
-
-User -\ Sensor: Bike accelerates
-Sensor -\ App: Velocity increase detected
-
-
-
-
-App -> GPS: Resume data collection
-activate GPS
-GPS --> App: Data collection resumed
-
-
-```
-#figure(
-  AutomaticPauseAndResumeRecording,
-  kind: image,
-  caption: [Automatic Pause and Resume of Recording Sequence Diagram]
-)
-#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")

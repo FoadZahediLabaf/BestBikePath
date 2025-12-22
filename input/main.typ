@@ -1097,6 +1097,36 @@ All communication with back-end services must be authenticated and authorized, b
 )
 
 #pagebreak()
+*UC10 Stop Recording*
+#table(
+  columns: 2,
+  [*Name*], [Stop Recording],
+  [*Actors*], [Authenticated User, Weather API],
+  [*Entry Conditions*], [
+- User stops biking and opens the BBP application
+  ],
+  [*Event Flow*], [+ The application displays the current data about the trip
++ User selects the option to end the automatic recording of the path
++ The application prompts the user for confirmation
++ User confirms termination of the recording
++ The application stops collecting GPS data
++ The application stops collecting data from gyroscope and accelerometer
++ Optional: The application collects meteorological data from an external weather API service
++ The application computes performance and path statistics based on the collected data
++ The application saves the path data in the database
++ The application redirects the user to the home page
+
+
+  ],
+  [*Exit Conditions*], [
+- The application correctly saves the path data in the database
+  ],
+  [*Exceptions*], [- The application correctly saves the path data in the database
+
+  ],
+)
+
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
@@ -1469,6 +1499,53 @@ deactivate Frontend
   kind: image,
   caption: [Automatic Obstacle Detection Sequence Diagram]
 )
+
+#pagebreak()
+*UC10 Stop Recording*
+#let stopRecordingSequenceDiagram = ```plantuml
+actor User
+boundary "BBP App" as App
+control "GPS/Sensor" as Sensors
+database "Database" as DB
+boundary "Weather API" as API
+activate User
+activate App
+activate Sensors
+
+
+User -> App: Select "Stop Recording"
+App -> User: Request for confirmation
+User --> App: Confirmation
+App -> Sensors: Stop collecting data
+
+
+Sensors --> App: Confirmation
+deactivate Sensors
+
+
+App -> API: Meteorological data request
+App → App: Compute path statistics
+alt Meteorological data available
+    activate API
+    API --> App: Meteorological data
+else Meteorological data unavailable
+    API --> App: Data unavailable
+    deactivate API
+end
+
+
+activate DB
+App -> DB: Save path data
+DB --> App: Path data saved
+deactivate DB
+
+```
+#figure(
+  stopRecordingSequenceDiagram,
+  kind: image,
+  caption: [Stop Recording Sequence Diagram]
+)
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")

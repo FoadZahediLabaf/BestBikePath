@@ -1127,6 +1127,39 @@ All communication with back-end services must be authenticated and authorized, b
 )
 
 #pagebreak()
+*UC11 Automatic Pause and Resume of Recording*
+#table(
+  columns: 2,
+  [*Name*], [Automatic Pause and Resume of Recording],
+  [*Actors*], [Authenticated User, Sensors, GPS],
+  [*Entry Conditions*], [
+- User stops biking and Automatic Recording is in progress
+  ],
+  [*Event Flow*], [
++ User stops biking
++ The application detects a decrease in velocity under a certain threshold
++ The application stops the recording
++ Optional: User visually confirms the recording has been paused
+  - User opens the application
+  - Application displays the current timestamp
+  - User puts their device away
++User resumes biking
++The application detects an increase in speed above a certain threshold
++The application resumes the recording and the collection of data
+
+  ],
+  [*Exit Conditions*], [
+- Application resumes recording
+  ],
+  [*Exceptions*], [
+- Sensor data is unavailable
+- Sensor data doesn’t detect a stop
+- GPS data is unavailable
+
+  ],
+)
+
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
@@ -1546,6 +1579,51 @@ App --> User: Profile page
   stopRecordingSequenceDiagram,
   kind: image,
   caption: [Stop Recording Sequence Diagram]
+)
+#pagebreak()
+*UC11 Automatic Pause and Resume of Recording*
+#let AutomaticPauseAndResumeRecording = ```plantuml
+actor User
+boundary "BBP App" as App
+control "GPS" as GPS
+control "Sensor" as Sensor
+
+activate User
+activate Sensor
+activate GPS
+activate App
+User -\ Sensor: Bike slows down
+Sensor -\ App: Velocity decrease detected
+
+App -> GPS: Pause data collection
+GPS --> App: data collection paused
+
+deactivate GPS
+
+opt User visually confirms pause
+User -> App: Open application
+
+App --> User: Paused indicator
+User -\ App: Close application
+
+end
+
+User -\ Sensor: Bike accelerates
+Sensor -\ App: Velocity increase detected
+
+
+
+
+App -> GPS: Resume data collection
+activate GPS
+GPS --> App: Data collection resumed
+
+
+```
+#figure(
+  AutomaticPauseAndResumeRecording,
+  kind: image,
+  caption: [Automatic Pause and Resume of Recording Sequence Diagram]
 )
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")

@@ -878,7 +878,6 @@ All communication with back-end services must be authenticated and authorized, b
   [*Name*], [User Sign-Out],
   [*Actors*], [Authenticated User],
   [*Entry Conditions*], [
-    - Entry Condition
     - User is authenticated in the BBP application.
     - User is on the account page.
   ],
@@ -953,6 +952,151 @@ All communication with back-end services must be authenticated and authorized, b
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
+*UC6 Automatic Recording With Manual Controls*
+#table(
+  columns: 2,
+  [*Name*], [Automatic Recording With Manual Controls],
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [
+    - The authenticated user opens the BBP application on their device and is on the recording screen (recording feature available).
+  ],
+  [*Event Flow*], [
+    + User presses the “Start” button.
+    + The application starts the activity recording and shows the recording UI.
+    + While the recording is active, the following events may occur repeatedly until the user stops the recording:
+      - Resume recording (if currently paused)
+        + User presses the “Resume” button.
+        + The application resumes the timer.
+        + The application updates the UI to reflect the resumed state.
+      - Pause recording (if currently recording)
+        + User presses the “Pause” button.
+        + The application pauses the timer.
+        + The application updates the UI to reflect the paused state
+    + User presses the “Stop Recording” button (if currently paused).
+    + The application stops the activity recording and ends the recording session (Stop Recording Use Case).
+  ],
+  [*Exit Conditions*], [
+    - Recording session is stopped.
+  ],
+  [*Exceptions*], [
+    - The recording cannot be started (e.g., required permissions missing or device sensors unavailable)
+    - Internal errors.
+    - Missing connection.
+  ],
+)
+
+*UC7 Automatic Recording With Activity Detection*
+#table(
+  columns: 2,
+  [*Name*], [Automatic Recording With Activity Detection],
+  [*Actors*], [Authenticated User, Sensor API (Device Activity Recognition)],
+  [*Entry Conditions*], [
+    - User opens BBP application on their device.
+    - User is on the recording screen and activity recognition capability is available.
+  ],
+  [*Event Flow*], [
+    + User presses the “Start” button.
+    + The application subscribes to device activity recognition updates by calling the Sensor API.
+    + While the recording session is active, the following loop repeats until the user stops the recording:
+      - If the Sensor API detects cycling activity:
+        + The Sensor API notifies the application with cycling.
+        + The application starts or resumes the timer.
+        + The application updates the UI to reflect the “recording” state.
+      - If the Sensor API detects non-cycling activity (e.g., stationary, walking, etc.):
+        + The Sensor API notifies the application with a non-cycling state.
+        + The application pauses the timer.
+        + The application updates the UI to reflect the “paused” state.
+    + User presses the “Stop” button.
+    + The application stops receiving activity updates by calling the Sensor API.
+    + The application ends the recording session(Stop Recording Use Case).
+  ],
+  [*Exit Conditions*], [
+    - Recording session is stopped.
+    - Subscription to Device Activity Detection is terminated.
+  ],
+  [*Exceptions*], [
+    - Activity recognition is unavailable or permission is missing (the application continues without automatic pause/resume).
+    - Sensor API fails to start or stop activity updates (internal/device error).
+  ],
+)
+
+#pagebreak()
+*UC8 Manual Obstacle Insertion*
+#table(
+  columns: 2,
+  [*Name*], [Manual Obstacle Insertion],
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [
+    - User is authenticated and has started a bike activity recording.
+    - User is on the recording screen.
+  ],
+  [*Event Flow*], [
+    + User presses the “Start” button.
+    + User presses the “Start” button to begin recording.
+    + While the recording session is active, the following steps may occur repeatedly until the recording stops:
+      - User presses the “Add Obstacle” button.
+        + The application increments the obstacle counter associated with the current recording.
+        + The application shows an obstacle confirmation dialog.
+        + The user chooses one of the following actions:
+          - Confirm or ignore the dialog:
+            + User presses “Confirm” or does not interact with the dialog.
+            + The obstacle remains recorded.
+          - Cancel:
+            + User presses “Cancel”.
+            + The application decrements the obstacle counter, discarding the obstacle.
+  ],
+  [*Exit Conditions*], [
+    - Obstacle count reflects the user confirmations.
+  ],
+  [*Exceptions*], [
+    - Internal error prevents updating the obstacle counter.
+    - Recording session is interrupted unexpectedly (e.g., application is terminated or crashes).
+  ],
+)
+
+#pagebreak()
+*UC9 Automatic Obstacle Detection*
+#table(
+  columns: 2,
+  [*Name*], [Automatic Obstacle Detection],
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [
+    - User opens BBP application on their device.
+    - User is on the recording screen and starts a recording session.
+    - Motion sensor capability is available and authorized.
+  ],
+  [*Event Flow*], [
+    + User presses the “Start” button.
+    + The application starts motion sensor monitoring by subscribing to:
+      - Accelerometer updates 
+      - Gyroscope updates 
+    
+    + While the recording session is active, the following loop repeats until the recording stops:
+      - The Sensor API provides accelerometer data to the application.
+      - The Sensor API provides gyroscope data to the application.
+      - The application processes sensor data to perform obstacle detection.
+      - If an obstacle is detected:
+        - The application increments the obstacle count for the current recording.
+        - The application shows an obstacle confirmation dialog to the user.
+        - The user chooses one of the following actions:
+          - Confirm or ignore the dialog:
+            - The obstacle remains recorded.
+          - Cancel:
+            - The application decrements the obstacle count and discards the detected obstacle.
+  ],
+  [*Exit Conditions*], [
+    - Motion sensor updates are terminated.
+    - Obstacle count reflects confirmed (or non-cancelled) detected obstacles.
+  ],
+  [*Exceptions*], [
+    - Accelerometer/gyroscope access is unavailable or permission is missing (the application continues without automatic obstacle detection).
+    - Sensor API fails to start/stop updates (device/platform error).
+    - Sensor data is noisy or delayed, producing false- positives/negatives in obstacle detection.
+    - Internal error prevents updating obstacle count or displaying the confirmation dialog.
+  ],
+)
+
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
@@ -1150,7 +1294,6 @@ else Capability access was denied
     alt Continue
       User -> Frontend: Press 'Dismiss' button
       Frontend -> Frontend: Continue without capability
-
     else Check
       User -> Frontend: Press 'Check permission' button
       Frontend -> CP: getAuthorizationStatus
@@ -1192,7 +1335,140 @@ deactivate Frontend
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+*UC6 Automatic Recording With Manual Controls*
+#let automaticRecordingManualControlsSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+activate User
+activate Frontend
+User ->> Frontend: Press "start" button
+loop Until recording stops
+  alt User presses "resume" button
+    User ->> Frontend: Press "resume" button
+    Frontend -> Frontend: Resume timer
+    Frontend --> User: Show updated UI
+  else User presses "pause" button
+    User ->> Frontend: Press "pause" button
+    Frontend -> Frontend: Pause timer
+    Frontend --> User: Show updated UI
+  end
+end
+User ->> Frontend: Press "stop" button
+deactivate User
+deactivate Frontend
+```
+#figure(
+  automaticRecordingManualControlsSequenceDiagram,
+  kind: image,
+  caption: [Automatic Recording With Manual Controls Sequence Diagram]
+)
 
+#pagebreak()
+*UC7 Automatic Recording With Activity Detection*
+#let automaticRecordingManualActivityDetectionSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+control "Sensor API" as CP
+activate User
+activate Frontend
+activate CP
+User -> Frontend: Press 'start' button
+Frontend -> CP: startActivityUpdates(handler)
+loop Until recording stops
+  alt User starts biking
+    CP ->> Frontend: cycling
+    Frontend -> Frontend: Start/resume timer
+    Frontend --> User: Show updated UI
+  else User stops biking
+    CP ->> Frontend: stationary / walking / ...
+    Frontend -> Frontend: Pause timer
+    Frontend --> User: Show updated UI
+  end
+end
+User -> Frontend: Press 'stop' button
+Frontend -> CP: stopActivityUpdates()
+deactivate CP
+deactivate User
+deactivate Frontend
+```
+#figure(
+  automaticRecordingManualActivityDetectionSequenceDiagram,
+  kind: image,
+  caption: [Automatic Recording With Activity Detection Sequence Diagram]
+)
+
+#pagebreak()
+*UC8 Manual Obstacle Insertion*
+#let manualObstacleInsertionSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+activate User
+activate Frontend
+User ->> Frontend: Press 'start' button
+loop Until recording stops
+  User ->> Frontend: Press 'add obstacle' button
+  Frontend -> Frontend: Increment obstacle count
+  Frontend --> User: Show obstacle confirmation dialog
+  alt User confirms or ignores dialog
+    User ->> Frontend: Press 'confirm' button
+  else User cancels
+    User ->> Frontend: Press 'cancel' button
+    Frontend -> Frontend: Decrement obstacle count
+  end
+end
+User ->> Frontend: Press 'stop' button
+deactivate User
+deactivate Frontend
+```
+#figure(
+  manualObstacleInsertionSequenceDiagram,
+  kind: image,
+  caption: [Manual Obstacle Insertion Sequence Diagram]
+)
+
+#pagebreak()
+*UC9 Automatic Obstacle Detection*
+#let automaticObstacleDetectionSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+control "Sensor API" as CP
+activate User
+activate Frontend
+activate CP
+User -> Frontend: Press "start" button
+Frontend -> CP: startAccelerometerUpdates(handler)
+Frontend -> CP: startGyroUpdates(handler)
+loop Until recording stops
+  CP ->> Frontend: accelerometerData
+  CP ->> Frontend: gyroData
+  Frontend -> Frontend: detectObstacle(accelerometerData, gyroData)
+  opt Obstacle is detected
+    Frontend -> Frontend: Increment obstacle count
+    Frontend ->> User: Show obstacle confirmation dialog
+    alt User confirms or ignores dialog
+      User -> Frontend: Press "confirm" button
+    else User cancels
+      User -> Frontend: Press "cancel" button
+      Frontend -> Frontend: Decrement obstacle count
+    end
+  end
+end
+User -> Frontend: Press "stop" button
+Frontend -> CP: stopAccelerometerUpdates()
+Frontend -> CP: stopGyroUpdates()
+deactivate CP
+deactivate User
+deactivate Frontend
+```
+#figure(
+  automaticObstacleDetectionSequenceDiagram,
+  kind: image,
+  caption: [Automatic Obstacle Detection Sequence Diagram]
+)
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")

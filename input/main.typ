@@ -1017,6 +1017,7 @@ deactivate CP
 deactivate User
 deactivate Frontend
 ```
+
 #figure(
   accountCreationSequenceDiagram,
   kind: image,
@@ -1129,9 +1130,66 @@ deactivate Frontend
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
 *UC5 Request Device Capability Permission*
+#let requestCapabilitySequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+entity "Capability Provider" as CP
+activate User
+activate Frontend
+activate CP
+Frontend -> Frontend: Needs device capability
+Frontend -> CP: getAuthorizationStatus
+alt Capability access is unavailable
+  CP --> Frontend: unavailable
+  Frontend -> Frontend: Continue without capability
+else Capability access was denied
+  CP --> Frontend: denied
+  Frontend ->> User: Show a modal explaining why the capability is needed\nand instructions to give permission in system settings
+  loop Until user presses 'Dismiss' or gives permission in settings
+    alt Continue
+      User -> Frontend: Press 'Dismiss' button
+      Frontend -> Frontend: Continue without capability
 
+    else Check
+      User -> Frontend: Press 'Check permission' button
+      Frontend -> CP: getAuthorizationStatus
+      note over Frontend,CP
+        Jump to 1
+      end note
+      Frontend -> Frontend: Continue with capability
+    end
+  end
+else Capability access is authorized
+  CP --> Frontend: authorized
+  Frontend -> Frontend: Continue with capability
+else Capability access is not determined
+  CP --> Frontend: notDetermined
+  Frontend ->> User: Show a modal explaining why the capability is needed
+  alt Dismiss modal
+    User -> Frontend: Press 'Dismiss' button
+  else Ask permission
+    User -> Frontend: Press 'Ask permission' button
+    Frontend ->> User: Show system dialog to give permission
+    alt Not allow usage
+      User -> Frontend: Press 'Not allow' button
+      Frontend -> Frontend: Continue without capability
+    else Allow usage
+      User -> Frontend: Press 'Allow' button
+      Frontend -> Frontend: Continue with capability
+    end
+  end
+end
+deactivate CP
+deactivate User
+deactivate Frontend
+```
+#figure(
+  requestCapabilitySequenceDiagram,
+  kind: image,
+  caption: [User Sign-Out Sequence Diagram]
+)
 
-#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 

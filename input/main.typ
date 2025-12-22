@@ -1539,6 +1539,8 @@ App -> DB: Save path data
 DB --> App: Path data saved
 deactivate DB
 
+App --> User: Profile page
+
 ```
 #figure(
   stopRecordingSequenceDiagram,

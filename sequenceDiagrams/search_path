@@ -1,0 +1,62 @@
+@startuml
+title UC - Search Ranked Paths Between Two Points
+
+actor "User" as U
+boundary "BBP App (UI)" as UI
+control "Path Search Controller" as PSC
+entity "Routing/Map Service" as MAP
+control "Ranking Engine" as RE
+database "BBP Database" as DB
+
+== Open feature ==
+U -> UI : Open "Find Paths"
+activate UI
+UI -> PSC : openFindPaths()
+activate PSC
+PSC --> UI : showSearchForm()
+deactivate PSC
+UI --> U : Form displayed (Origin, Destination)
+
+== Submit query ==
+U -> UI : Enter origin + destination\nTap "Search"
+UI -> PSC : searchPaths(origin,destination)
+activate PSC
+
+alt Invalid or missing location
+  PSC --> UI : showError("Invalid or missing location")
+  UI --> U : User fixes inputs
+else Network/Map service unavailable
+  PSC -> MAP : computeFeasiblePaths(origin,destination)
+  activate MAP
+  MAP --> PSC : error/unavailable
+  deactivate MAP
+  PSC --> UI : showError("Map service unavailable")
+  UI --> U : Notification shown
+else Feasible paths computation
+  PSC -> MAP : computeFeasiblePaths(origin,destination)
+  activate MAP
+  MAP --> PSC : candidatePaths
+  deactivate MAP
+
+  PSC -> DB : fetchPathMetadata(candidatePaths)\n(status, freshness, confirmations)
+  activate DB
+  DB --> PSC : metadata
+  deactivate DB
+
+  PSC -> RE : rankPaths(candidatePaths, metadata)
+  activate RE
+  RE --> PSC : rankedPaths
+  deactivate RE
+
+  alt No feasible path
+    PSC --> UI : showMessage("No feasible path found")
+    UI --> U : No results shown
+  else Ranked paths available
+    PSC --> UI : displayRankedList(rankedPaths)\nrenderOnMap(rankedPaths)
+    UI --> U : Ranked list + map visualization
+  end
+end
+
+deactivate PSC
+deactivate UI
+@enduml

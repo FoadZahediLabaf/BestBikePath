@@ -1,0 +1,57 @@
+@startuml
+title UC - Confirm Automatically Detected Obstacles
+
+actor "Authenticated User" as U
+boundary "BBP App (UI)" as UI
+control "Trip Review Controller" as TR
+entity "Obstacle Analyzer" as OA
+database "BBP Database" as DB
+
+== Open trip summary ==
+U -> UI : Open recorded trip summary
+activate UI
+UI -> TR : loadTripSummary(tripId)
+activate TR
+TR -> DB : fetchTrip(tripId)
+activate DB
+DB --> TR : trip data
+deactivate DB
+TR -> OA : getDetectedAnomalies(trip)
+activate OA
+OA --> TR : anomalies list
+deactivate OA
+TR --> UI : displayTripWithHighlightedAnomalies()
+deactivate TR
+UI --> U : Trip summary displayed
+
+== Validate obstacles ==
+loop For each detected anomaly
+  U -> UI : Select Confirm / Reject / Modify
+  UI -> TR : validateAnomaly(anomalyId, decision)
+  activate TR
+  TR -> DB : updateAnomaly(anomalyId, decision)
+  deactivate TR
+end
+
+== Save validated data ==
+U -> UI : Save validation
+UI -> TR : saveValidatedObstacles()
+activate TR
+TR -> DB : persistValidatedObstacles(tripId)
+activate DB
+DB --> TR : OK
+deactivate DB
+TR --> UI : showConfirmation()
+deactivate TR
+UI --> U : Validation completed
+
+alt User skips confirmation
+  UI --> U : Unvalidated anomalies retained
+else Storage error
+  DB --> TR : error
+  TR --> UI : showError("Unable to save changes")
+  UI --> U : Validation not saved
+end
+
+deactivate UI
+@enduml

@@ -1,0 +1,57 @@
+@startuml
+title UC - Delete Path from System
+
+actor "Authenticated User" as U
+boundary "BBP App (UI)" as UI
+control "History Controller" as HC
+database "BBP Database" as DB
+
+== Open history ==
+U -> UI : Open "Trip History"
+activate UI
+UI -> HC : requestTripList()
+activate HC
+HC -> DB : fetchUserTrips(userId)
+activate DB
+DB --> HC : tripsList
+deactivate DB
+HC --> UI : displayTrips(tripsList)
+deactivate HC
+UI --> U : Show trips list
+
+== Delete trip ==
+U -> UI : Select trip + Tap "Delete"
+UI -> HC : requestDelete(tripId)
+activate HC
+HC --> UI : showConfirmationDialog()
+deactivate HC
+
+alt User cancels deletion
+  U -> UI : Tap "Cancel"
+  UI --> U : Trip remains unchanged
+else User confirms deletion
+  U -> UI : Tap "Confirm"
+  UI -> HC : confirmDelete(tripId)
+  activate HC
+  HC -> DB : deleteTrip(tripId)
+  activate DB
+  alt Trip not found
+    DB --> HC : notFound
+    deactivate DB
+    HC --> UI : showError("Trip not found")\nrefreshList()
+    UI --> U : Error shown + list refreshed
+  else Deletion success
+    DB --> HC : OK
+    deactivate DB
+    HC -> DB : fetchUserTrips(userId)
+    activate DB
+    DB --> HC : updatedTripsList
+    deactivate DB
+    HC --> UI : displayTrips(updatedTripsList)
+    UI --> U : Updated list shown
+  end
+  deactivate HC
+end
+
+deactivate UI
+@enduml

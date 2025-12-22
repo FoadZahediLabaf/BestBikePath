@@ -1,0 +1,73 @@
+@startuml
+title UC - Manual Path Recording
+
+actor "Authenticated User" as U
+boundary "BBP App (UI)" as UI
+control "Path Creation Controller" as PC
+entity "Map Service" as MAP
+database "BBP Database" as DB
+
+== Open manual creation ==
+U -> UI : Open "Manual Path Creation"
+activate UI
+UI -> PC : openManualCreation()
+activate PC
+PC --> UI : showManualCreationForm()
+deactivate PC
+UI --> U : Form displayed (Start, Destination)
+
+== Insert start & destination ==
+U -> UI : Enter start + destination\nPress "Search Area"
+UI -> PC : setEndpoints(start,destination)
+activate PC
+PC -> MAP : loadMapArea(start,destination)
+activate MAP
+MAP --> PC : mapData
+deactivate MAP
+PC --> UI : displayMap(mapData)\nenable segment selection
+deactivate PC
+UI --> U : Map shown + selectable streets/segments
+
+== Define path and status ==
+U -> UI : Select streets/segments
+UI -> PC : addSegments(segments)
+activate PC
+PC --> UI : updateSelectedRoute()
+deactivate PC
+
+U -> UI : Select path status
+UI -> PC : setStatus(status)
+activate PC
+PC --> UI : statusSet()
+deactivate PC
+
+== Save ==
+U -> UI : Press "Save"
+UI -> PC : savePath()
+activate PC
+
+alt Invalid start/destination
+  PC --> UI : showError("Invalid start/destination")
+  UI --> U : Fix inputs
+else Incomplete/invalid route
+  PC --> UI : showError("Incomplete or invalid path")
+  UI --> U : Complete selection
+else Storage error
+  PC -> DB : storePath(user,route,status)
+  activate DB
+  DB --> PC : error
+  deactivate DB
+  PC --> UI : showError("Storage error")
+  UI --> U : Not saved
+else Success
+  PC -> DB : storePath(user,route,status)
+  activate DB
+  DB --> PC : OK
+  deactivate DB
+  PC --> UI : showConfirmation()\naddToHistory()
+  UI --> U : Path saved in history
+end
+
+deactivate PC
+deactivate UI
+@enduml

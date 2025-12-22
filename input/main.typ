@@ -1219,7 +1219,7 @@ alt Capability access is unavailable
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
   CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining why the capability is needed and instructions\nto give permission in system settings
+  Frontend ->> User: Show a modal explaining why the capability is needed and instructions to\ngive permission in system settings
   loop Until user presses 'Dismiss' or gives permission in settings
     alt Continue
       User -> Frontend: Press 'Dismiss' button
@@ -1569,34 +1569,56 @@ deactivate Frontend
 #pagebreak()
 *UC10 Stop Recording*
 #let stopRecordingSequenceDiagram = ```plantuml
-autonumber
-actor "User" as U
+skinparam sequence {
+
+
+
+
+LifeLineBackgroundColor LightGrey
+
+
+}
+skinparam SequenceMessageAlign center
+
+
+
+
+actor User
 boundary "BBP App" as App
-participant "GPS/Sensors" as Sensors
+control "GPS/Sensor" as Sensors
 database "Database" as DB
-participant "Weather API" as API
-U -> App : Select "Stop Recording"
-App -> U : Request confirmation
-U --> App : Confirm
-App -> Sensors : Stop collecting data
-Sensors --> App : Confirmation
-App -> App : Compute path statistics
-opt Weather enrichment enabled
-  App -> API : Meteorological data request
-  alt Meteorological data available
-    API --> App : Meteorological data
-  else Meteorological data unavailable
-    API --> App : Data unavailable
-  end
+boundary "Weather API" as API
+activate User
+activate App
+activate Sensors
+
+
+User -> App: Select "Stop Recording"
+App -> User: Request for confirmation
+User --> App: Confirmation
+App -> Sensors: Stop collecting data
+
+
+Sensors --> App: Confirmation
+deactivate Sensors
+
+
+App -> API: Meteorological data request
+App → App: Compute path statistics
+alt Meteorological data available
+    activate API
+    API --> App: Meteorological data
+else Meteorological data unavailable
+    API --> App: Data unavailable
+    deactivate API
 end
-App -> DB : Save path data
-alt Storage error
-  DB --> App : Error
-  App --> U : Show error
-else Success
-  DB --> App : Path data saved
-  App --> U : Profile page
-end
+
+
+activate DB
+App -> DB: Save path data
+DB --> App: Path data saved
+deactivate DB
+
 ```
 #figure(
   stopRecordingSequenceDiagram,

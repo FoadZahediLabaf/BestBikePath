@@ -494,7 +494,7 @@ The termination of the recording, which is manually performed by the user, can o
 hide empty description
 [*] --> Active: User is biking
 Active --> Paused : Velocity drops\nbelow threshold
-Active --> Paused : User pauses recording
+Active --> Paused : User pauses\nrecording
 Paused --> Active : Velocity rises\nabove threshold
 Paused --> Active : User resumes recording
 Active --> Canceled : Sensor / GPS failure\nor inaccurate data

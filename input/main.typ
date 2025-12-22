@@ -763,9 +763,194 @@ All communication with back-end services must be authenticated and authorized, b
 === Use Cases
 
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+*UC1 Account Creation*
+#table(
+  columns: 2,
+  [*Name*], [Account Creation],
+  [*Actors*], [Unauthenticated User, SMTP Server],
+  [*Entry Conditions*], [
+    - User opens BBP application on their device and navigates to the account page.
+  ],
+  [*Event Flow*], [
+  	+	User opens the account page.
+  	+	The application displays an email field.
+  	+	The unauthenticated user enters their email.
+  	+	The application asks the Backend to verify the email.
+  	+	The Backend checks whether an account with that email exists.
+  	+	The application displays the email verification code field.
+  	+	The application requests the Backend to send a verification code.
+  	+	The Backend generates a one-time code and stores (code → email) in the KV store (TTL: 1 hour).
+  	+	The Backend sends the code to the user via SMTP and confirms success.
+  	+	The application shows a “Code Sent” banner.
+  	+	The user enters the verification code.
+  	+	The application asks the Backend to validate the code.
+  	+	The Backend verifies the code–email association.
+  	+	The application displays the sign-up form.
+  	+	The user enters name and password and accepts the privacy terms.
+  	+	The application sends the sign-up request.
+  	+	The Backend revalidates the code, creates the account, and returns 201 Created with an authentication token.
+  	+	The application displays the authenticated homepage.
+  ],
+  [*Exit Conditions*], [
+    - User account is created and the user is authenticated (token issued).
+  ],
+  [*Exceptions*], [
+    - Email already registered (User redirected to sign-in flow)
+    - SMTP delivery fails
+    - KV store save or read error.
+    - Verification code is invalid, expired (TTL exceeded), or does not match the provided email.
+    - Database error prevents account creation.
+    - No internet connection prevents Backend communication.
+  ],
+)
 
+#pagebreak()
+*UC2 User Sign-In*
+#table(
+  columns: 2,
+  [*Name*], [User Sign-In],
+  [*Actors*], [Unauthenticated User],
+  [*Entry Conditions*], [
+    - Unauthenticated User (with an existing account) opens BBP application on their device and navigates to the account page.
+  ],
+  [*Event Flow*], [
+    + User opens the account page.
+    + The application displays the email text field.
+    + User inserts their email.
+    + The application requests the backend to check whether the user exists
+    + The backend queries the database to verify the existence of the account.
+    + The backend confirms that the user exists.
+    + The application displays the password text field.
+    + User inserts their password
+    + The application sends the sign-in request to the backend
+    + The backend retrieves the account data from the database
+    + The backend checks the provided credentials against the stored ones:
+      - If credentials are not valid:
+        + The backend returns 401 Unauthorized.
+        + The application displays an authentication error message to the user.
+      - If credentials are valid:
+        + The backend returns 200 OK, along with the authentication token.
+        + The application shows the homepage as a logged-in user.
+  ],
+  [*Exit Conditions*], [
+    - User is authenticated (token issued)
+  ],
+  [*Exceptions*], [
+    - Internal error prevents retrieving account data from the database.
+    - Backend error prevents credential validation or token generation.
+    - No internet connection prevents backend communication.
+  ],
+)
+
+#pagebreak()
+*UC3 Account Deletion*
+#table(
+  columns: 2,
+  [*Name*], [Account Deletion],
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [
+    - User is authenticated in the BBP application.
+    - User is on the account page.
+  ],
+  [*Event Flow*], [
+    + User presses the “Delete Account” button.
+    + The application shows a confirmation dialog.
+    + User confirms by pressing the Confirm button.
+    + The application sends an authenticated request to the Backend to delete the user account.
+    + The Backend requests the database to delete the account
+    + The database confirms the deletion
+    + The Backend returns 200 OK to the Frontend.
+    + The application updates the UI and shows the homepage as an unauthenticated user.
+  ],
+  [*Exit Conditions*], [- User account is deleted and the user is signed out ],
+  [*Exceptions*], [
+    - Authentication fails (missing/invalid/expired token) -> Backend returns 401 Unauthorized.
+    - Internal error prevents the database from deleting the account.
+    - No internet connection prevents Backend communication.
+    - The account cannot be deleted (e.g., account not found / already deleted) -> Backend returns an error.
+  ],
+)
+
+#pagebreak()
+*UC4 User Sign-Out*
+#table(
+  columns: 2,
+  [*Name*], [User Sign-Out],
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [
+    - Entry Condition
+    - User is authenticated in the BBP application.
+    - User is on the account page.
+  ],
+  [*Event Flow*], [
+    + User presses the “Sign out” button.
+    + The application shows a confirmation dialog.
+    + User confirms by pressing the Confirm button.
+    + The application clears the local authentication state (e.g., token/session)
+    + The application updates the UI and shows the homepage as an anonymous user.
+  ],
+  [*Exit Conditions*], [
+    - User is signed out of the application.
+  ],
+  [*Exceptions*], [
+    - Internal error prevents clearing the local authentication state
+  ],
+)
+
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
+*UC5 Request Device Capability Permission*
+#table(
+  columns: 2,
+  [*Name*], [Request Device Capability Permission],
+  [*Actors*], [User, Capability Provider],
+  [*Entry Conditions*], [
+    - The user is using the BBP application and a feature requires access to a device capability (e.g., location, motion sensors, notifications)
+  ],
+  [*Event Flow*], [
+    + The application determines that a device capability is required.
+    + The application requests the current authorization status from the Capability Provider.
+      - If capability access is unavailable:
+        + The Capability Provider returns unavailable.
+        + The application continues without the capability.
+      - If capability access was denied:
+        + The Capability Provider returns denied.
+        + The application displays a modal explaining why the capability is needed and provides instructions to enable permission in system settings.
+        + The following loop repeats until the user either continues without the capability or enables permission in settings:
+          - Continue without capability
+            + User presses “Continue”.
+            + The application continues without the capability.
+          - Check permission again
+            + User presses “Check permission”.
+            + The application requests the authorization status again (getAuthorizationStatus).
+            + If the capability is now authorized, the application continues with the capability.
+      - If capability access is authorized:
+          + The Capability Provider returns authorized.
+          + The application continues with the capability.
+      - If capability access is not determined:
+          + The Capability Provider returns notDetermined.
+          + The application shows a modal explaining why the capability is needed.
+          + User chooses one of the following:
+            - Deny permission
+              + User presses “Deny permission”.
+              + The application continues without the capability.
+            - Request permission
+              + User presses “Give permission”.
+              + The application shows the system permission dialog.
+              + If the user denies in the system dialog, the application continues without the capability.
+              + If the user grants in the system dialog, the application continues with the capability.
+  ],
+  [*Exit Conditions*], [
+    - The application proceeds either with the required capability (authorized) or without it (denied/unavailable), depending on the user decision and platform status.
+  ],
+  [*Exceptions*], [
+    - Internal error prevents reading authorization status from the Capability Provider.
+    - The system permission dialog cannot be displayed 
+  ],
+)
+
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
@@ -778,6 +963,173 @@ All communication with back-end services must be authenticated and authorized, b
 === Sequence Diagrams
 
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+*UC1 Account Creation*
+#let accountCreationSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+control "Capability Provider" as CP
+activate User
+activate Frontend
+activate CP
+Frontend -> Frontend: Needs device capability
+Frontend -> CP: getAuthorizationStatus
+alt Capability access is unavailable
+  CP --> Frontend: unavailable
+  Frontend -> Frontend: Continue without capability
+else Capability access was denied
+  CP --> Frontend: denied
+  Frontend ->> User: Show a modal explaining why the capability is needed\nand instructions to give permission in system settings
+  loop Until user presses 'Dismiss' or gives permission in settings
+    alt Continue
+      User -> Frontend: Press 'Dismiss' button
+      Frontend -> Frontend: Continue without capability
+    else Check
+      User -> Frontend: Press 'Check permission' button
+      Frontend -> CP: getAuthorizationStatus
+      note over Frontend, CP
+        Jump to 1
+      end note
+      Frontend -> Frontend: Continue with capability
+    end
+  end
+else Capability access is authorized
+  CP --> Frontend: authorized
+  Frontend -> Frontend: Continue with capability
+else Capability access is not determined
+  CP --> Frontend: notDetermined
+  Frontend ->> User: Show a modal explaining why the capability is needed
+  alt Dismiss modal
+    User -> Frontend: Press 'Dismiss' button
+  else Ask permission
+    User -> Frontend: Press 'Ask permission' button
+    Frontend ->> User: Show system dialog to give permission
+    alt Not allow usage
+      User -> Frontend: Press 'Not allow' button
+      Frontend -> Frontend: Continue without capability
+    else Allow usage
+      User -> Frontend: Press 'Allow' button
+      Frontend -> Frontend: Continue with capability
+    end
+  end
+end
+deactivate CP
+deactivate User
+deactivate Frontend
+```
+#figure(
+  accountCreationSequenceDiagram,
+  kind: image,
+  caption: [Account Creation Sequence Diagram]
+)
+
+#pagebreak()
+*UC2 User Sign-In*
+#let userSignInSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+control "Backend" as Backend
+database "Database" as DB
+activate User
+activate Frontend
+User -> Frontend: Open account page
+Frontend --> User: Show email textfield
+User -> Frontend: Insert email
+activate Backend
+Frontend -> Backend: userExists(email)
+activate DB
+Backend -> DB: userExists(email)
+DB --> Backend: 200 OK (true)
+deactivate DB
+Backend --> Frontend: 200 OK (true)
+deactivate Backend
+Frontend --> User: Show password textfield
+User -> Frontend: Insert password
+activate Backend
+Frontend -> Backend: signin(email, password)
+activate DB
+Backend -> DB: getAccount(email)
+DB --> Backend: 200 OK (account)
+deactivate DB
+Backend -> Backend: checkCredentials(password, password)
+alt Not valid credentials
+  Backend --> Frontend: 401 Unauthorized
+  Frontend --> User: Show error
+else Valid credentials
+  Backend --> Frontend: 200 OK (account, token)
+  Frontend --> User: Show homepage as logged user
+end
+deactivate Backend
+deactivate User
+deactivate Frontend
+```
+#figure(
+  userSignInSequenceDiagram,
+  kind: image,
+  caption: [User Sign-in Sequence Diagram]
+)
+
+#pagebreak()
+*UC3 Account Deletion*
+#let accountDeletionSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+control "Backend" as Backend
+database "Database" as DB
+activate User
+activate Frontend
+User -> Frontend: Press delete account button
+Frontend --> User: Show confirmation
+User -> Frontend: Press confirm button
+activate Backend
+Frontend -> Backend: deleteAccount(email)
+note over Frontend, Backend
+  Request authenticated
+end note
+activate DB
+Backend -> DB: deleteAccount(email)
+DB --> Backend: 200 OK (true)
+deactivate DB
+Backend --> Frontend: 200 OK (true)
+deactivate Backend
+Frontend --> User: Show homepage as unauthenticated user
+deactivate User
+deactivate Frontend
+```
+#figure(
+  accountDeletionSequenceDiagram,
+  kind: image,
+  caption: [Account Deletion Sequence Diagram]
+)
+
+#pagebreak()
+*UC4 User Sign-Out*
+#let userSignOutSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "Frontend" as Frontend
+activate User
+activate Frontend
+User ->> Frontend: Press logout account button
+Frontend --> User: Show confirmation dialog
+User ->> Frontend: Press confirm button
+Frontend --> User: Show homepage as unauthenticated user
+deactivate User
+deactivate Frontend
+```
+#figure(
+  userSignOutSequenceDiagram,
+  kind: image,
+  caption: [User Sign-Out Sequence Diagram]
+)
+
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+*UC5 Request Device Capability Permission*
+
 
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 

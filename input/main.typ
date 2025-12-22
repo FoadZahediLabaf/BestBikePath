@@ -1033,6 +1033,7 @@ assert BestPathsAreRecommended {
 ```
 
 #figure(
+  
   image("alloy/Picture2.png", height: 10%),
   caption: [BestPathsAreRecommended assertion execution]
 )
@@ -1074,8 +1075,19 @@ assert NoPrivatePathsInQueryResults {
 ) <alloy-world-2>
 
 = Effort Spent
-In this section you will include information about the number of hours each
-group member has worked for this document.
+
+
+#figure(
+  table(
+    columns: 4,
+    table.header([], [*Foad Zahedi Labaf*], [*Lorenzo Fiamingo*], [*Alexander Gabriel Fox*]),
+    [*Section 1*], [], [], [],
+    [*Section 2*], [], [], [],
+    [*Section 3*], [], [], [],
+    [*Section 4*], [], [], [],
+  ),
+  caption: [The number of hours each group member has worked for this document]
+)
 
 = References
 

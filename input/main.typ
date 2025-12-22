@@ -666,7 +666,7 @@ All communication with back-end services must be authenticated and authorized, b
 *R9*: The system shall use the device’s sensors to collect information about obstacles along the path and the speed of the user. \
 *R10*: The system shall display the current trip data (current duration time, map of the path, average speed, top speed, weather conditions, distance covered) while the user is biking. \
 *R11*: The system shall prompt the user for confirmation of a detected obstacle while biking. \
-*R12*: The system shall allow the authenticated user to insert an obstacle manually. \
+*R12*: The system shall allow the authenticated user to insert an obstacle manually.
 
 *Stop Recording* \
 *R13*: The system shall allow the authenticated user to manually stop the automatic recording of a bike path. \ 
@@ -851,6 +851,227 @@ _Further details will be provided in the corresponding Design Document_
 The application should be able to run on the main mobile operating systems, specifically Android and iOS. The app should be supported by mobile devices, like smartphones and tablets, as long as they  respect the hardware limitations outlined in Section 3.4.2. 
 
 = Formal Analysis Using Alloy
+The Alloy analysis of our BBP project allows for a formal demonstration of how the requirements defined in the previous section are both necessary and sufficient for the satisfaction of our initially defined goals.
+This analysis mainly focuses on the representation of some of the core functions provided by the application, such as the  “path browsing” functionality through which users are given bike path recommendations based on a quality score, and the publishing functionality that allows users to make their paths available to the public, as well as the way the system manages the validity of each recorded bike path.
+For the sake of simplicity and clarity, some elements that define our system have been simplified, allowing for better readability of both the code and the diagrams, while still capturing the essential constraints and behaviors. The main simplifications are listed below:
+- There is no distinction between unauthenticated and authenticated users
+- GPS and sensor data is excluded from the bike path representations
+- The process through which a street is considered compatible is omitted
+- No distinction is made between different types of obstacles
+- Paths are considered acyclic
+- Streets connect to at most two other streets
+
+#pagebreak()
+```alloy
+sig User{
+	paths: set Path
+}
+
+sig Path{
+	streets: some Street,
+	var obstacles: set Obstacle,
+	status: one Status,
+	creator: one User,
+	var privacy: one Privacy,
+	alert: one Alert,
+}
+
+sig RecommendedPath{
+	streets: some Street,
+	instances: some Path,
+	quality: one Int,
+	alert: one Alert}{
+	
+	//every path instance must have the same streets
+	all p1, p2 : instances | p1.streets = p2.streets
+
+	// The RecommendedPath streets must be equal to the streets of its instances
+    	streets = instances.streets
+	
+	//the alert badge of the RecommendedPath is active if it contains at least one street that is incompatible with biking
+	alert=On iff (some s: streets | s.compatible = No)
+	
+	//path recommendations can only consider user paths that are publicly available
+	all p: instances | p.privacy = Public
+}
+
+sig Query {
+    qStart: lone Street,
+    qEnd: lone Street,
+    requester: one User,
+    var results: set RecommendedPath
+}
+
+sig Street{
+	previous: lone Street,
+	next: lone Street,
+	compatible: one Compatibility
+}{
+	this not in previous
+	this not in next
+	previous != next
+}
+
+abstract sig Obstacle{}
+
+enum Status{Optimal, Medium, RequiresMaintenance}
+
+enum Privacy{Public, Private}
+
+enum Alert{On, Off}
+
+enum Compatibility{Yes, No}
+
+//Each recorded path is owned by its creator
+fact Ownership{
+    all p: Path, u: User | p in u.paths implies p.creator = u
+}
+
+fact validPath{
+
+	//each path contains at least one street
+	all p:Path | some p.streets
+	
+	//Each path is composed of connected street segments
+   	all p:Path, s: p.streets | one s.previous implies s.previous in p.streets
+	
+	all p:Path, s: p.streets | one s.next implies s.next in p.streets
+	
+	//Each path has a beginning and end
+	all p: Path | one s: p.streets | no s.previous
+
+	all p: Path | one s: p.streets | no s.next
+	
+}
+
+fact noCycles {
+    no s: Street | s in s.^next
+}
+
+fact badPathAlert{
+	all p:Path | (some s: p.streets | s.compatible = No) iff p.alert = On
+}
+
+fun start[p: RecommendedPath]: one Street {
+    { s: p.streets | no s.previous }  
+}
+
+fun end[p: RecommendedPath]: one Street {
+    { s: p.streets | no s.next } 
+}
+
+fact ComputeQualityScore {
+    all rp: RecommendedPath |
+        rp.quality = score[rp]
+}
+
+// To model data freshness in the quality score computation, only one user path
+// is considered, representing the most recently recorded instance, while older
+// path instances are ignored.
+
+fun obstacleCount[p: RecommendedPath]: Int {
+    # { o: Obstacle | one i: p.instances | o in i.obstacles }
+}
+
+fun score[p: RecommendedPath]: Int {
+    obstacleCount[p]
+}
+
+//The query returns a set of path recommendations with the same beginning and end
+//as the ones specified in the query
+fact QueryProducesResults {
+    always (
+        all q: Query |
+            (some q.qStart and some q.qEnd) implies
+            after (
+                q.results = { p: RecommendedPath |
+                    start[p] = q.qStart and
+                    end[p] = q.qEnd
+                }
+            )
+    )
+}
+
+//Each query produces the top three best path recommendations
+fact TopThreeBest {
+	all q: Query |
+		let matched = { p: RecommendedPath | start[p] = q.qStart and end[p] = q.qEnd } |
+        
+        // No matched path outside the results has better quality
+		all p: matched - q.results | all r: q.results | r.quality <= p.quality and	#q.results <= 3
+}
+```
+
+@alloy-world-1 shows an example of two paths, both owned by the same user and associated with their respective data. The two paths contain the same set of streets but differ in the information attached to them. For instance, the obstacles encountered along each path are different, which reflects a realistic scenario that may occur in practice.
+The two paths also have different status values. Although the computation of the status was excluded from this Alloy representation, this situation is still plausible, since users can create their own paths and assign different statuses despite having the same route.
+Another characteristic is the presence of an incompatible street in the paths, which causes the Alert signature associated with each path to be in the “On” state.
+
+#figure(
+  image("alloy/Picture1.png"),
+  caption: [Two paths with same route]
+) <alloy-world-1>
+
+The following assertion verifies that each query requested by the user will only contain the RecommendedPaths with the highest rating, allowing the user to view the best possible paths between two points.
+The quality of each path recommendation is computed by selecting the number of obstacles in a  single “path instance”. The selected paths are the ones with the lowest scores. This is clearly a simplification to illustrate how the overall quality of a path is determined by the recorded data, but in reality it must consider many more factors that can’t be clearly illustrated through an Alloy model.
+
+```alloy
+assert BestPathsAreRecommended {
+    all q: Query |
+        (some q.qStart and some q.qEnd) implies
+        eventually (
+            let matched = { p: RecommendedPath | start[p] = q.qStart and end[p] = q.qEnd } |
+            
+            // The results contain exactly the matched paths
+            q.results = matched and
+
+            // No better-quality path exists among matched paths outside the results
+            all p: matched - q.results |
+                all r: q.results |
+                    p.quality >= r.quality
+        )
+}
+```
+
+#figure(
+  image("alloy/Picture2.png", height: 10%),
+  caption: [BestPathsAreRecommended assertion execution]
+)
+
+The following assertion shows how every user will be visually notified if a certain path may not be suitable for biking, therefore allowing the user to follow specific paths with the full knowledge of the possible risks associated with them.
+
+```alloy
+assert NoFalseAlerts {
+    all p: Path | p.alert = On implies some s: p.streets | s.compatible = No
+}
+```
+
+#figure(
+  image("alloy/Picture3.png", height: 10%),
+  caption: [NoFalseAlerts assertion execution]
+)
+
+The assertion below verifies that only public paths are returned to the user following a query, thereby forbidding the use of private paths in constructing the query response and protecting the user’s private data.
+
+```alloy
+assert NoPrivatePathsInQueryResults {
+    all q: Query |
+        all rp: q.results |
+            all p: rp.instances |
+                p.privacy = Public
+}
+```
+
+#figure(
+  image("alloy/Picture4.png", height: 10%),
+  caption: [NoPrivatePathsInQueryResults assertion execution]
+)
+
+@alloy-world-2 illustrates an example of a query execution. The query returns two path recommendations to the user. Each recommendation is computed based on a set of path instances, which are used to determine the overall quality of the path. In this example, both path recommendations consist of a single instance, each with the same start and end points specified in the query, but following different routes between them. Each recommendation is associated with a quality score, calculated based on the characteristics of its path instances, particularly the number of obstacles.
+
+#figure(
+  image("alloy/Picture5.png"),
+  caption: [Query execution]
+) <alloy-world-2>
 
 = Effort Spent
 In this section you will include information about the number of hours each
@@ -858,6 +1079,7 @@ group member has worked for this document.
 
 = References
 
+Add maybe we have to reference plantuml, ...\
 Remember to check if we have time to add automatic mode cancellation (by user or by connectivity)
 
 

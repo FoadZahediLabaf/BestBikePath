@@ -1219,7 +1219,7 @@ alt Capability access is unavailable
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
   CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining why the capability is needed\nand instructions to give permission in system settings
+  Frontend ->> User: Show a modal explaining why the capability is needed and instructions\nto give permission in system settings
   loop Until user presses 'Dismiss' or gives permission in settings
     alt Continue
       User -> Frontend: Press 'Dismiss' button
@@ -1603,6 +1603,7 @@ end
   kind: image,
   caption: [Stop Recording Sequence Diagram]
 )
+
 #pagebreak()
 *UC11 Automatic Pause and Resume of Recording*
 #let AutomaticPauseAndResumeRecording = ```plantuml
@@ -1636,6 +1637,7 @@ deactivate App
   kind: image,
   caption: [Automatic Pause and Resume of Recording Sequence Diagram]
 )
+
 #pagebreak()
 *UC12 Manual Pause and Resume of Recording*
 

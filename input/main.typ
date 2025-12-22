@@ -1160,6 +1160,21 @@ All communication with back-end services must be authenticated and authorized, b
 )
 
 #pagebreak()
+*UC 12 Manual Pause and Resume of Recording*  
+columns: 2,
+  [*Name*], [Pause and Resume of Recording],
+  [*Actors*], [Pause and Resume of Recording],
+  [*Entry Conditions*], [The Automatic Recording session is currently in progress.],
+  [*Event Flow*], [+ The user presses the “Pause” button during an ongoing trip recording.
++ The system suspends GPS and sensor data acquisition and freezes the update of trip statistics.
++ The user presses the “Resume” button.
++ The system restarts GPS and sensor data acquisition and continues updating the trip statistics.
+],
+  [*Exit Conditions*], [- Application resumes recording],
+  [*Exceptions*], [- Sensor data is unavailable
+- GPS data is unavailable],
+)
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
@@ -1577,7 +1592,51 @@ end
   caption: [Stop Recording Sequence Diagram]
 )
 #pagebreak()
+*UC11 Automatic Pause and Resume of Recording*
+#let AutomaticPauseAndResumeRecording = ```plantuml
+actor User
+boundary "BBP App" as App
+control "GPS" as GPS
+control "Sensor" as Sensor
 
+activate User
+activate Sensor
+activate GPS
+activate App
+User -\ Sensor: Bike slows down
+Sensor -\ App: Velocity decrease detected
+
+App -> GPS: Pause data collection
+GPS --> App: data collection paused
+
+deactivate GPS
+
+opt User visually confirms pause
+User -> App: Open application
+
+App --> User: Paused indicator
+User -\ App: Close application
+
+end
+
+User -\ Sensor: Bike accelerates
+Sensor -\ App: Velocity increase detected
+
+
+App -> GPS: Resume data collection
+activate GPS
+GPS --> App: Data collection resumed
+
+
+```
+#figure(
+  AutomaticPauseAndResumeRecording,
+  kind: image,
+  caption: [Automatic Pause and Resume of Recording Sequence Diagram]
+)
+#pagebreak()
+
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
@@ -1704,7 +1763,6 @@ For the sake of simplicity and clarity, some elements that define our system hav
 - The process through which a street is considered compatible is omitted
 - No distinction is made between different types of obstacles
 - Paths are considered acyclic
-- Streets connect to at most two other streets
 
 #pagebreak()
 ```alloy
@@ -1714,11 +1772,16 @@ sig User{
 
 sig Path{
 	streets: some Street,
+	start: one Street,
+	end: one Street,
 	var obstacles: set Obstacle,
 	status: one Status,
 	creator: one User,
 	var privacy: one Privacy,
 	alert: one Alert,
+}{
+    start in streets
+    end in streets
 }
 
 sig RecommendedPath{
@@ -1730,15 +1793,18 @@ sig RecommendedPath{
 	//every path instance must have the same streets
 	all p1, p2 : instances | p1.streets = p2.streets
 
-	// The RecommendedPath streets must be equal to the streets of its instances
+	// the RecommendedPath streets must be equal to the streets of its instances
     	streets = instances.streets
 	
-	//the alert badge of the RecommendedPath is active if it contains at least one street that is incompatible with biking
+	//the alert badge of the RecommendedPath is active if it contains at least one street that is incompatible
 	alert=On iff (some s: streets | s.compatible = No)
 	
-	//path recommendations can only consider user paths that are publicly available
 	all p: instances | p.privacy = Public
+
+	all p1, p2: instances | p1.start = p2.start and p1.end = p2.end
 }
+
+
 
 sig Query {
     qStart: lone Street,
@@ -1748,13 +1814,10 @@ sig Query {
 }
 
 sig Street{
-	previous: lone Street,
-	next: lone Street,
+	connectedTo: set Street,
 	compatible: one Compatibility
 }{
-	this not in previous
-	this not in next
-	previous != next
+	no s: connectedTo | s = this
 }
 
 abstract sig Obstacle{}
@@ -1772,21 +1835,17 @@ fact Ownership{
     all p: Path, u: User | p in u.paths implies p.creator = u
 }
 
-fact validPath{
+fact ValidPath {
+  all p: Path | {
+     some p.streets
+     //everything in the path must be reachable from start
+     all s: p.streets | s in p.start.^connectedTo
 
-	//each path contains at least one street
-	all p:Path | some p.streets
-	
-	//Each path is composed of connected street segments
-   	all p:Path, s: p.streets | one s.previous implies s.previous in p.streets
-	
-	all p:Path, s: p.streets | one s.next implies s.next in p.streets
-	
-	//Each path has a beginning and end
-	all p: Path | one s: p.streets | no s.previous
+	   all s:p.streets | s in p.streets.connectedTo
 
-	all p: Path | one s: p.streets | no s.next
-	
+	  //no cycles
+   p.start != p.end
+    }
 }
 
 fact noCycles {

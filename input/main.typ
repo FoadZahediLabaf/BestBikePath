@@ -1635,6 +1635,41 @@ GPS --> App: Data collection resumed
   caption: [Automatic Pause and Resume of Recording Sequence Diagram]
 )
 #pagebreak()
+*UC12 Manual Pause and Resume of Recording*
+#let ManualPauseAndResumeRecording = ```plantuml
+@startuml
+title Manual Pause and Resume Trip Recording
+actor "Authenticated User" as U
+boundary "BBP App" as UI
+participant "Sensors/GPS" as S
+== Pause ==
+U -> UI : Tap "Pause"
+activate UI
+UI -> S : stopDataAcquisition()
+activate S
+S --> UI : Acquisition stopped
+deactivate S
+UI --> U : Show paused state\n(Resume button enabled)
+deactivate UI
+== Resume ==
+U -> UI : Tap "Resume"
+activate UI
+UI -> S : startDataAcquisition()
+activate S
+S --> UI : Acquisition started
+deactivate S
+UI --> U : Show recording state
+deactivate UI
+
+
+@enduml
+
+```
+#figure(
+  ManualPauseAndResumeRecording,
+  kind: image,
+  caption: [Manual Pause and Resume of Recording Sequence Diagram]
+)
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
@@ -1794,7 +1829,7 @@ sig RecommendedPath{
 	all p1, p2 : instances | p1.streets = p2.streets
 
 	// the RecommendedPath streets must be equal to the streets of its instances
-    	streets = instances.streets
+ streets = instances.streets
 	
 	//the alert badge of the RecommendedPath is active if it contains at least one street that is incompatible
 	alert=On iff (some s: streets | s.compatible = No)

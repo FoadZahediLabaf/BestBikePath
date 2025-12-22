@@ -375,7 +375,13 @@ AutomaticBikePath "1" *-- "0..1" Weather
 
 *Account Life-Cycle*
 
-This state diagram describes the evolution of a user’s account. Initially, the user doesn’t possess a BBP account and is therefore unauthenticated and unregistered. Once the user follows the necessary steps for signing up, they will have a dedicated account to which they have to still sign in. After completing the sign-in process, they will obtain the necessary access tokens for verifying their identity within the system and will thus be authenticated.
+This state diagram describes the evolution of a user’s account. 
+
+Initially, the user doesn’t possess a BBP account and is therefore unauthenticated and unregistered. Once the user follows the necessary steps for signing up, they will have a dedicated account to which they have to still sign in. 
+
+After completing the sign-in process, they will obtain the necessary access tokens for verifying their identity within the system and will thus be authenticated.
+
+
 If the user decides to log-out, they will move back into the “Registered” state and will have to complete the sign-in process again. If the user deletes their account, all the data associated with the user will be deleted from the database and their session will be terminated and will thus move to the initial state.
 
 #let accountStateDiagram = ```plantuml
@@ -397,6 +403,40 @@ Authenticated --> Unregistered : Delete account
   caption: [Account Life-Cycle State Diagram]
 )
 
+*Capability Life-Cycle*
+
+This state diagram describes the evolution of a device capability. 
+
+Initially, a capability may be `Unavailable`, meaning the device doesn't support or can't access the capability. Alternatively, the capability may be `NotDetermined`, meaning the user has not chosen whether the app can use the capability.
+
+When the capability is in the `NotDetermined` state, the system may request authorization from the user through a permission dialog. If the user grants permission, the capability transitions to the `Authorized` state and becomes usable by the application. Otherwise, if the user denies the permission request, the capability transitions to the Denied state and cannot be used. The capability may only transition to the `Authorized` state if the user manually enables it through the device’s system settings. 
+
+Once in the `Denied` state the application can't request again the permission through the system dialog. `Authorized` capability may transition back to the `Denied` state if the user revokes the permission from the system settings.
+
+#let capabilityStateDiagram = ```plantuml
+left to right direction
+hide empty description
+state NotUsable{
+    state Unavailable 
+    state NotDetermined 
+    state Denied
+}
+state Usable{
+    state Authorized
+}
+[*] --> Unavailable
+[*] --> NotDetermined
+NotDetermined --> Denied : User accept in dialog
+NotDetermined --> Authorized : User deny dialog
+Denied --> Authorized : Toggle in settings
+Authorized --> Denied
+```
+#figure(
+  capabilityStateDiagram,
+  kind: image,
+  caption: [Capability Life-Cycle State Diagram]
+)
+
 #pagebreak()
 *Path Life-Cycle*
 
@@ -415,7 +455,7 @@ hide empty description
 [*] --> ManualInserting
 AutomaticRecording --> Completed : Stop\nRecording
 ManualInserting --> Completed: Manual\nInsertion
-Completed --> Deleted : Delete Path
+Completed --> Deleted : Delete\nPath
 state Completed {
        state Privacy {
         [*] --> Private

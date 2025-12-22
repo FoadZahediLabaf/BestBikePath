@@ -1571,29 +1571,22 @@ deactivate Frontend
 #let stopRecordingSequenceDiagram = ```plantuml
 autonumber
 skinparam SequenceMessageAlign center
-
 actor User
 boundary "BBP App" as App
-control "GPS/Sensor" as Sensors
+control "GPS/Sensors" as Sensors
 database "Database" as DB
 boundary "Weather API" as API
 activate User
 activate App
 activate Sensors
-
-
 User -> App: Select "Stop Recording"
 App -> User: Request for confirmation
 User --> App: Confirmation
 App -> Sensors: Stop collecting data
-
-
 Sensors --> App: Confirmation
 deactivate Sensors
-
-
 App -> API: Meteorological data request
-App → App: Compute path statistics
+App -> App: Compute path statistics
 alt Meteorological data available
     activate API
     API --> App: Meteorological data
@@ -1601,13 +1594,10 @@ else Meteorological data unavailable
     API --> App: Data unavailable
     deactivate API
 end
-
-
 activate DB
 App -> DB: Save path data
 DB --> App: Path data saved
 deactivate DB
-
 ```
 #figure(
   stopRecordingSequenceDiagram,

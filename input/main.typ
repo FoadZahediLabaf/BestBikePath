@@ -378,7 +378,6 @@ AutomaticBikePath "1" *-- "0..1" Weather
 This state diagram describes the evolution of a user’s account. 
 
 Initially, the user doesn’t possess a BBP account and is therefore unauthenticated and unregistered. Once the user follows the necessary steps for signing up, they will have a dedicated account to which they have to still sign in. 
-
 After completing the sign-in process, they will obtain the necessary access tokens for verifying their identity within the system and will thus be authenticated.
 
 
@@ -403,6 +402,7 @@ Authenticated --> Unregistered : Delete account
   caption: [Account Life-Cycle State Diagram]
 )
 
+#pagebreak()
 *Capability Life-Cycle*
 
 This state diagram describes the evolution of a device capability. 
@@ -426,9 +426,9 @@ state Usable{
 }
 [*] --> Unavailable
 [*] --> NotDetermined
-NotDetermined --> Denied : User accept in dialog
-NotDetermined --> Authorized : User deny dialog
-Denied --> Authorized : Toggle in settings
+NotDetermined --> Denied : User accept permission in dialog
+NotDetermined --> Authorized : User deny permission dialog
+Denied --> Authorized : Toggle permission in settings
 Authorized --> Denied
 ```
 #figure(
@@ -440,12 +440,16 @@ Authorized --> Denied
 #pagebreak()
 *Path Life-Cycle*
 
-The state machine diagram describes the different states in which a path can be in during its life-cycle. The life-cycle of a bike path can begin in two ways:
-Automatic recording: the device starts the recording of a new bike path when it senses that the user is currently biking
-Manual Insertion: the user manually adds a new bike path by specifying relevant details such as the start, the street names along the route, the destination, and the status.
+The state machine diagram describes the different states in which a path can be in during its life-cycle. 
+
+The life-cycle of a bike path can begin in two ways:
+- Automatic recording: the device starts the recording of a new bike path when it senses that the user is currently biking
+- Manual Insertion: the user manually adds a new bike path by specifying relevant details such as the start, the street names along the route, the destination, and the status.
+
 After the user confirms the completion of the bike path, the system saves it to the database.
 Each bike path is associated with a “Privacy” attribute that determines the privacy status of the bike path (public or private). 
 By default, when the bike path is first added, the “Privacy” attribute is set to “private”, but can be later modified according to the user’s preferences.
+
 The bike path can optionally enter the “Deleted” state, where the bike path is permanently removed from the database, at the user’s discretion.
 
 #let pathStateDiagram = ```plantuml
@@ -475,9 +479,15 @@ Deleted --> [*]
 *Automatic Recording*
 
 The state diagram describes the recording process of a bike path as the user is biking and the device automatically records the followed route.
-When the user stops biking, the device’s sensors detect a sudden drop in velocity. When the system reads this information, it concludes that the user is no longer biking and therefore temporarily pauses the recording. This prevents the collection of inaccurate trip statistics, such as the final calculation of the average speed or the total active biking time. Pausing is also necessary for avoiding possible incorrect obstacle detections and for maintaining a “smooth” recorded route. It also helps with conserving battery power.
+
+When the user stops biking, the device’s sensors detect a sudden drop in velocity. 
+When the system reads this information, it concludes that the user is no longer biking and therefore temporarily pauses the recording. This prevents the collection of inaccurate trip statistics, such as the final calculation of the average speed or the total active biking time. 
+
+Pausing is also necessary for avoiding possible incorrect obstacle detections and for maintaining a “smooth” recorded route. It also helps with conserving battery power.
 The user can also optionally pause and resume the recording at their discretion.
+
 When the user resumes biking, the system detects the movement and resumes the recording once the velocity reaches a threshold that indicates that the user is currently biking.
+
 The termination of the recording, which is manually performed by the user, can only occur when the user has stopped. If any errors occur during this process, they must be effectively handled by the system.
 
 #let automaticRecordingStateDiagram = ```plantuml

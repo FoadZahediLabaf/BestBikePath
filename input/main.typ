@@ -377,11 +377,11 @@ AutomaticBikePath "1" *-- "0..1" Weather
 
 This state diagram describes the evolution of a user’s account. 
 
-Initially, the user doesn’t possess a BBP account and is therefore unauthenticated and unregistered. Once the user follows the necessary steps for signing up, they will have a dedicated account to which they have to still sign in. 
-After completing the sign-in process, they will obtain the necessary access tokens for verifying their identity within the system and will thus be authenticated.
+Initially, the user doesn’t possess a BBP account and is therefore `Unauthenticated` and `Unregistered`. Once the user follows the necessary steps for signing up, they will have a dedicated account to which they have to still sign in. 
+After completing the sign in process, they will obtain the necessary access tokens for verifying their identity within the system and will thus be authenticated.
 
 
-If the user decides to log-out, they will move back into the “Registered” state and will have to complete the sign-in process again. If the user deletes their account, all the data associated with the user will be deleted from the database and their session will be terminated and will thus move to the initial state.
+If the user decides to sign out, they will move back into the `Registered` state and will have to complete the sign in process again. If the user deletes their account, all the data associated with the user will be deleted from the database and their session will be terminated and will thus move to the initial state.
 
 #let accountStateDiagram = ```plantuml
 left to right direction
@@ -443,14 +443,14 @@ Authorized --> Denied
 The state machine diagram describes the different states in which a path can be in during its life-cycle. 
 
 The life-cycle of a bike path can begin in two ways:
-- Automatic recording: the device starts the recording of a new bike path when it senses that the user is currently biking
-- Manual Insertion: the user manually adds a new bike path by specifying relevant details such as the start, the street names along the route, the destination, and the status.
+- `AutomaticRecording`: the device starts the recording of a new bike path when it senses that the user is currently biking
+- `ManualInsertion`: the user manually adds a new bike path by specifying relevant details such as the start, the street names along the route, the destination, and the status.
 
 After the user confirms the completion of the bike path, the system saves it to the database.
-Each bike path is associated with a “Privacy” attribute that determines the privacy status of the bike path (public or private). 
-By default, when the bike path is first added, the “Privacy” attribute is set to “private”, but can be later modified according to the user’s preferences.
+Each bike path is associated with a `Privacy` attribute that determines the privacy status of the bike path (public or private). 
+By default, when the bike path is first added, the `Privacy` attribute is set to “private”, but can be later modified according to the user’s preferences.
 
-The bike path can optionally enter the “Deleted” state, where the bike path is permanently removed from the database, at the user’s discretion.
+The bike path can optionally enter the `Deleted` state, where the bike path is permanently removed from the database, at the user’s discretion.
 
 #let pathStateDiagram = ```plantuml
 left to right direction
@@ -492,18 +492,18 @@ The termination of the recording, which is manually performed by the user, can o
 
 #let automaticRecordingStateDiagram = ```plantuml
 hide empty description
-[*] --> RecordingActive: User is biking
-RecordingActive --> RecordingPaused : Velocity drops\nbelow threshold
-RecordingActive --> RecordingPaused : User pauses recording
-RecordingPaused --> RecordingActive : Velocity rises\nabove threshold
-RecordingPaused --> RecordingActive : User resumes recording
-RecordingActive --> Canceled : Sensor / GPS failure\nor inaccurate data
-RecordingPaused --> Canceled : Sensor / GPS failure\nor inaccurate data
-RecordingPaused --> [*] : User stops recording
+[*] --> Active: User is biking
+Active --> Paused : Velocity drops\nbelow threshold
+Active --> Paused : User pauses recording
+Paused --> Active : Velocity rises\nabove threshold
+Paused --> Active : User resumes recording
+Active --> Canceled : Sensor / GPS failure\nor inaccurate data
+Paused --> Canceled : Sensor / GPS failure\nor inaccurate data
+Paused --> [*] : User stops recording
 note on link
 Stop Recording use case
 end note
-note left of RecordingActive
+note left of Active
 - Collect GPS data
 - Update trip metrics
 end note

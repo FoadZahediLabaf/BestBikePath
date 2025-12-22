@@ -1160,7 +1160,7 @@ All communication with back-end services must be authenticated and authorized, b
 )
 
 #pagebreak()
-*UC 12 Manual Pause and Resume of Recording*  
+*UC12 Manual Pause and Resume of Recording*  
 columns: 2,
   [*Name*], [Pause and Resume of Recording],
   [*Actors*], [Pause and Resume of Recording],
@@ -1175,6 +1175,24 @@ columns: 2,
 - GPS data is unavailable],
 )
 #pagebreak()
+*UC13 Manual Path Insertion*
+  columns: 2,
+  [*Name*], [Manual Path Insertion
+],
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [- User navigates to Manual Insertion page],
+  [*Event Flow*], [+The authenticated user accesses the functionality for manual bike path creation.
++ The user specifies the starting point and the destination of the path.
++ The system displays the map corresponding to the selected area.
++ The user defines the bike path by selecting the streets segments composing the route.
++ The user selects a status to associate with the bike path.
++ The user saves the bike path.
++ The system stores the bike path in the user’s personal history],
+  [*Exit Conditions*], [- A new bike path is stored in the database.],
+  [*Exceptions*], [- Internal Error prevents the path from being stored in the database
+- Missing Internet connection],
+#pagebreak()
+
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
@@ -1551,25 +1569,18 @@ deactivate Frontend
 #pagebreak()
 *UC10 Stop Recording*
 #let stopRecordingSequenceDiagram = ```plantuml
-@startuml
-title UC - Stop Recording
 autonumber
-
 actor "User" as U
 boundary "BBP App" as App
 participant "GPS/Sensors" as Sensors
 database "Database" as DB
 participant "Weather API" as API
-
 U -> App : Select "Stop Recording"
 App -> U : Request confirmation
 U --> App : Confirm
-
 App -> Sensors : Stop collecting data
 Sensors --> App : Confirmation
-
 App -> App : Compute path statistics
-
 opt Weather enrichment enabled
   App -> API : Meteorological data request
   alt Meteorological data available
@@ -1578,7 +1589,6 @@ opt Weather enrichment enabled
     API --> App : Data unavailable
   end
 end
-
 App -> DB : Save path data
 alt Storage error
   DB --> App : Error
@@ -1587,9 +1597,6 @@ else Success
   DB --> App : Path data saved
   App --> U : Profile page
 end
-
-@enduml
-
 ```
 #figure(
   stopRecordingSequenceDiagram,
@@ -1599,41 +1606,30 @@ end
 #pagebreak()
 *UC11 Automatic Pause and Resume of Recording*
 #let AutomaticPauseAndResumeRecording = ```plantuml
-@startuml
-title Automatic Pause and Resume Based on Speed
-
 actor User
 boundary "BBP App" as App
 participant "Speed Sensor" as Sensor
 participant "GPS" as GPS
-
 == Automatic Pause ==
 Sensor -> App : Velocity decrease detected
 activate App
-
 App -> GPS : Pause data collection
 activate GPS
 GPS --> App : Data collection paused
 deactivate GPS
-
 opt User checks paused state
   User -> App : Open application
   App --> User : Show paused indicator
 end
-
 deactivate App
-
 == Automatic Resume ==
 Sensor -> App : Velocity increase detected
 activate App
-
 App -> GPS : Resume data collection
 activate GPS
 GPS --> App : Data collection resumed
 deactivate GPS
-
 deactivate App
-@enduml
 ```
 #figure(
   AutomaticPauseAndResumeRecording,
@@ -1642,9 +1638,8 @@ deactivate App
 )
 #pagebreak()
 *UC12 Manual Pause and Resume of Recording*
+
 #let ManualPauseAndResumeRecording = ```plantuml
-@startuml
-title Manual Pause and Resume Trip Recording
 actor "Authenticated User" as U
 boundary "BBP App" as UI
 participant "Sensors/GPS" as S
@@ -1666,10 +1661,6 @@ S --> UI : Acquisition started
 deactivate S
 UI --> U : Show recording state
 deactivate UI
-
-
-@enduml
-
 ```
 #figure(
   ManualPauseAndResumeRecording,
@@ -1679,6 +1670,7 @@ deactivate UI
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 

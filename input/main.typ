@@ -1551,39 +1551,44 @@ deactivate Frontend
 #pagebreak()
 *UC10 Stop Recording*
 #let stopRecordingSequenceDiagram = ```plantuml
+@startuml
+title UC - Stop Recording
 autonumber
-actor User
+
+actor "User" as U
 boundary "BBP App" as App
 participant "GPS/Sensors" as Sensors
 database "Database" as DB
 participant "Weather API" as API
 
-User -> App: Select "Stop Recording"
-App -> User: Request confirmation
-User --> App: Confirm
+U -> App : Select "Stop Recording"
+App -> U : Request confirmation
+U --> App : Confirm
 
-App -> Sensors: Stop collecting data
-Sensors --> App: Confirmation
+App -> Sensors : Stop collecting data
+Sensors --> App : Confirmation
 
-App -> App: Compute path statistics
+App -> App : Compute path statistics
 
 opt Weather enrichment enabled
-  App -> API: Meteorological data request
+  App -> API : Meteorological data request
   alt Meteorological data available
-    API --> App: Meteorological data
+    API --> App : Meteorological data
   else Meteorological data unavailable
-    API --> App: Data unavailable
+    API --> App : Data unavailable
   end
 end
 
-App -> DB: Save path data
+App -> DB : Save path data
 alt Storage error
-  DB --> App: Error
-  App --> User: Show error
+  DB --> App : Error
+  App --> U : Show error
 else Success
-  DB --> App: Path data saved
-  App --> User: Profile page
+  DB --> App : Path data saved
+  App --> U : Profile page
 end
+
+@enduml
 
 ```
 #figure(
@@ -1594,40 +1599,41 @@ end
 #pagebreak()
 *UC11 Automatic Pause and Resume of Recording*
 #let AutomaticPauseAndResumeRecording = ```plantuml
+@startuml
+title Automatic Pause and Resume Based on Speed
+
 actor User
 boundary "BBP App" as App
-control "GPS" as GPS
-control "Sensor" as Sensor
+participant "Speed Sensor" as Sensor
+participant "GPS" as GPS
 
-activate User
-activate Sensor
-activate GPS
+== Automatic Pause ==
+Sensor -> App : Velocity decrease detected
 activate App
-User -\ Sensor: Bike slows down
-Sensor -\ App: Velocity decrease detected
 
-App -> GPS: Pause data collection
-GPS --> App: data collection paused
-
+App -> GPS : Pause data collection
+activate GPS
+GPS --> App : Data collection paused
 deactivate GPS
 
-opt User visually confirms pause
-User -> App: Open application
-
-App --> User: Paused indicator
-User -\ App: Close application
-
+opt User checks paused state
+  User -> App : Open application
+  App --> User : Show paused indicator
 end
 
-User -\ Sensor: Bike accelerates
-Sensor -\ App: Velocity increase detected
+deactivate App
 
+== Automatic Resume ==
+Sensor -> App : Velocity increase detected
+activate App
 
-App -> GPS: Resume data collection
+App -> GPS : Resume data collection
 activate GPS
-GPS --> App: Data collection resumed
+GPS --> App : Data collection resumed
+deactivate GPS
 
-
+deactivate App
+@enduml
 ```
 #figure(
   AutomaticPauseAndResumeRecording,
@@ -1797,7 +1803,8 @@ For the sake of simplicity and clarity, some elements that define our system hav
 - GPS and sensor data is excluded from the bike path representations
 - The process through which a street is considered compatible is omitted
 - No distinction is made between different types of obstacles
-- Paths are considered acyclic
+- Paths are  acyclic
+- Paths aren't necessarily formed by a connected sequence of street segments
 
 #pagebreak()
 ```alloy
@@ -1883,20 +1890,16 @@ fact ValidPath {
     }
 }
 
-fact noCycles {
-    no s: Street | s in s.^next
-}
-
 fact badPathAlert{
 	all p:Path | (some s: p.streets | s.compatible = No) iff p.alert = On
 }
 
-fun start[p: RecommendedPath]: one Street {
-    { s: p.streets | no s.previous }  
+fun start[rp: RecommendedPath]: one Street {
+    rp.instances.start
 }
 
-fun end[p: RecommendedPath]: one Street {
-    { s: p.streets | no s.next } 
+fun end[rp: RecommendedPath]: one Street {
+    rp.instances.end
 }
 
 fact ComputeQualityScore {

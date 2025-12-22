@@ -1569,19 +1569,8 @@ deactivate Frontend
 #pagebreak()
 *UC10 Stop Recording*
 #let stopRecordingSequenceDiagram = ```plantuml
-skinparam sequence {
-
-
-
-
-LifeLineBackgroundColor LightGrey
-
-
-}
+autonumber
 skinparam SequenceMessageAlign center
-
-
-
 
 actor User
 boundary "BBP App" as App

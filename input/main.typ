@@ -2085,7 +2085,7 @@ alt Meteorological data available
     activate API
     API --> App: 200 OK (weatherData)
 else Meteorological data unavailable
-    API --> App: Data unavailable
+    API --> App: 404 Not Found
     deactivate API
 end
 App --> App: Compute path statistics

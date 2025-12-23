@@ -1073,7 +1073,6 @@ All communication with back-end services must be authenticated and authorized, b
     + The application starts motion sensor monitoring by subscribing to:
       - Accelerometer updates 
       - Gyroscope updates 
-    
     + While the recording session is active, the following loop repeats until the recording stops:
       - The Sensor API provides accelerometer data to the application.
       - The Sensor API provides gyroscope data to the application.
@@ -1106,26 +1105,25 @@ All communication with back-end services must be authenticated and authorized, b
   [*Name*], [Stop Recording],
   [*Actors*], [Authenticated User, Weather API],
   [*Entry Conditions*], [
-- User stops biking and opens the BBP application
+    - User stops biking and opens the BBP application.
   ],
-  [*Event Flow*], [+ The application displays the current data about the trip
-+ User selects the option to end the automatic recording of the path
-+ The application prompts the user for confirmation
-+ User confirms termination of the recording
-+ The application stops collecting GPS data
-+ The application stops collecting data from gyroscope and accelerometer
-+ Optional: The application collects meteorological data from an external weather API service
-+ The application computes performance and path statistics based on the collected data
-+ The application saves the path data in the database
-+ The application redirects the user to the home page
-
-
+  [*Event Flow*], [
+    + The application displays the current data about the trip.
+    + User selects the option to end the automatic recording of the path.
+    + The application prompts the user for confirmation.
+    + User confirms termination of the recording.
+    + The application stops collecting GPS data.
+    + The application stops collecting data from gyroscope and accelerometer.
+    + Optional: The application collects meteorological data from an external weather API service.
+    + The application computes performance and path statistics based on the collected data.
+    + The application saves the path data in the database.
+    + The application redirects the user to the home page.
   ],
   [*Exit Conditions*], [
-- The application correctly saves the path data in the database
+    - The application correctly saves the path data in the database.
   ],
-  [*Exceptions*], [- The application correctly saves the path data in the database
-
+  [*Exceptions*], [
+    - The application correctly saves the path data in the database.
   ],
 )
 #pagebreak()
@@ -1164,27 +1162,34 @@ All communication with back-end services must be authenticated and authorized, b
 #table(
   columns: 2,
   [*Name*], [View Detailed Information],
-  [*Actors*], [- Authenticated User],
-  [*Entry Conditions*], [- User opens BBP application on their device],
-  [*Event Flow*], [+ User navigates to their history page
-    + Application shows a list of paths associated with the user
-    + User selects a specific path to view more details
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [
+    - User opens BBP application on their device.
+  ],
+  [*Event Flow*], [
+    + User navigates to their history page.
+    + Application shows a list of paths associated with the user.
+    + User selects a specific path to view more details.
     + The system displays the information:
-        - System displays the visual representation of the path on a map
-        - System displays the status of the path
-        - System displays the privacy status
-        - System displays the date
-        - Optional: System displays the total time
-        - Optional: System displays the active time
-        - Optional: System displays the average speed
-        - Optional: System displays the top speed
-        - Optional: System displays the total travelled distance
-        - Optional: System displays the obstacles that were encountered
-        - Optional: System displays meteorological data],
-  [*Exit Conditions*], [- User views the additional information],
+        - System displays the visual representation of the path on a map.
+        - System displays the status of the path.
+        - System displays the privacy status.
+        - System displays the date.
+        - Optional: System displays the total time.
+        - Optional: System displays the active time.
+        - Optional: System displays the average speed.
+        - Optional: System displays the top speed.
+        - Optional: System displays the total travelled distance.
+        - Optional: System displays the obstacles that were encountered.
+        - Optional: System displays meteorological data.
+  ],
+  [*Exit Conditions*], [
+    - User views the additional information.
+  ],
   [*Exceptions*], [
-    - Internal error prevents the system from fetching the data
-    - No internet connection],
+    - Internal error prevents the system from fetching the data.
+    - No internet connection.
+  ],
 )
 
 
@@ -1200,22 +1205,22 @@ All communication with back-end services must be authenticated and authorized, b
   [*Event Flow*], [
     + User opens their history page.
     + The application shows a list of paths associated with the user.
-    + User selects the desired path
+    + User selects the desired path.
     + The system displays the path detail view.
     + User sets privacy toggle.
       - Toggle is set to "Off":
         + The user sets the privacy toggle on.
-        + The application updates the database by setting the path status to “Private”
+        + The application updates the database by setting the path status to “Private”.
       - Toggle is set to "On":
         + The user sets the privacy toggle off.
-        + The application updates the database by setting the path status to “Public”
+        + The application updates the database by setting the path status to “Public”.
   ],
   [*Exit Conditions*], [
     - Path has the selected privacy.
   ],
   [*Exceptions*], [
-    - Internal error prevents the database from being updated
-    - No internet connection
+    - Internal error prevents the database from being updated.
+    - No internet connection.
   ],
 )
 
@@ -1231,7 +1236,7 @@ All communication with back-end services must be authenticated and authorized, b
   [*Event Flow*], [
     + The user navigate to their History Page.
     + The system displays the list of recorded paths.
-    + The user selects the desired path
+    + The user selects the desired path.
     + The system displays the path’s detailed view.
     + The user presses the “Delete” button.
     + The system asks for confirmation.
@@ -1250,7 +1255,33 @@ All communication with back-end services must be authenticated and authorized, b
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
-
+*UC15 Browse Community Paths*
+#table(
+  columns: 2,
+  [*Name*], [Browse Community Paths],
+  [*Actors*], [User],
+  [*Entry Conditions*], [
+    - User opens the BBP app.
+    - The system contains publishable path information generated by users.
+  ],
+  [*Event Flow*], [
+    + The user navigates to the community path browsing page.
+    + The user specifies a starting point and a destination.
+    + The system finds paths (with “Public” privacy status) connecting the two points.
+    + The system evaluates each path using quality and freshness.
+    + The system asks the Map Service to display each path.
+    + The Map Service displays the ranked list of paths on a map.
+    + Optional: if the user is authenticated they can select a path and start an automatic recording session.
+  ],
+  [*Exit Conditions*], [
+    - The application correctly displays the ranked list of paths.
+  ],
+  [*Exceptions*], [
+    - Cannot compute any path between the starting point and destination.
+    - Origin/destination not recognized.
+    - Map service is unavailable
+  ],
+)
 #pagebreak()
 === Sequence Diagrams
 
@@ -1804,11 +1835,10 @@ deactivate DB
 UI --> U : Show user paths
 == Delete trip ==
 U -> UI : Select path
-U -> App: Select path
 UI--> U: Show Detailed view
-activate db
-UI-> db: getUserPathDetails(userPath)
-db --> App: userPathDetail
+activate DB
+UI-> DB: getUserPathDetails(userPath)
+DB --> UI: userPathDetail
 UI-> U: Show Path Details
 U -> UI: Delete Path
 UI --> U : Show confirmation dialog
@@ -1835,13 +1865,54 @@ deactivate UI
 )
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+*UC15 Browse Community Paths*
+#let browseCommunityPathSequenceDiagram = ```plantuml
+autonumber
+actor "User" as U
+boundary "BBP App " as UI
+boundary "Routing/Map Service" as MAP
+database "BBP Database" as DB
+== Open feature ==
+U -> UI : Open "Find Paths"
+activate UI
+UI -> U : Show search form
+== Submit query ==
+U -> UI : Enter start + destination
+activate DB
+UI -> DB : fetchPathMetadata(start, destination)
+DB - -> UI: paths + metadata
+deactivate DB
+UI -> UI : rankPaths(paths, metadata)
+UI -> MAP : mapPaths(paths)
+activate MAP
+MAP --> UI : map
+deactivate MAP
+UI -> U : Display ranked list and render paths on map
+deactivate UI
+opt User is authenticated
+  U -> UI : Select a Path
+  UI -> U : Show “Start Recording” Button
+  U -> UI : Press “Start Recording” Button
+  UI -> U : Show Automatic Recording Page\nwith selected path displayed on the map
+end
+```
+#figure(
+  browseCommunityPathSequenceDiagram,
+  kind: image,
+  caption: [Browse Community Paths Sequence Diagram]
+)
 
 #pagebreak()
 == Performance Requirements
 
-Regarding the performance analysis of our system, the BBP application must ensure a satisfactory user experience. To achieve this, the system must provide the user with the requested data within an adequate period of time, specifically when interacting directly with the UI. 
+Regarding the performance analysis of our system, the BBP application must ensure a satisfactory user experience. To achieve this, the system must provide the user with the requested data within an adequate period of time, specifically when interacting directly with the UI.
+
+Therefore, the system will apply pagination when potentially large quantities of data are requested by the user, for example when retrieving ranked lists of community bike paths from the database.
+
 The system must also ensure that more computationally intensive back-end operations don’t reduce the responsiveness of the application, especially when computing aggregated quality scores and displaying one or more alternative paths on a map to the user.
+
 While biking, the app must periodically collect GPS and sensor data to guarantee a high degree of accuracy of the followed route (within 10 meters of the actual position of the user), while also maintaining a relatively low level of battery consumption and CPU usage.
+
 The following table provides the ideal maximum duration for each operation under normal load conditions.
 
 #figure(
@@ -1918,7 +1989,9 @@ In the absence of network connectivity the app should be able to store the infor
 
 === Reliability
 When interacting with the application outside of biking, the system should ensure access to its main functionalities even during serious failures. To guarantee this, the system must be implemented with fault-tolerance mechanisms that allow its components to degrade gracefully.
+
 Regarding the automatic recording functionality, the system must ensure that any failures due to GPS and motion-sensor malfunctions or imprecise and conflicting data do not lead to application crashes and loss of data. This unfinished path information must therefore be durable, consistent, and recoverable. To ensure these properties, the data must be reliably stored on the user’s device using mechanisms that reduce any risk of corruption and that allow recovery when possible.
+
 Finally, the inability to connect to external services, specifically for retrieving meteorological data, must be appropriately handled.
 
 === Availability

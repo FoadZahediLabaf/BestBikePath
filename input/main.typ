@@ -2119,24 +2119,26 @@ actor "User" as User
 boundary "BBP App " as App
 database "BBP Database" as db
 activate User
-User -> App: Open application
-App -> User: Show History page 
 activate App
+User ->> App: Open application
+App -> User: Show History page 
 activate db
 App -> db: getPaths(user)
 db --> App: userPaths
 deactivate db
 App -> User: Show user paths 
-User -> App: Select path
-App --> User: Show Detailed view
+User ->> App: Select path
+App -> User: Show Detailed view
 alt Publish bike path
-    User -> App: Set privacy toggle to "On"
+    User ->> App: Set privacy toggle to "On"
+    User ->> App: Press save button
     activate db
     App -> db: setPrivacyStatus(userPath, "Public") 
     db --> App: OK
     deactivate db
 else Unpublish bike path
-    User -> App: Set privacy toggle to "Off"
+    User ->> App: Set privacy toggle to "Off"
+    User ->> App: Press save button
     activate db
     App -> db: setPrivacyStatus(userPath, "Private") 
     db --> App: OK

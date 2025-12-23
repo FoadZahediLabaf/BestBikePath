@@ -1077,7 +1077,108 @@ All communication with back-end services must be authenticated and authorized, b
 
 #pagebreak()
 === Use Case Diagram
+#pagebreak()
 
+#let useCaseDiagram = ```
+"User" as user
+"Registered User" as ruser
+"Weather Service" as weather
+"GPS and Sensors" as sensors
+"Map Service" as map
+"SMTP Server" as email
+user <|- ruser
+
+rectangle "Best Bike Paths"{
+
+    package "Account Management"{
+    usecase "Account Creation"
+    usecase "User Sign-In"
+    usecase "User Sign-Out"
+    usecase "Account Deletion"
+    }
+
+    package "Permission Management"{
+    usecase "Request Device Capability"
+    }
+
+    package "Automatic Bike Path Recording"{
+
+    usecase "Manual Controls"
+    usecase "Activity Detection"
+    usecase "Automatic Obstacle Detection"
+    usecase "Manual Obstacle Insertion"
+    usecase "Stop Recording"
+
+    usecase "Automatic Recording"
+
+    }
+
+    package "Manual Bike Path Insertion"{
+    usecase "Manual Path Insertion"
+    }
+
+    package "Personal History Management"{
+    usecase "Set Bike Path Privacy"
+    usecase "Delete Bike Path"
+    usecase "Show Detailed View"
+
+    }
+
+    package "Community Bike Path Browsing"{
+    usecase "Browse Community Paths"
+    }
+
+
+ 
+
+}
+
+left to right direction
+user -> (User Sign-In) : <initiate>
+user --> (Account Creation): <initiate>
+
+user --> (Browse Community Paths): <initiate>
+left to right direction
+ruser --> (Automatic Recording): <initiate>
+
+
+(Automatic Recording) <-- weather: <participate>
+
+
+left to right direction
+(Automatic Recording) ..> (Manual Controls): <include>
+(Automatic Recording) ..> (Activity Detection): <include>
+(Automatic Recording) ..> (Stop Recording): <include>
+
+(Automatic Obstacle Detection) ..> (Automatic Recording): <extend>
+(Manual Obstacle Insertion) ..> (Automatic Recording): <extend>
+
+(Browse Community Paths) ..> (Automatic Recording): <extend>
+
+
+ruser --> (Account Deletion): <initiate>
+ruser --> (Manual Path Insertion): <initiate>
+ruser --> (Show Detailed View): <initiate>
+ruser --> (Set Bike Path Privacy): <initate>
+ruser --> (User Sign-Out): <initiate>
+ruser --> (Request Device Capability): <participate>
+ruser --> (Delete Bike Path): <initiate>
+
+
+
+map --> (Show Detailed View)
+map --> (Browse Community Paths)
+
+left to right direction
+(Account Creation) <-- email: <participate>
+
+(Automatic Recording) <-- sensors: <participate>
+```
+#figure(
+  useCaseDiagram,
+  kind: image,
+  caption: [Use Case Diagram]
+)
 #pagebreak()
 === Use Cases
 
@@ -1935,9 +2036,9 @@ boundary "BBP App" as Frontend
 control "Sensor API" as CP
 activate User
 activate Frontend
-activate CP
 User ->> Frontend: Press "start" button
 Frontend -> CP: startAccelerometerUpdates(handler)
+activate CP
 Frontend -> CP: startGyroUpdates(handler)
 loop Until recording stops
   CP ->> Frontend: accelerometerData
@@ -1958,8 +2059,6 @@ User ->> Frontend: Press "stop" button
 Frontend -> CP: stopAccelerometerUpdates()
 Frontend -> CP: stopGyroUpdates()
 deactivate CP
-deactivate User
-deactivate Frontend
 ```
 #figure(
   automaticObstacleDetectionSequenceDiagram,

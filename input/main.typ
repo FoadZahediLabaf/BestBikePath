@@ -2162,17 +2162,17 @@ activate User
 activate App
 User ->> App: Open application
 App -> User: Show History Page 
-activate App
-activate db
 App -> db: getPaths(user)
+activate db
 db --> App: userPaths
 deactivate db
 App -> User: Show user paths 
 User ->> App: Select path
 App -> User: Show Detailed view
-activate db
 App -> db: getUserPathDetails(userPath)
+activate db
 db --> App: userPathDetail
+deactivate db
 App -> User: Show Path Details
 opt Performance data available
     App -> User: Show Performance data
@@ -2180,8 +2180,6 @@ end
 opt Meteorological data available
     App -> User: Show Meteorological data
 end
-deactivate App
-deactivate User
 ```
 #figure(
   showUserPathDetailedViewSequenceDiagram,

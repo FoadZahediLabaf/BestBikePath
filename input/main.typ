@@ -1886,17 +1886,17 @@ control "Sensor API" as CP
 activate User
 activate Frontend
 activate CP
-User -> Frontend: Press 'start' button
+User ->> Frontend: Press 'start' button
 Frontend -> CP: startActivityUpdates(handler)
 loop Until recording stops
   alt User starts biking
     CP ->> Frontend: cycling
     Frontend -> Frontend: Start/resume timer
-    Frontend --> User: Show updated UI
+    Frontend -> User: Show updated UI
   else User stops biking
     CP ->> Frontend: stationary / walking / ...
     Frontend -> Frontend: Pause timer
-    Frontend --> User: Show updated UI
+    Frontend -> User: Show updated UI
   end
 end
 User -> Frontend: Press 'stop' button
@@ -1923,7 +1923,7 @@ User ->> Frontend: Press 'start' button
 loop Until recording stops
   User ->> Frontend: Press 'add obstacle' button
   Frontend -> Frontend: Increment obstacle count
-  Frontend --> User: Show obstacle confirmation dialog
+  Frontend -> User: Show obstacle confirmation dialog
   alt User confirms or ignores dialog
     User ->> Frontend: Press 'confirm' button
   else User cancels

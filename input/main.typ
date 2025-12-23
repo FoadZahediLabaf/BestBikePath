@@ -54,13 +54,13 @@ This application is therefore intended to run on a mobile device equipped with G
 *WP1*: The user decides to take a bike trip. \
 *WP2*: Weather conditions change over time. \
 *WP3*: Accelerometer and gyroscope collects device motion data.GPS collects device location data. \
-*WP4v: GPS collects device location data. \
+*WP4*: GPS collects device location data. \
 *WP5*: Street infrastructure changes over time (new streets are built, existing streets are upgraded, downgraded, or decommissioned). \
 *WP6*: Path conditions change over time due to natural degradation, weather, or maintenance. \
 *WP7*: The user starts and stops biking. \
-*WP8v: The user velocity changes. \
-*WP9v: The user encounters an obstacle. \
-*WP10v: Stoplight changes color. \
+*WP8*: The user velocity changes. \
+*WP9*: The user encounters an obstacle. \
+*WP10*: Stoplight changes color. \
 *WP11*: The user's device’s internet connection changes over time.
 
 === Shared Phenomena
@@ -93,33 +93,33 @@ This application is therefore intended to run on a mobile device equipped with G
 *SP23*: The system displays  the user’s personal bike paths in their  history.  \
 *SP24*: The system displays ranked community bike paths between a chosen origin and destination. \
 *SP25*: The system shows detailed information for any selected path. \
-*SP26*: The system alerts the user when a selected path contains incompatible streets for biking. 
+*SP26*: The system alerts the user when a selected path contains incompatible streets for biking.
 
 
 #figure(
   caption: [Mapping between goals and phenomena],
   table(
-  columns: 3,
-  table.header([], [*Shared Phenomena*], [*World Phenomena*]),
-  [*G1*], [SP2, SP4, SP7, SP13, SP14, SP16, SP17, SP20, SP21],
-          [WP1, WP3, WP4, WP7, WP8, WP11],
-  [*G2*], [SP2, SP5, SP6, SP7, SP17],
-          [WP5],
-  [*G3*], [SP2, SP8, SP19],
-          [WP9],
-  [*G4*], [SP2, SP4, SP9],
-          [WP7, WP9],
-  [*G5*], [SP2, SP23, SP25],
-          [],
-  [*G6*], [SP2, SP7, SP24, SP25],
-          [],
-  [*G7*], [SP2, SP13, SP14, SP15, SP20, SP22, SP25],
-          [WP2, WP3, WP4, WP8],
-  [*G8*], [SP11, SP12, SP18, SP24, SP25],
-          [WP5, WP6],
-  [*G9*], [SP18, SP26],
-          [WP5, WP6, WP10],
-)
+    columns: 3,
+    table.header([], [*Shared Phenomena*], [*World Phenomena*]),
+    [*G1*], [SP2, SP4, SP7, SP13, SP14, SP16, SP17, SP20, SP21],
+            [WP1, WP3, WP4, WP7, WP8, WP11],
+    [*G2*], [SP2, SP5, SP6, SP7, SP17],
+            [WP5],
+    [*G3*], [SP2, SP8, SP19],
+            [WP9],
+    [*G4*], [SP2, SP4, SP9],
+            [WP7, WP9],
+    [*G5*], [SP2, SP23, SP25],
+            [],
+    [*G6*], [SP2, SP7, SP24, SP25],
+            [],
+    [*G7*], [SP2, SP13, SP14, SP15, SP20, SP22, SP25],
+            [WP2, WP3, WP4, WP8],
+    [*G8*], [SP11, SP12, SP18, SP24, SP25],
+            [WP5, WP6],
+    [*G9*], [SP18, SP26],
+            [WP5, WP6, WP10],
+  )
 )
 
 == Definitions, Acronyms, Abbreviations
@@ -413,7 +413,7 @@ Initially, a capability may be `Unavailable`, meaning the device doesn't support
 
 When the capability is in the `NotDetermined` state, the system may request authorization from the user through a permission dialog. If the user grants permission, the capability transitions to the `Authorized` state and becomes usable by the application. Otherwise, if the user denies the permission request, the capability transitions to the Denied state and cannot be used. The capability may only transition to the `Authorized` state if the user manually enables it through the device’s system settings. 
 
-Once in the `Denied` state the application can't request again the permission through the system dialog. `Authorized` capability may transition back to the `Denied` state if the user revokes the permission from the system settings.
+Once in the `Denied` state the application can't request the permission anymore through the system dialog. `Authorized` capability may transition back to the `Denied` state if the user revokes the permission from the system settings.
 
 #let capabilityStateDiagram = ```plantuml
 left to right direction
@@ -2027,7 +2027,8 @@ The application should be able to run on the main mobile operating systems, spec
 = Formal Analysis Using Alloy
 The Alloy analysis of our BBP project allows for a formal demonstration of how the requirements defined in the previous section are both necessary and sufficient for the satisfaction of our initially defined goals.
 
-This analysis mainly focuses on the representation of some of the core functions provided by the application, such as the  “path browsing” functionality through which users are given bike path recommendations based on a quality score, and the publishing functionality that allows users to make their paths available to the public, as well as the way the system manages the validity of each recorded bike path.
+This analysis mainly focuses on the representation of some of the core functions provided by the application, such as the  “path browsing” functionality through which users are given bike path recommendations based on a quality score, and the publishing functionality that allows users to make their paths available to the public, as well as the way the system manages the validity of each recorded bike path.\
+We also focus on the management of user permissions for accessing device capabilities (e.g., notifications, sensors, GPS) and the protection of sensitive user data.
 
 For the sake of simplicity and clarity, some elements that define our system have been simplified, allowing for better readability of both the code and the diagrams, while still capturing the essential constraints and behaviors. The main simplifications are listed below:
 - There is no distinction between unauthenticated and authenticated users
@@ -2036,6 +2037,8 @@ For the sake of simplicity and clarity, some elements that define our system hav
 - No distinction is made between different types of obstacles
 - Paths are  acyclic
 - Paths aren't necessarily formed by a connected sequence of street segments
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Path Browsing")
 
 #pagebreak()
 ```alloy
@@ -2208,7 +2211,7 @@ assert BestPathsAreRecommended {
 #figure(
   
   image("alloy/Picture2.png", height: 10%),
-  caption: [BestPathsAreRecommended assertion execution]
+  caption: [`BestPathsAreRecommended` assertion execution]
 )
 
 The following assertion shows how every user will be visually notified if a certain path may not be suitable for biking, therefore allowing the user to follow specific paths with the full knowledge of the possible risks associated with them.
@@ -2221,7 +2224,7 @@ assert NoFalseAlerts {
 
 #figure(
   image("alloy/Picture3.png", height: 10%),
-  caption: [NoFalseAlerts assertion execution]
+  caption: [`NoFalseAlerts` assertion execution]
 )
 
 The assertion below verifies that only public paths are returned to the user following a query, thereby forbidding the use of private paths in constructing the query response and protecting the user’s private data.
@@ -2237,7 +2240,7 @@ assert NoPrivatePathsInQueryResults {
 
 #figure(
   image("alloy/Picture4.png", height: 10%),
-  caption: [NoPrivatePathsInQueryResults assertion execution]
+  caption: [`NoPrivatePathsInQueryResults` assertion execution]
 )
 
 @alloy-world-2 illustrates an example of a query execution. The query returns two path recommendations to the user. Each recommendation is computed based on a set of path instances, which are used to determine the overall quality of the path. In this example, both path recommendations consist of a single instance, each with the same start and end points specified in the query, but following different routes between them. Each recommendation is associated with a quality score, calculated based on the characteristics of its path instances, particularly the number of obstacles.
@@ -2246,6 +2249,124 @@ assert NoPrivatePathsInQueryResults {
   image("alloy/Picture5.png"),
   caption: [Query execution]
 ) <alloy-world-2>
+
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Capability Management")
+
+In the following section we analyze the management capability permissions and requests for access. A capability represents any device feature requiring user authorization, such as localization services, motion sensors, and notifications.
+
+A capability is considered usable by the application only if the user has explicitly granted authorization. Authorization for a capability may be requested directly from the user only when the capability is available on the device and the system has not previously requested permission for it.
+
+If the user denied the system permission request, the capability permission should be enabled in the device’s system settings.
+
+```alloy
+open util/boolean
+
+sig Capability {
+  var status: one CapabilityStatus,
+  var isUsable: one Bool,
+  var availableAction: lone CapabilityAction
+}
+
+enum CapabilityStatus {
+  Unavailable,
+  NotDetermined,
+  Denied,
+  Authorized
+}
+
+enum CapabilityAction {
+  AskPermission,
+  ModifyInSettings
+}
+
+fact CapabilityUsability {
+  always all c: Capability |
+    c.isUsable = True iff c.status = Authorized
+}
+
+fact CapabilityAvailableActions {
+  always all c: Capability |
+    (
+      c.status = Unavailable implies
+        no c.availableAction
+    ) and
+    (
+      c.status = NotDetermined implies
+        c.availableAction = AskPermission
+    ) and
+    (
+      c.status = Denied implies
+        c.availableAction = ModifyInSettings
+    ) and
+    (
+      c.status = Authorized implies
+        no c.availableAction
+    )
+}
+
+```
+
+@capability-management-world is an example of a world showcasing two capabilities that are available on the user's device.
+Although both capabilities exist, neither is currently usable by the application. In fact, permission to access the first capability was explicitly denied by the user, while access to the second hasn't yet been requested and will therefore remain unavailable until BBP explicitly asks the user for permission.
+
+#figure(
+  image("alloy/capability-management/world.png"),
+  caption: [Query execution]
+) <capability-management-world>
+
+The following assertion checks that a capability is not usable if permission was authorized by the user.
+```alloy
+assert AuthorizedIsUsable {
+  always all c: Capability |
+    c.status = Authorized implies c.isUsable = True
+}
+```
+#figure(
+  image("alloy/capability-management/AuthorizedIsUsable.png"),
+  caption: [`AuthorizedIsUsable` assertion execution]
+)
+
+The following assertion checks that a capability is not usable if permission was denied by the user.
+```alloy
+assert DeniedNotUsable {
+  always all c: Capability |
+    c.status = Denied implies c.isUsable = False
+}
+```
+#figure(
+  image("alloy/capability-management/DeniedNotUsable.png"),
+  caption: [`DeniedNotUsable` assertion execution]
+)
+
+Here we check that permission for the capability can be asked if not yet determined.
+```alloy
+assert NotDeterminedRequiresAsk {
+  always all c: Capability |
+    c.status = NotDetermined implies c.availableAction = AskPermission
+}
+```
+#figure(
+  image("alloy/capability-management/NotDeterminedRequiresAsk.png"),
+  caption: [`NotDeterminedRequiresAsk` assertion execution]
+)
+
+Here we check that no action can be taken if the capability is unavailable.
+```alloy
+assert UnavailableImpliesNoAction {
+  always all c: Capability |
+    c.status = Unavailable implies no c.availableAction
+}
+```
+#figure(
+  image("alloy/capability-management/UnavailableImpliesNoAction.png"),
+  caption: [`UnavailableImpliesNoAction` assertion execution]
+)
+
+
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Recording")
+
 
 = Effort Spent
 

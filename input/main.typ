@@ -2161,27 +2161,26 @@ actor "Authenticated User" as U
 boundary "BBP App " as UI
 database "BBP Database" as DB
 activate U
-== Open history ==
-U -> UI : Open History Page
 activate UI
+== Open history ==
+U ->> UI : Open History Page
 UI -> DB : getPaths(user)
 activate DB
 DB --> UI : pathList
 deactivate DB
 UI -> U : Show user paths
 == Delete trip ==
-U -> UI : Select path
-UI-> U: Show Detailed view
+U ->> UI : Select path
 activate DB
 UI-> DB: getUserPathDetails(userPath)
 DB --> UI: userPathDetail
 UI-> U: Show Path Details
-U -> UI: Delete Path
-UI --> U : Show confirmation dialog
+U ->> UI: Delete Path
+UI -> U : Show confirmation dialog
 alt User cancels deletion
-  U -> UI : Tap "Cancel"
+  U ->> UI : Tap "Cancel"
 else User confirms deletion
-  U -> UI : Tap "Confirm"
+  U ->> UI : Tap "Confirm"
   UI -> DB : deletePath(path)
   activate DB
   DB --> UI : OK
@@ -2190,7 +2189,7 @@ else User confirms deletion
   activate DB
   DB --> UI : pathList
   deactivate DB
-  UI -> U : show History Page
+  UI -> U : Show History Page
 end
 deactivate UI
 ```

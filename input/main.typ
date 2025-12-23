@@ -125,7 +125,7 @@ This application is therefore intended to run on a mobile device equipped with G
 == Definitions, Acronyms, Abbreviations
 
 === Definitions
-*User*: Term used to indicate both authenticated and unauthenticated individuals who interact with the application. These individuals can be distinguished between authenticated and unauthenticated users.
+*User*: Term used to indicate both authenticated and unauthenticated individuals who interact with the application.
 
 *Authenticated User*: User who are authenticated in their BBP account. An authenticated user has full access to the functionalities offered by the application.
 
@@ -1352,7 +1352,6 @@ deactivate Backend
 Frontend --> User: Show homepage as logged user
 deactivate User
 deactivate Frontend
-
 ```
 
 #figure(
@@ -1483,7 +1482,7 @@ alt Capability access is unavailable
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
   CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining why the capability is needed\nand instructionsto give permission in system settings
+  Frontend ->> User: Show a modal explaining\nwhy the capability is needed\nand instructionsto give\npermission in system settings
   loop Until user presses 'Cancel' or authorize capability access in settings
     alt Continue
       User -> Frontend: Press 'Cancel' button
@@ -1503,7 +1502,7 @@ else Capability access is authorized
   Frontend -> Frontend: Continue with capability
 else Capability access is not determined
   CP --> Frontend: notDetermined
-  Frontend ->> User: Show a modal explaining why the capability is needed
+  Frontend ->> User: Show a modal explaining\nwhy the capability is needed
   alt Cancel
     User -> Frontend: Press 'Cancel' button
   else Continue

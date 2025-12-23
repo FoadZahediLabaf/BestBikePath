@@ -1853,7 +1853,7 @@ deactivate Frontend
 #let automaticRecordingManualControlsSequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
@@ -2454,17 +2454,17 @@ fact ValidPath {
 
 	   all s:p.streets | s in p.streets.connectedTo
 
-	  //no cycles
-   p.start != p.end
+	    //no cycles
+     p.start != p.end
     }
 }
 
 fact badPathAlert{
-	all p:Path | (some s: p.streets | s.compatible = No) iff p.alert = On
+  	  all p:Path | (some s: p.streets | s.compatible = No) iff p.alert = On
 }
 
 fun start[rp: RecommendedPath]: one Street {
-    rp.instances.start
+  rp.instances.start
 }
 
 fun end[rp: RecommendedPath]: one Street {
@@ -2476,9 +2476,9 @@ fact ComputeQualityScore {
         rp.quality = score[rp]
 }
 
-// To model data freshness in the quality score computation, only one user path
-// is considered, representing the most recently recorded instance, while older
-// path instances are ignored.
+//to model data freshness in the quality score computation, only one user path
+//is considered, representing the most recently recorded instance, while older
+//path instances are ignored.
 
 fun obstacleCount[p: RecommendedPath]: Int {
     # { o: Obstacle | one i: p.instances | o in i.obstacles }
@@ -2488,27 +2488,24 @@ fun score[p: RecommendedPath]: Int {
     obstacleCount[p]
 }
 
-//The query returns a set of path recommendations with the same beginning and end
+//the query returns a set of path recommendations with the same beginning and end
 //as the ones specified in the query
 fact QueryProducesResults {
     always (
         all q: Query |
             (some q.qStart and some q.qEnd) implies
             after (
-                q.results = { p: RecommendedPath |
-                    start[p] = q.qStart and
-                    end[p] = q.qEnd
-                }
+                q.results = { p: RecommendedPath | start[p] = q.qStart and end[p] = q.qEnd}
             )
     )
 }
 
-//Each query produces the top three best path recommendations
+//each query produces the top three best path recommendations
 fact TopThreeBest {
 	all q: Query |
 		let matched = { p: RecommendedPath | start[p] = q.qStart and end[p] = q.qEnd } |
         
-        // No matched path outside the results has better quality
+    //No matched path outside the results has better quality
 		all p: matched - q.results | all r: q.results | r.quality <= p.quality and	#q.results <= 3
 }
 ```
@@ -2527,19 +2524,14 @@ The quality of each path recommendation is computed by selecting the number of o
 
 ```alloy
 assert BestPathsAreRecommended {
-    all q: Query |
-        (some q.qStart and some q.qEnd) implies
-        eventually (
-            let matched = { p: RecommendedPath | start[p] = q.qStart and end[p] = q.qEnd } |
-            
-            // The results contain exactly the matched paths
-            q.results = matched and
+  all q: Query |
+    (some q.qStart and some q.qEnd) implies
+    eventually (
+      let matched = { p: RecommendedPath | start[p] = q.qStart and end[p] = q.qEnd } |
 
-            // No better-quality path exists among matched paths outside the results
-            all p: matched - q.results |
-                all r: q.results |
-                    p.quality >= r.quality
-        )
+      //The results contain the highest-quality paths
+      all p: matched - q.results | all r: q.results | p.quality >= r.quality
+    )
 }
 ```
 #figure(
@@ -2710,8 +2702,11 @@ assert UnavailableImpliesNoAction {
 
 = References
 
-Add maybe we have to reference plantuml, ...\
-Remember to check if we have time to add automatic mode cancellation (by user or by connectivity)
+- *Typst* language and online editor to build this document.
+- *PlantUML* to define and create diagrams.
+- *Alloy* for formal analysis.
+- *GitHub* for project versioning and automate diagram creation.
+- *Google Docs* for collaborative writing.
 
 
 #show: backmatter.with()

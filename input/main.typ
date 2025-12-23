@@ -2038,9 +2038,9 @@ For the sake of simplicity and clarity, some elements that define our system hav
 - Paths are  acyclic
 - Paths aren't necessarily formed by a connected sequence of street segments
 
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Path Browsing")
 
-#pagebreak()
 ```alloy
 sig User{
 	paths: set Path
@@ -2178,14 +2178,14 @@ fact TopThreeBest {
 }
 ```
 
-@alloy-world-1 shows an example of two paths, both owned by the same user and associated with their respective data. The two paths contain the same set of streets but differ in the information attached to them. For instance, the obstacles encountered along each path are different, which reflects a realistic scenario that may occur in practice.
+@alloy-community-path-browsing-world1 shows an example of two paths, both owned by the same user and associated with their respective data. The two paths contain the same set of streets but differ in the information attached to them. For instance, the obstacles encountered along each path are different, which reflects a realistic scenario that may occur in practice.
 The two paths also have different status values. Although the computation of the status was excluded from this Alloy representation, this situation is still plausible, since users can create their own paths and assign different statuses despite having the same route.
 Another characteristic is the presence of an incompatible street in the paths, which causes the Alert signature associated with each path to be in the “On” state.
 
 #figure(
-  image("alloy/Picture1.png"),
+  image("alloy/community-path-browsing/world1.png"),
   caption: [Two paths with same route]
-) <alloy-world-1>
+) <alloy-community-path-browsing-world1>
 
 The following assertion verifies that each query requested by the user will only contain the RecommendedPaths with the highest rating, allowing the user to view the best possible paths between two points.
 The quality of each path recommendation is computed by selecting the number of obstacles in a  single “path instance”. The selected paths are the ones with the lowest scores. This is clearly a simplification to illustrate how the overall quality of a path is determined by the recorded data, but in reality it must consider many more factors that can’t be clearly illustrated through an Alloy model.
@@ -2207,28 +2207,23 @@ assert BestPathsAreRecommended {
         )
 }
 ```
-
 #figure(
-  
-  image("alloy/Picture2.png", height: 10%),
+  image("alloy/community-path-browsing/BestPathsAreRecommended.png", height: 10%),
   caption: [`BestPathsAreRecommended` assertion execution]
 )
 
 The following assertion shows how every user will be visually notified if a certain path may not be suitable for biking, therefore allowing the user to follow specific paths with the full knowledge of the possible risks associated with them.
-
 ```alloy
 assert NoFalseAlerts {
     all p: Path | p.alert = On implies some s: p.streets | s.compatible = No
 }
 ```
-
 #figure(
-  image("alloy/Picture3.png", height: 10%),
+  image("alloy/community-path-browsing/NoFalseAlerts.png", height: 10%),
   caption: [`NoFalseAlerts` assertion execution]
 )
 
 The assertion below verifies that only public paths are returned to the user following a query, thereby forbidding the use of private paths in constructing the query response and protecting the user’s private data.
-
 ```alloy
 assert NoPrivatePathsInQueryResults {
     all q: Query |
@@ -2237,18 +2232,16 @@ assert NoPrivatePathsInQueryResults {
                 p.privacy = Public
 }
 ```
-
 #figure(
-  image("alloy/Picture4.png", height: 10%),
+  image("alloy/community-path-browsing/NoPrivatePathsInQueryResults.png", height: 10%),
   caption: [`NoPrivatePathsInQueryResults` assertion execution]
 )
 
-@alloy-world-2 illustrates an example of a query execution. The query returns two path recommendations to the user. Each recommendation is computed based on a set of path instances, which are used to determine the overall quality of the path. In this example, both path recommendations consist of a single instance, each with the same start and end points specified in the query, but following different routes between them. Each recommendation is associated with a quality score, calculated based on the characteristics of its path instances, particularly the number of obstacles.
-
+@alloy-community-path-browsing-world2 illustrates an example of a query execution. The query returns two path recommendations to the user. Each recommendation is computed based on a set of path instances, which are used to determine the overall quality of the path. In this example, both path recommendations consist of a single instance, each with the same start and end points specified in the query, but following different routes between them. Each recommendation is associated with a quality score, calculated based on the characteristics of its path instances, particularly the number of obstacles.
 #figure(
-  image("alloy/Picture5.png"),
+  image("alloy/community-path-browsing/world2.png"),
   caption: [Query execution]
-) <alloy-world-2>
+) <alloy-community-path-browsing-world2>
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Capability Management")
@@ -2363,13 +2356,10 @@ assert UnavailableImpliesNoAction {
   caption: [`UnavailableImpliesNoAction` assertion execution]
 )
 
-
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Recording")
 
-
 = Effort Spent
-
 
 #figure(
   table(

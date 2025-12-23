@@ -2157,10 +2157,10 @@ deactivate App
 *UC14 Delete Bike Path*
 #let deleteBikePathSequenceDiagram = ```plantuml
 autonumber
-activate User
 actor "Authenticated User" as U
 boundary "BBP App " as UI
 database "BBP Database" as DB
+activate U
 == Open history ==
 U -> UI : Open History Page
 activate UI

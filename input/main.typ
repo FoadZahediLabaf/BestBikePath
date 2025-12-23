@@ -1469,7 +1469,7 @@ alt Capability access is unavailable
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
   CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining why the capability is needed and instructions\nto give permission in system settings
+  Frontend ->> User: Show a modal explaining why the capability is needed \n and instructionsto give permission in system settings
   loop Until user presses 'Cancel' or authorize capability access in settings
     alt Continue
       User -> Frontend: Press 'Cancel' button
@@ -1515,6 +1515,7 @@ deactivate Frontend
 )
 
 
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 *UC6 Automatic Recording With Manual Controls*
 #let automaticRecordingManualControlsSequenceDiagram = ```plantuml

@@ -203,7 +203,7 @@ The following reference materials were used for the preparation of this document
 1. *Introduction*: a description of the project that highlights the objectives that it aims to satisfy as well as the core interactions between the application and the environment in which it operates.
 2. *Overall Description*: a more detailed description of the functionalities provided by the application, including real-world scenarios and descriptions of the types of users that interact with the system.
 3. *Specific Requirements*: includes an overview of the main interfaces provided or used by the system as well as an exhaustive list and analysis of the main requirements that guarantee satisfaction of the project’s main objectives, including diagrams that describe the interaction between the system and the environment.
-4. *Formal analysis using Alloy*: a formal description of the domain and an analysis of  some of the product’s requirements through Alloy in order to objectively determine the satisfaction of specific goals.
+4. *Formal analysis using Alloy*: a formal description of the domain and an analysis of some of the product’s requirements through Alloy in order to objectively determine the satisfaction of specific goals.
 5. *Effort spent*: Includes the amount of time dedicated by each member for the realization of each section of the document.
 6. *References*: reference to documents or tools used for writing this document.
 
@@ -216,9 +216,9 @@ The following reference materials were used for the preparation of this document
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
 
 *Unauthenticated user signs up an account* \
-The user, after downloading the Best Bike Paths app, opens it on their device. Since the user is anonymous the app displays a content unavailable view explaining what the user is missing, since they’re not logged in, and a CTA to sign in. The user decides to create an account in order to take full advantage of the app’s capabilities. After tapping the sign-in button, the app presents a modal. The user is prompted to insert an email, which the app uses to discern if the user is new and should create a new account or, if already taken, to log in. The user inserts their email and the app verifies the email is not used by another account.  The app then displays a verify-email page where the user has to insert a one-time code sent to their email. After correctly inserting the code, the app displays a page with a name, password and password-confirmation text fields.  After inserting the new requested data, the modal is dismissed and the user is redirected to the home view.
+The user, after downloading the Best Bike Paths app, opens it on their device. Since the user is anonymous the app displays a _Content Unavailable_ view explaining what the user is missing, since they’re not logged in, and a CTA to sign in. The user decides to create an account in order to take full advantage of the app’s capabilities. After tapping the sign-in button, the app presents a modal. The user is prompted to insert an email, which the app uses to discern if the user is new and should create a new account or, if already taken, to log in. The user inserts their email and the app verifies the email is not used by another account.  The app then displays a _verify-email_ page where the user has to insert a one-time code sent to their email. After correctly inserting the code, the app displays a page with a name, password and password-confirmation text fields.  After inserting the new requested data, the modal is dismissed and the user is redirected to the home view.
 
-*Authenticated User deletes their account* \
+*Authenticated user deletes their account* \
 An authenticated user opens the BBP application and accesses their personal profile settings.
 The user selects the option to delete their account. The system informs the user that deleting the account will permanently remove all data associated with the user, including personal profile information, recorded trips, and any bike paths previously published by the user.
 After the user confirms this action, the system deletes the account and all related data from the database and terminates the user session.
@@ -237,26 +237,26 @@ The same flow of events will be replicated wherever other capabilities are requi
 
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
-*Authenticated Users press start button before biking* \
-While on the home page, the user presses the Start Recording button. The app displays the path recording page, consisting of a map, a timer, and a start button. If the user presses the start button the system begins the time-lapse, and displays a Stop button, a pause button and relevant information regarding the trip, such as the covered distance, current speed, average speed and top speed.
+*Authenticated user presses start button before biking* \
+While on the home page, the user presses the Start Recording button. The app displays the path recording page, consisting of a map, a timer, and a Start button. If the user presses the Start button the system begins the time-lapse, and displays a Stop button, a Pause button and relevant information regarding the trip, such as the covered distance, current speed, average speed and top speed.
 
-*Authenticated User pauses recording* \
+*Authenticated user pauses recording* \
 While a trip recording is in progress, the user temporarily stops biking and selects the option to pause the recording.
 The system suspends the collection of GPS and sensor data and stops the trip timer. 
-When the user decides to resume biking, the user selects the resume option. The system continues the recording, continues collecting GPS and sensor data, and updates the trip statistics accordingly until the trip is stopped or paused again.
+When the user decides to resume biking, the user selects the Resume option. The system continues the recording, continues collecting GPS and sensor data, and updates the trip statistics accordingly until the trip is stopped or paused again.
 
 *System detects obstacles and asks for the Authenticated User’s confirmation* \
 While biking, the user encounters an obstacle and rides over it. The device records vibrations and speed changes via the gyroscope and accelerometer, recognizing the obstacle. The system displays a timed alert to give users the opportunity to confirm the presence of the obstacle. 
 The user may either confirm or reject the detected obstacle. If the user ignores the alert, after a certain amount of time the app will silently accept and add the obstacle to the path data.
 
-*Authenticated User adds an obstacle while biking* \
+*Authenticated user adds an obstacle while biking* \
 While biking, the user encounters an obstacle and rides near it without the system detecting it. The user therefore decides to notify the presence of this obstacle and opens the BBP application, presses the “Add Obstacle” button, and closes the app.
 The system records the obstacle and adds it to the current path information. 
 
-*Authenticated User stops at a red light* \
+*Authenticated user stops at a red light* \
 While biking, the user encounters a red light and stops. The system registers the sudden change in the bike’s velocity and pauses the recording. The user quickly opens the application on their device and sees that the time-lapse has paused. After putting away their device, the stoplight turns green, and the user resumes biking. The system recognizes that the bike has started to move and therefore resumes the time-lapse.
 
-*Authenticated User stops biking and stop recording* \
+*Authenticated user stops biking and stops recording* \
 After having reached their destination, the user opens the BBP application, which is currently recording the path that they have taken up to this point. The user presses a button to stop the recording. The application prompts the user for confirmation to terminate the recording. After the user selects the “Confirm” option, the system ends the recording and shows a recap of the trip, allowing the user to review the collected and to set the privacy status of the path. After user confirmation, the system displays the user's personal history page.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
@@ -267,29 +267,29 @@ Before saving the bike path, the user selects a status to associate with the pat
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
-*Authenticated User visits their history page* \
+*Authenticated user visits their history page* \
 After the authenticated user opens the BBP application on their device, they navigate to their history page, where they can view a list of all the paths that they’ve travelled (organized by chronological order). Each path shows a limited amount of information, such as the beginning and destination of the trip, the date when the trip was taken, and the total duration.
-There is also an option to select a specific path to view additional information, such as a visual representation of the path traveled, average speed, meteorological information, and the obstacles encountered along the trail, as well as a button that makes the information about that path public.
+There is also an option to select a specific path to view additional information, such as a visual representation of the traveled path, average speed, meteorological information, and the obstacles encountered along the trail, as well as a button that makes the information about that path public.
 
-*Authenticated User deletes a bike path* \
+*Authenticated user deletes a bike path* \
 After opening the BBP app on their device and navigating to their history page, the user notices that a bike path was added by mistake. To remove it, the user selects the path to open its dedicated page, where they can find the button that allows them to delete the bike path. The system asks for confirmation before permanently removing it from the database. After confirming the action, the system deletes it and updates the user’s history page.
 
-*Authenticated User toggles bike path privacy state* \
+*Authenticated user toggles bike path privacy status* \
 After navigating to their history page, the user selects a bike path that is currently private and presses the button that allows the system to make the information about it public. Following this action, the system updates both the path status within the database and the user’s history view. The user then presses the button again after changing his mind, causing another update of the UI. The system subsequently makes the information associated with the path private.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
-*Authenticated User searches for a path* \
+*Authenticated user searches for a path* \
 The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths and selects it. The user is presented with the option to start the automatic recording function or to simply follow the path without recording. Once the user selects one of the options, they will be redirected to a page displaying the map of the path, a timer, and other metrics
 
-*Unauthenticated User searches for a path* \
+*Unauthenticated user searches for a path* \
 The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths, selects and is redirected to a page displaying the map of the path, a timer, and other metrics
 
 #pagebreak()
 === Class Diagram
 
 The diagram models the main entities of the Best Bike Path application.
-A `User` represent the account of an authenticated user, that can create and own multiple `BikePath` objects.
+A `User` represents the account of an authenticated user that can create and own multiple `BikePath` objects.
 
 `BikePath` represents a single bike ride made by a user. It's an abstract class containing common route information, such as date, visibility, and route structure. \
 It can be specialized into two class: 
@@ -442,10 +442,10 @@ Authorized --> Denied
 #pagebreak()
 *Path Life-Cycle*
 
-The state machine diagram describes the different states in which a path can be in during its life-cycle. 
+The state diagram describes the different states in which a path can be in during its life-cycle. 
 
 The life-cycle of a bike path can begin in two ways:
-- `AutomaticRecording`: the device starts the recording of a new bike path when it senses that the user is currently biking
+- `AutomaticRecording`: the device starts the recording of a new bike path when it senses that the user is currently biking.
 - `ManualInsertion`: the user manually adds a new bike path by specifying relevant details such as the start, the street names along the route, the destination, and the status.
 
 After the user confirms the completion of the bike path, the system saves it to the database.
@@ -484,6 +484,7 @@ The state diagram describes the recording process of a bike path as the user is 
 
 When the user stops biking, the device’s sensors detect a sudden drop in velocity. 
 When the system reads this information, it concludes that the user is no longer biking and therefore temporarily pauses the recording. This prevents the collection of inaccurate trip statistics, such as the final calculation of the average speed or the total active biking time. 
+The user is also allowed to manually pause and resume the recording independently of the actual motion-state of the device.
 
 Pausing is also necessary for avoiding possible incorrect obstacle detections and for maintaining a “smooth” recorded route. It also helps with conserving battery power.
 The user can also optionally pause and resume the recording at their discretion.
@@ -538,7 +539,7 @@ The system allows authenticated users to delete their personal account.
 
 *Permissions Management* \
 The system shall request and manage the permissions required to get the proper access level to the device services necessary for the correct functioning of the application.
-Permission requests to comply with the target platform guidelines shall be issued only when the related functionality is required and shall clearly inform the user about the purpose of each requested permission.
+Permission requests shall be issued only when the related functionality is required and shall clearly inform the user about the purpose of each requested permission.
 The system shall request the following permissions:
 - Location Services, including background location access, to enable ride tracking;
 - Motion sensors (accelerometer and gyroscope), to support bike activity detection and obstacle identification;
@@ -550,22 +551,22 @@ The system shall handle cases in which permissions are denied or revoked by disa
 
 *Manual Control* \
 The system shall allow the user to start a recording by pressing a dedicated button before biking. 
-Once the ride recording starts or resumes, the system should start tracking the user path and allow the user to pause the recording by pressing a dedicated button.
-Once the ride recording pauses, the system should pause to track the user path and allow the user to resume or stop the recording by pressing a dedicated button.
-Once the ride recording stops, the system should stop tracking the user path and allow the user to review the collected information and set the path’s privacy status.
+Once the ride recording starts or resumes, the system should start tracking the path and allow the user to pause the recording by pressing a dedicated button.
+Once the ride recording pauses, the system should stop tracking the path and allow the user to resume or end the recording by pressing a dedicated button.
+Once the ride recording ends, the system should stop tracking the user path and allow the user to review the collected information and set the path’s privacy status.
 
 *Automatic Activity Detection* \
-The system should be capable of recognizing if the user is biking, by using sensor data. The platform provides frameworks capable of providing the current user motion activity (`CNMotionActivityManager` on iOS, and `ActivityRecognitionClient` on Android). 
-Based on the detected change in the user current activity (whether is biking or not), the system takes an action. If we are in record mode, the system should resume or pause the recording. If we are not in record mode, the system should suggest the user to start a new recording session.
+The system should be capable of recognizing if the user is biking by using sensor data. The platform provides frameworks capable of providing the current user motion activity (`CNMotionActivityManager` on iOS, and `ActivityRecognitionClient` on Android). 
+Based on the detected change in the user's current activity (whether they are biking or not), the system will perform specific actions: when in recording mode, the system should resume or pause the recording; when not in recording mode, the system should suggest the user to start a new recording session.
 
 *Manual Obstacle Reporting* \
 The system shall allow the user to report the presence of an obstacle by pressing a dedicated button.
 
 *Automatic Obstacle Detection* \
-The system should be able to detect an obstacle by using data collected from the device's sensors, and prompt the user for confirmation.
+The system should be able to detect an obstacle by using data collected from the device's sensors and prompt the user for confirmation.
 
 *Stop Recording* \
-The automatic path recording is manually terminated at the user’s discretion. When the user selects “Stop Recording”, the system prompts the user for confirmation. After user confirmation, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and to set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
+The automatic path recording is manually terminated at the user’s discretion. When the user selects “Stop Recording”, the system prompts the user for confirmation. After the user confirms, the system stops collecting data from the GPS and the sensors and allows the user to review the collected information, such as obstacles, street names, performance statistics, and set the privacy status of the path. The system then saves the path information in the database and redirects the user to their personal history page.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
@@ -581,35 +582,35 @@ The system also allows the user to revert previously published paths back to “
 *View Detailed Path Information* \
 The system allows users to access a detailed view of their travelled paths. After choosing this option, the system will display relevant information related to the path, such as a map of the route, the total duration, the active biking time, the date of the recording, the average speed, the top speed, the encountered obstacles, the status, and, when available, relevant meteorological information.
 
-*Personal Trip Deletion* \
+*Personal Path Deletion* \
 The system allows users to delete their previously recorded paths from their personal history. When a path is deleted, the system removes all the data associated with it from the database, ensuring that it is no longer accessible to any user.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
 *Bike Path search and Ranking* \
 the system allows users, both authenticated and unauthenticated, to search for bike paths by specifying an origin and a destination.
-When multiple paths are available, the system computes a score for each path and presents the results ranked according to their quality and reliability, both as a list and on a map. After selecting a path, the user is redirected to a page displaying the route on a map, along with a timer and performance-related statistics.
-If the user is authenticated, they are also given the option to record the selected path.
+When multiple paths are available, the system computes a score for each path and presents the results ranked according to their quality and reliability, both as a list and on a map. After selecting a path, authenticated users are redirected to a page displaying the route on a map, along with a timer and performance-related statistics, and will be given the option to start an automatic recording session. If the user refuses, information about the trip won't be stored in the user's personal history.
+
 
 
 == User Characteristics
 
 === Unauthenticated User
 
-Users who haven’t created an account or logged in yet, and who don’t have a valid, non-expired authentication token, will still be able to access the application but will be restricted from using certain functionalities that require user authentication. 
+Users who haven’t created an account or haven't logged in yet, and who don’t have a valid, non-expired authentication token, will still be able to access the application but will be restricted from using certain functionalities that require user authentication. 
 More specifically, an unauthenticated user can look up community bike paths (by inserting a starting point and a destination), which will be displayed on a map, and their system-computed path ranking.
 
 === Authenticated User
 An authenticated user possesses a valid access token for authentication. Authenticated users have full access to the functionalities provided by the BBP application, including those offered to unauthenticated users. 
-Authenticated users can automatically record travelled bike paths, but the system also collects relevant trip data and will occasionally prompt the user for confirmation of encountered obstacles. Completed trips will be stored by the system and can be viewed by the user in the corresponding section of their personal profile page. These users will also be able to optionally publish them, allowing the system to use this information to assess the quality of the bike path and enabling recommendations to other users. 
-These users are also able to browse bike paths and optionally select one to follow before activating the automatic recording functionality.
-Authenticated users are also capable of manually inserting new bike paths by specifying the streets, obstacles, and status associated with the path.
+Authenticated users can automatically record travelled bike paths, but the system also collects relevant trip data and will occasionally prompt the user for confirmation of encountered obstacles. Completed trips will be stored by the system and can be viewed by the user in the corresponding section of their personal history page. These users will also be able to optionally publish them, allowing the system to use this information to assess the quality of the bike path and enabling recommendations to other users. 
+These users are also able to browse bike paths and optionally select one to follow before optionally activating the automatic recording functionality.
+Authenticated users are also capable of manually inserting new bike paths by specifying the streets, privacy, and status associated with the path.
 
 == Assumptions, Dependencies And Constraints
 
 === Regulatory policies
 
-BBP collects and processes user location data, motion sensor data, and information about road conditions such as obstacles and segment status. This information must be handled in full compliance with the General Data Protection Regulation (GDPR), ensuring that personal and location data are stored securely and used only for the purposes of trip recording, path recommendation, and community-based path evaluation.
+BBP collects and processes user location data, motion sensor data, and information about road conditions such as obstacles and segment status. This information must be handled in full compliance with the General Data Protection Regulation (GDPR), ensuring that personal and location data are stored securely and used only for the purposes of trip recording, path recommendation, and community-based path evaluations.
 Users should grant permission for the application to access location services, motion sensors, and notifications on their devices.
 Furthermore, any publishable information contributed by users becomes visible to the community and must be treated as user-generated content, respecting applicable regulations on data sharing and responsibility.
 BBP relies on external mapping and meteorological services, whose terms of use and licensing policies must also be respected.
@@ -634,10 +635,329 @@ BBP relies on external mapping and meteorological services, whose terms of use a
 Best Bike Paths will be an app for mobile devices (iOS and Android). 
 The User Interface will be optimized for touch screens and will follow their platform device guidelines (Human Interface Guidelines for iOS and Material Design for Android). Compliance with these standards ensures a consistent user experience and facilitates the implementation of accessibility best practices.
 User interaction occurs through touch input, gestures, and native UI components.
-Since the app relies on motion and location device features, the interface will include UI elements to request permission to interact with these device capabilities, following the platform specific guidelines.
+Since the app relies on motion and location device features, the interface will include UI elements to request permission to interact with these device capabilities, following the platform-specific guidelines.
 
-`TODO: - Insert images from prototype`
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 45%)[
+      #figure(
+        image("ui/account-management/home-unauthenticated.png", width: 66.7%),
+          caption: [Home page as unauthenticated user.]
+      )
+    ]
+  ][
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/account-management/home-authenticated.png", width: 66.7%),
+          caption: [Home page as authenticated user.]
+      )
+    ]
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 45%)[
+      #figure(
+        image("ui/account-management/account-unhauthenticated.png", width: 66.7%),
+          caption: [Account page as unauthenticated user.]
+      )
+    ]
+  ][
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/account-management/account-unhauthenticated-filled.png", width: 66.7%),
+          caption: [Account page as authenticated user after entering data.]
+      )
+    ]
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 45%)[
+      #figure(
+        image("ui/account-management/account-emailverification.png", width: 66.7%),
+          caption: [Account email verification page.]
+      )
+    ]
+  ][
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/account-management/account-emailverification-filled.png", width: 66.7%),
+          caption: [Account email verification page after entering data.]
+      )
+    ]
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 45%)[
+      #figure(
+        image("ui/account-management/account-signup.png", width: 66.7%),
+          caption: [Account sign-up page.]
+      )
+    ]
+  ][
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/account-management/account-signup-filled.png", width: 66.7%),
+          caption: [Account sign-up page after entering data.]
+      )
+    ]
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 30%)[
+      #figure(
+        image("ui/account-management/account-signin.png"),
+          caption: [Account sign-up page.]
+      )
+    ]
+  ][
+    #block(width: 30%)[
+      #figure(
+        image("ui/account-management/account-signin-filled.png"),
+          caption: [Account sign-up page after entering data.]
+      )
+    ]
+  ][
+    #block(width: 30%)[
+      #figure(
+        image("ui/account-management/account-signin-wrongpassword.png"),
+          caption: [Account sign-in page after entering wrong password.]
+      )
+    ]
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 30%)[
+      #figure(
+        image("ui/account-management/account-authorized.png"),
+          caption: [Account page as authorized user.]
+      )
+    ]
+  ][
+    #block(width: 30%)[
+      #figure(
+        image("ui/account-management/account-authorized-signoutconfirmation.png"),
+          caption: [Account page as authorized user sign-out confirmation dialog.]
+      )
+    ]
+  ][
+    #block(width: 30%)[
+      #figure(
+        image("ui/account-management/account-authorized-deleteaccountconfirmation.png"),
+          caption: [Account page as authorized user delete account confirmation dialog.]
+      )
+    ]
+  ]
+]
 
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 45%)[
+      #figure(
+        image("ui/capability-management/requestcapability-notdetermined.png", width: 66.7%),
+          caption: [Request capability page when capability access is not determined.]
+      )
+    ]
+  ][
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/capability-management/requestcapability-notdetermined-systemdialog.png", width: 66.7%),
+          caption: [System capability authorization dialog.]
+      )
+    ]
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 45%)[
+      #figure(
+        image("ui/capability-management/requestcapability-denied.png", width: 66.7%),
+          caption: [Request capability page when capability access is denied.]
+      )
+    ]
+  ][
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/capability-management/requestcapability-unavailable.png", width: 66.7%),
+          caption: [Request capability page when capability access is unavailable.]
+      )
+    ]
+  ]
+]
+
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 30%)[
+      #figure(
+        image("ui/automatic-path-recording/pathrecording-idle.png"),
+          caption: [Recording page before starting.]
+      )
+    ]
+  ][
+    #block(width: 30%)[
+      #figure(
+        image("ui/automatic-path-recording/pathrecording-active.png"),
+          caption: [Recording page while active.]
+      )
+    ]
+  ][
+    #block(width: 30%)[
+      #figure(
+        image("ui/automatic-path-recording/pathrecording-obstaclealert.png"),
+          caption: [Recording page notification after an obstacle is detected or inserted by the user.]
+      )
+    ]
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 45%)[
+      #figure(
+        image("ui/automatic-path-recording/pathrecording-paused.png", width: 66.7%),
+          caption: [Recording page when paused.]
+      )
+    ]
+  ][
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/automatic-path-recording/pathrecording-stopped.png", width: 66.7%),
+          caption: [Recording page when stopped.]
+      )
+    ]
+  ]
+]
+
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 45%)[
+      #figure(
+        image("ui/manual-path-insertion/pathinsertion.png", width: 66.7%),
+          caption: [Insertion page.]
+      )
+    ]
+  ][
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/manual-path-insertion/pathinsertion-filled.png", width: 66.7%),
+          caption: [Insertion page after entering data.]
+      )
+    ]
+  ]
+]
+
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    45%
+  ][
+    #block(width: 45%)[
+      #figure(
+        image("ui/personal-path-history/history.png", width: 66.7%),
+          caption: [History in home page as authenticated user.]
+      )
+    ]
+  ][
+    45%
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 30%)[
+      #figure(
+        image("ui/personal-path-history/history-detail.png"),
+          caption: [Personal path detail page.]
+      )
+    ]
+  ][
+    #block(width: 30%)[
+      #figure(
+        image("ui/personal-path-history/history-detail-fullscreen.png"),
+          caption: [Personal path detail page in full-screen.]
+      )
+    ]
+  ][
+    #block(width: 30%)[
+      #figure(
+        image("ui/personal-path-history/history-detail-edited.png"),
+          caption: [Personal path detail page after being edited.]
+      )
+    ]
+  ]
+]
+
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 29%)[
+      #figure(
+        image("ui/community-paths-browsing/browsing-focused.png"),
+          caption: [Community browser page.]
+      )
+    ]
+  ][
+    #block(width: 29%)[
+      #figure(
+        image("ui/community-paths-browsing/browsing-startentered.png"),
+          caption: [Community browser page after entering start location.]
+      )
+    ]
+  ][
+    #block(width: 29%)[
+      #figure(
+        image("ui/community-paths-browsing/browsing-endentered.png"),
+          caption: [Community browser page after entering end location.]
+      )
+    ]
+  ]
+]
+#align(center)[
+  #stack(dir: ltr, spacing: 5%)[
+    #block(width: 29%)[
+      #figure(
+        image("ui/community-paths-browsing/browsing-list.png"),
+          caption: [Community path list page.]
+      )
+    ]
+  ][
+    #block(width: 29%)[
+      #figure(
+        image("ui/community-paths-browsing/browsing-detail-authenticated.png"),
+          caption: [Community path detail as authenticated user.]
+      )
+    ]
+  ][
+    #block(width: 29%)[
+      #figure(
+        image("ui/community-paths-browsing/browsing-detail-unauthenticated.png"),
+          caption: [Community path detail as unauthenticated user.]
+      )
+    ]
+  ]
+]
+
+#pagebreak()
 === Hardware Interfaces
 
 To ensure the user makes the most of the app's capabilities, the user’s device should be equipped with the following hardware components (the app should handle their unavailability properly):
@@ -646,8 +966,6 @@ To ensure the user makes the most of the app's capabilities, the user’s device
 - GPS module, to detect the device location
 
 The device will also need a stable and reliable connection to the internet to make the app work properly. When no network interface is available, the application continues to operate in offline mode, storing data locally, and when connectivity is restored synchronizes with backend services.
-
-`CHECK IF WE INSERTED THIS AS REQUIREMENTs IN SECTION 3.2`
 
 === Software Interfaces
 
@@ -672,7 +990,7 @@ _Network on iOS, NetworkMonitor on Android_
 The app uses these services to monitor the network in order to make the UI respond to connectivity changes.
 
 *Best Bike Paths Backend* \
-The app will communicate with the Best Bike Paths backend, through a REST API, in order to sync user accounts, and store and retrieve user and community paths. The backend communicates with other external or internal components (e.g., SMTP Server, Database, etc.).
+The app will communicate with the Best Bike Paths backend through a REST API in order to sync user accounts and store and retrieve user data and community paths. The backend communicates with other external or internal components (e.g., SMTP Server, Database, etc.).
 
 === Communication Interfaces
 
@@ -737,7 +1055,7 @@ All communication with back-end services must be authenticated and authorized, b
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
-*R23:*The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops, and a status.
+*R23:*The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops and defining privacy and a quality status.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
@@ -751,11 +1069,11 @@ All communication with back-end services must be authenticated and authorized, b
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
-*R28*: The system shall allow the user to browse publicly available bike paths, by specifying the start and destination. \
-*R29*: The system shall show the user the matching paths, sorting them by their system-computed quality score (calculated based on the public user path instances). \
+*R28*: The system shall allow the user to browse publicly available bike paths by specifying a starting point and a destination. \
+*R29*: The system shall show the user the matching paths, sorting them by their system-computed average quality score (calculated based on the public user path instances). \
 *R30*: The system shall display for each path the route map along with the system-computed quality score. \
 *R31*: The system should display an alert badge if a path contains incompatible roads for biking. \
-*R32*: The system shall allow the user to select  a path as the suggested route for a new automatic mode registration session.
+*R32*: The system shall allow the user to select a path as the suggested route for a new automatic recording session.
 
 
 #pagebreak()
@@ -1176,11 +1494,11 @@ All communication with back-end services must be authenticated and authorized, b
         - System displays the privacy status.
         - System displays the date.
         - Optional: System displays the total time.
-        - Optional: System displays the active time.
+        // - Optional: System displays the active time.
         - Optional: System displays the average speed.
         - Optional: System displays the top speed.
         - Optional: System displays the total travelled distance.
-        - Optional: System displays the obstacles that were encountered.
+        // - Optional: System displays the obstacles that were encountered.
         - Optional: System displays meteorological data.
   ],
   [*Exit Conditions*], [

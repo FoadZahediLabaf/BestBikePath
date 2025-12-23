@@ -1995,9 +1995,9 @@ boundary "Weather API" as API
 activate User
 activate App
 activate Sensors
-User -> App: Select "Stop Recording"
+User ->> App: Select "Stop Recording"
 App -> User: Request for confirmation
-User -> App: Confirmation
+User ->> App: Confirm
 App -> Sensors: Stop collecting data
 Sensors --> App: Confirmation
 deactivate Sensors

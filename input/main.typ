@@ -2952,6 +2952,251 @@ assert UnavailableImpliesNoAction {
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Recording")
+This Alloy model formalizes the automatic recording workflow of the application as a single recording session per user, that evolves over discrete time steps. Each RecordingSession moves through a finite set of states (Idle, Recording, Paused, StopPending, Stopped, Cancelled) driven by explicit user commands and system actions.
+Recording can start only when the user issues Start from Idle. During recording, the user can request stopping (StopReq), which transitions the session to StopPending, and only a subsequent confirmation (StopConfirm) completes the process by moving the session to Stopped. The user can also manually pause and resume the recording (Pause and Resume). When the user is not issuing commands (control=None), the system enforces two automatic behaviors:
+(1) GPS reliability control, where consecutive bad GPS accuracy during Recording increases a counter (badStreak) and triggers automatic cancellation when it reaches K;
+(2) speed-based control, where low speed pauses the recording and high speed resumes it, provided cancellation is not triggered.
+The model also describes the creation of a Trip: a trip is stored only when a session reaches Stopped, and cancelled sessions never generate a trip. Finally,in every step the next state is uniquely defined by the priority rules.
+
+
+```alloy
+// Automatic Recording
+enum RecState { Idle, Recording, Paused, StopPending, Stopped, Cancelled }
+enum Control  { None, Start, Pause, Resume, StopReq, StopConfirm }
+enum Speed    { Low, High }
+enum GpsAcc   { Good, Bad }
+
+// K = "15 seconds" 
+fun K: one Int { 15 }
+
+sig User {}
+
+sig RecordingSession {
+  user: one User,
+
+  // evolving attributes
+  var state: one RecState,
+  var control: one Control,
+  var speed: one Speed,
+  var gpsAcc: one GpsAcc,
+  var badStreak: one Int
+}
+
+var sig Trip {
+  var owner: one User,
+  var from: one RecordingSession
+}
+
+
+// Structural constraint
+
+fact OneSessionPerUser {
+  all u: User | lone s: RecordingSession | s.user = u
+}
+
+
+// Initial conditions 
+
+fact Init {
+  all s: RecordingSession |
+    s.state = Idle and
+    s.control = None and
+    s.badStreak = 0
+  no Trip
+}
+
+
+// badStreak update (GPS reliability)
+
+fact BadStreakUpdate {
+  always all s: RecordingSession |
+    (s.state = Recording and s.gpsAcc = Bad)
+      implies s.badStreak' = s.badStreak.plus[1]
+
+  always all s: RecordingSession |
+    not (s.state = Recording and s.gpsAcc = Bad)
+      implies s.badStreak' = 0
+
+  always all s: RecordingSession | s.badStreak >= 0
+}
+
+
+// priority encoded by ordering
+
+fact TotalStateNext {
+  always all s: RecordingSession |
+
+    // Terminal absorption
+    (s.state = Stopped) implies (s.state' = Stopped) else
+    (s.state = Cancelled) implies (s.state' = Cancelled) else
+    // 1) Stop flow
+    (s.control = StopReq and (s.state = Recording or s.state = Paused))
+      implies (s.state' = StopPending) else
+    (s.control = StopConfirm and s.state = StopPending)
+      implies (s.state' = Stopped) else
+
+    // 2) Manual pause/resume
+    (s.control = Pause and s.state = Recording)
+      implies (s.state' = Paused) else
+    (s.control = Resume and s.state = Paused)
+      implies (s.state' = Recording) else
+
+    // 3) Manual start
+    (s.control = Start and s.state = Idle)
+      implies (s.state' = Recording) else
+
+    // 4) Auto-cancel (only when no manual command is being issued)
+    (s.control = None and s.state = Recording and s.badStreak >= K)
+      implies (s.state' = Cancelled) else
+
+    // 5) Auto pause/resume (only when no manual command is being issued)
+    (s.control = None and s.state = Recording and s.speed = Low and not (s.badStreak >= K))
+      implies (s.state' = Paused) else
+    (s.control = None and s.state = Paused and s.speed = High)
+      implies (s.state' = Recording) else
+
+    // 6) Otherwise persist
+    (s.state' = s.state)
+}
+
+
+// Trip semantics
+
+fact TripSemantics {
+
+  // Existing trips keep their fields (no mutation)
+  always all t: Trip |
+    (t in Trip) implies (t.owner' = t.owner and t.from' = t.from)
+
+  // Trip consistency
+  always all t: Trip | t.owner = t.from.user
+
+  // Cancelled sessions never have trips
+  always all s: RecordingSession |
+    (s.state = Cancelled) implies no t: Trip | t.from = s
+
+  // Stopped sessions have exactly one trip
+  always all s: RecordingSession |
+    (s.state = Stopped) implies one t: Trip | t.from = s
+
+  // Trip creation happens exactly on StopConfirm step:
+  // - if StopConfirm on StopPending: add exactly one new trip for that session
+  // - otherwise: Trip set stays the same
+  always all s: RecordingSession |
+    (s.control = StopConfirm and s.state = StopPending)
+      implies (
+        one t: Trip' - Trip | (t.from' = s and t.owner' = s.user)
+        and Trip' = Trip + (Trip' - Trip)
+      )
+      else (Trip' = Trip)
+}
+```
+@automatic-recording-world shows one possible evolution of a recording session over time. It illustrates how the session moves between states such as Idle, Recording, Paused, StopPending, Stopped, and Cancelled based on user actions (e.g., start, pause, resume, stop) and automatic conditions related to speed and GPS accuracy. The trace also shows that a trip is created only when the recording is successfully stopped.
+#figure(
+  image("alloy/automatic-recording/world.png"),
+  caption: [Example execution of the automatic recording process]
+) <automatic-recording-world>
+
+ The following assertion shows recording session can enter Recording from Idle only if the user explicitly issues the Start command. This captures the requirement that recording never starts automatically.
+```alloy
+assert StartOnlyByStart {
+  always all s: RecordingSession |
+    (s.state = Idle and s.state' = Recording)
+      implies s.control = Start
+}
+check StartOnlyByStart for 2 but 5 Int, 6 steps
+
+```
+#figure(
+  image("alloy/automatic-recording/StartOnlybyStart.png"),
+  caption: [`StartOnlybyStart` assertion execution]
+)
+
+The following assertion shows that a session can become Stopped only if the user confirms stopping (StopConfirm) while in the confirmation state StopPending. This captures the mandatory confirmation behavior.
+```alloy
+assert StopOnlyByConfirm {
+  always all s: RecordingSession |
+    (s.state != Stopped and s.state' = Stopped)
+      implies (s.state = StopPending and s.control = StopConfirm)
+}
+check StopOnlyByConfirm for 2 but 5 Int, 6 steps
+
+```
+#figure(
+  image("alloy/automatic-recording/StopOnlyByConfirm.png"),
+  caption: [`StopOnlyByConfirm` assertion execution]
+)
+
+The following assertion shows that a session can enter StopPending only if the user requests stop (StopReq) while the session is either Recording or Paused. This encodes the start of the “stop with confirmation” flow.
+```alloy
+assert StopPendingOnlyByStopReq {
+  always all s: RecordingSession |
+    (s.state != StopPending and s.state' = StopPending)
+      implies ((s.state = Recording or s.state = Paused) and s.control = StopReq)
+}
+check StopPendingOnlyByStopReq for 2 but 5 Int, 6 steps
+```
+#figure(
+  image("alloy/automatic-recording/StopPendingOnlyByStopReq.png"),
+  caption: [`StopPendingOnlyByStopReq` assertion execution]
+)
+
+The following assertion shows that a session can be automatically cancelled only when it is Recording, no manual command is being issued (control=None), and the number of consecutive bad-GPS instants has reached the threshold K.
+```alloy
+assert CancelOnlyAfterBadGps {
+  always all s: RecordingSession |
+    (s.state != Cancelled and s.state' = Cancelled)
+    implies (s.state = Recording and s.control = None and s.badStreak >= K)
+}
+check CancelOnlyAfterBadGps for 2 but 5 Int, 6 steps
+```
+#figure(
+  image("alloy/automatic-recording/CancelOnlyAfterBadGps.png"),
+  caption: [`CancelOnlyAfterBadGps` assertion execution]
+)
+
+The following assertion shows that if the session goes from Recording to Paused without any manual control, then the cause must be the automatic speed rule: speed is Low, and cancellation is not being triggered.
+```alloy
+assert AutoPauseCause {
+  always all s: RecordingSession |
+    (s.state = Recording and s.control = None and s.state' = Paused)
+      implies (s.speed = Low and not (s.badStreak >= K))
+}
+check AutoPauseCause for 2 but 5 Int, 6 steps
+```
+#figure(
+  image("alloy/automatic-recording/AutoPauseCause.png"),
+  caption: [`AutoPauseCause` assertion execution]
+)
+
+The following assertion shows that if the session goes from Paused to Recording with no manual control, then the cause must be the automatic resume rule: speed is High.
+```alloy
+assert AutoResumeCause {
+  always all s: RecordingSession |
+    (s.state = Paused and s.control = None and s.state' = Recording)
+      implies (s.speed = High)
+}
+check AutoResumeCause for 2 but 5 Int, 6 steps
+```
+#figure(
+  image("alloy/automatic-recording/AutoResumeCause.png"),
+  caption: [`AutoResumeCause` assertion execution]
+)
+
+The following assertion shows that that a trip exists for a session only if that session is Stopped. Additionally, cancelled sessions never produce trips. This captures the persistence semantics: only successfully stopped recordings are saved.
+```alloy
+assert TripIffStopped {
+  always all s: RecordingSession |
+    (s.state = Stopped) iff (one t: Trip | t.from = s)
+  always all s: RecordingSession |
+    (s.state = Cancelled) implies no t: Trip | t.from = s
+}
+check TripIffStopped for 2 but 5 Int, 6 steps
+```
+#figure(
+  image("alloy/automatic-recording/TripIffStopped.png"),
+  caption: [`TripIffStopped` assertion execution]
+)
 
 = Effort Spent
 
@@ -2959,10 +3204,10 @@ assert UnavailableImpliesNoAction {
   table(
     columns: 4,
     table.header([], [*Foad Zahedi Labaf*], [*Lorenzo Fiamingo*], [*Alexander Gabriel Fox*]),
-    [*Section 1*], [], [8], [7],
-    [*Section 2*], [], [10], [14],
-    [*Section 3*], [], [23], [17],
-    [*Section 4*], [], [5], [8],
+    [*Section 1*], [7], [8], [7],
+    [*Section 2*], [15], [10], [14],
+    [*Section 3*], [18], [23], [17],
+    [*Section 4*], [6], [5], [8],
   ),
   caption: [The number of hours each group member has worked for this document]
 )

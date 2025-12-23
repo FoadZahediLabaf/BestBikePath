@@ -1130,6 +1130,7 @@ All communication with back-end services must be authenticated and authorized, b
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 *UC11 Manual Path Insertion*
+#table(
   columns: 2,
   [*Name*], [Manual Path Insertion],
   [*Actors*], [Authenticated User],
@@ -1149,6 +1150,7 @@ All communication with back-end services must be authenticated and authorized, b
     - Internal Error prevents the path from being stored in the database
     - Missing Internet connection
   ],
+)
 #pagebreak()
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
@@ -1367,7 +1369,7 @@ else Capability access is not determined
     User -> Frontend: Press 'Ask permission' button
     Frontend ->> User: Show system dialog to give permission
     alt Not allow usage
-      User -> Frontend: Press 'Not allow' button
+      User -> Frontend: Press 'Don't allow' button
       Frontend -> Frontend: Continue without capability
     else Allow usage
       User -> Frontend: Press 'Allow' button
@@ -1565,21 +1567,16 @@ App --> User: Home page
 #pagebreak()
 *UC11 Manual Path Recording*
 #let ManualPathRecording = ```plantuml
-@startuml
-title UC - Manual Path Recording
 autonumber
-
 actor "Authenticated User" as U
 boundary "BBP App " as UI
 boundary "Map Service" as MAP
 database "BBP Database" as DB
-
 == Open manual creation ==
 activate U
 activate UI
 U -> UI : Open "Manual Path Creation"
 UI -> U : Show form (Start, Destination)
-
 == Insert start & destination ==
 U -> UI : Enter start + destination\nTap "Search Area"
 UI -> MAP : loadMapArea(start,destination)
@@ -1587,14 +1584,11 @@ activate MAP
 MAP --> UI : mapData
 deactivate MAP
 UI --> U : Display map and enable\nstreet/segment selection
-
 == Define path and status ==
 U -> UI : Select streets/segments
 UI -> UI : Update selected route on map
-
 U -> UI : Select path status
 UI -> UI : Store status selection
-
 == Save ==
 U -> UI : Tap "Save"
 UI -> DB : storePath(user, route, status)
@@ -1602,11 +1596,8 @@ activate DB
 DB --> UI : OK
 deactivate DB
 UI --> U : Show confirmation\nPath added to history
-
 deactivate U
 deactivate UI
-@enduml
-
 ```
 #figure(
   ManualPathRecording,

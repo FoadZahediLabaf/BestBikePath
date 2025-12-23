@@ -2088,7 +2088,7 @@ else Meteorological data unavailable
     API --> App: 404 Not Found
     deactivate API
 end
-App --> App: Compute path statistics
+App -> App: Compute path statistics
 App -> DB: savePath(path) 
 activate DB
 DB --> App: 200 OK

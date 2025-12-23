@@ -1126,23 +1126,24 @@ All communication with back-end services must be authenticated and authorized, b
 
   ],
 )
-
 #pagebreak()
+
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 *UC11 Manual Path Insertion*
 #table(
   columns: 2,
   [*Name*], [Manual Path Insertion],
-  [*Actors*], [Authenticated User],
+  [*Actors*], [Authenticated User, Map Service],
   [*Entry Conditions*], [- User navigates to Manual Insertion page],
   [*Event Flow*], [
-    + The authenticated user accesses the functionality for manual bike path creation.
-    + The user specifies the starting point and the destination of the path.
+    + The user accesses the functionality for manual bike path creation.
+    + The user inserts street segment addresses
+    + The system retrieves the corresponding locations of the addresses from an external Map Service
     + The system displays the map corresponding to the selected area.
-    + The user defines the bike path by writing the streets segments address composing the route.
-    + The user selects a status to associate with the bike path.
-    + The user saves the bike path.
-    + The system stores the bike path in the user’s personal history],
+    + The user selects the path status
+    + The user selects the privacy status
+    + The user presses the "Save" button
+    + The system stores the bike path in the database],
   [*Exit Conditions*], [
     - A new bike path is stored in the database.
   ],
@@ -1152,10 +1153,41 @@ All communication with back-end services must be authenticated and authorized, b
     - User inserts streets that are not connected.
   ],
 )
+
+
 #pagebreak()
-
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+*UC13 Set Bike Path Privacy*
+#table(
+  columns: 2,
+  [*Name*], [Set Bike Path Privacy],
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [
+    - User opens BBP application on their device.
+  ],
+  [*Event Flow*], [
+    + User opens their history page.
+    + The application shows a list of paths associated with the user.
+    + User selects the desired path
+    + The system displays the path detail view.
+    + User sets privacy toggle.
+      - Toggle is set to "Off":
+        + The user sets the privacy toggle on.
+        + The application updates the database by setting the path status to “Private”
+      - Toggle is set to "On":
+        + The user sets the privacy toggle off.
+        + The application updates the database by setting the path status to “Public”
+  ],
+  [*Exit Conditions*], [
+    - Path has the selected privacy.
+  ],
+  [*Exceptions*], [
+    - Internal error prevents the database from being updated
+    - No internet connection
+  ],
+)
 
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
 #pagebreak()
@@ -1566,6 +1598,7 @@ App -> User: Show Homepage
 )
 
 #pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 *UC11 Manual Path Insertion*
 #let manualPathInserionSequenceDiagram = ```plantuml
 autonumber
@@ -1613,12 +1646,45 @@ deactivate UI
   kind: image,
   caption: [Manual Path Insertion Sequence Diagram]
 )
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+
 
 #pagebreak()
-#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
-
-
-#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+*UC13 Set Bike Path Privacy*
+#let setPrivacySequenceDiagram = ```plantuml
+activate User
+User -> App: Open application
+App -> User: Show History page 
+activate App
+activate db
+App -> db: getPaths(user)
+db --> App: userPaths
+deactivate db
+App -> User: Show user paths 
+User -> App: Select path
+App --> User: Show Detailed view
+alt Publish bike path
+    User -> App: Set privacy toggle to "On"
+    activate db
+    App -> db: setPrivacyStatus(userPath, "Public") 
+    db --> App: OK
+    deactivate db
+else Unpublish bike path
+    User -> App: Set privacy toggle to "Off"
+    activate db
+    App -> db: setPrivacyStatus(userPath, "Private") 
+    db --> App: OK
+    deactivate db
+end
+App -> User: Notify User
+deactivate App
+```
+#figure(
+  setPrivacySequenceDiagram,
+  kind: image,
+  caption: [Manual Path Insertion Sequence Diagram]
+)
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 

@@ -162,6 +162,7 @@ Obstacles can be automatically detected through the device’s motion sensors or
 *BBP*: Best Bike Paths \
 *CPU*: Central Processing Unit \
 *CTA*: Call To Action \
+*DBMS*: DataBase Management System \
 *EU*: European Union \
 *GDPR*: General Data Protection Regulation \
 *GPS*: Global Positioning System \
@@ -486,8 +487,7 @@ The state diagram describes the recording process of a bike path as the user is 
 When the user stops biking, the device’s sensors detect a sudden drop in velocity. 
 When the system reads this information, it concludes that the user is no longer biking and therefore temporarily pauses the recording. This prevents the collection of inaccurate trip statistics, such as the final calculation of the average speed or the total active biking time. 
 The user is also allowed to manually pause and resume the recording independently of the actual motion-state of the device.
-
-Pausing is also necessary for avoiding possible incorrect obstacle detections and for maintaining a “smooth” recorded route. It also helps with conserving battery power.
+While paused, no obstacle will be detected.
 The user can also optionally pause and resume the recording at their discretion.
 
 When the user resumes biking, the system detects the movement and resumes the recording once the velocity reaches a threshold that indicates that the user is currently biking.
@@ -525,7 +525,7 @@ Canceled --> [*]
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
 
 *User Account Sign-up* \
-The system allows users to create a personal account by providing their credentials and accepting applicable terms and privacy notices. The system shall validate input data as possible and prevent account duplication.
+The system allows users to create a personal account by providing their credentials and accepting applicable terms and privacy notices. The system shall validate input data and prevent account duplication.
 
 *User Account Sign-in* \
 The system allows unauthenticated users to access their personal account by providing their credentials.
@@ -611,7 +611,7 @@ Authenticated users are also capable of manually inserting new bike paths by spe
 
 === Regulatory policies
 
-BBP collects and processes user location data, motion sensor data, and information about road conditions such as obstacles and segment status. This information must be handled in full compliance with the General Data Protection Regulation (GDPR), ensuring that personal and location data are stored securely and used only for the purposes of trip recording, path recommendation, and community-based path evaluations.
+BBP collects and processes user location data, motion sensor data, and information about road conditions such as obstacles and path status. This information must be handled in full compliance with the General Data Protection Regulation (GDPR), ensuring that personal and location data are stored securely and used only for the purposes of trip recording, path recommendation, and community-based path evaluations.
 Users should grant permission for the application to access location services, motion sensors, and notifications on their devices.
 Furthermore, any publishable information contributed by users becomes visible to the community and must be treated as user-generated content, respecting applicable regulations on data sharing and responsibility.
 BBP relies on external mapping and meteorological services, whose terms of use and licensing policies must also be respected.
@@ -989,7 +989,7 @@ _Network on iOS, NetworkMonitor on Android_
 The app uses these services to monitor the network in order to make the UI respond to connectivity changes.
 
 *Best Bike Paths Backend* \
-The app will communicate with the Best Bike Paths backend through a REST API in order to sync user accounts and store and retrieve user data and community paths. The backend communicates with other external or internal components (e.g., SMTP Server, Database, etc.).
+The app will communicate with the Best Bike Paths backend through a REST API in order to sync user accounts and store and retrieve user data and community paths. The backend communicates with other external or internal components (e.g., SMTP Server, DBMS, etc.).
 
 === Communication Interfaces
 
@@ -1769,6 +1769,7 @@ activate Frontend
 User ->> Frontend: Press logout account button
 Frontend --> User: Show confirmation dialog
 User ->> Frontend: Press confirm button
+Frontend --> Frontend: deleteToken()
 Frontend --> User: Show homepage as unauthenticated user
 deactivate User
 deactivate Frontend

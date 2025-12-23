@@ -1767,10 +1767,10 @@ boundary "BBP App" as Frontend
 activate User
 activate Frontend
 User ->> Frontend: Press logout account button
-Frontend --> User: Show confirmation dialog
+Frontend -> User: Show confirmation dialog
 User ->> Frontend: Press confirm button
-Frontend --> Frontend: deleteToken()
-Frontend --> User: Show homepage as unauthenticated user
+Frontend -> Frontend: deleteToken()
+Frontend -> User: Show homepage as unauthenticated user
 deactivate User
 deactivate Frontend
 ```
@@ -1800,14 +1800,14 @@ alt Capability access is unavailable
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
   CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining\nwhy the capability is needed\nand instructionsto give\npermission in system settings
+  Frontend -> User: Show a modal explaining\nwhy the capability is needed\nand instructionsto give\npermission in system settings
   loop Until user presses 'Cancel' or authorize capability access in settings
     alt Continue
-      User -> Frontend: Press 'Cancel' button
+      User ->> Frontend: Press 'Cancel' button
       Frontend -> Frontend: Continue without capability
     else Authorize capability access
       activate Settings
-      User -> Settings: Authorize capability access
+      User ->> Settings: Authorize capability access
       Settings -> CP: updateCapabilityAuthorization('authorized')
       deactivate Settings
       User ->> Frontend: Open application
@@ -1820,17 +1820,17 @@ else Capability access is authorized
   Frontend -> Frontend: Continue with capability
 else Capability access is not determined
   CP --> Frontend: notDetermined
-  Frontend ->> User: Show a modal explaining\nwhy the capability is needed
+  Frontend -> User: Show a modal explaining\nwhy the capability is needed
   alt Cancel
-    User -> Frontend: Press 'Cancel' button
+    User ->> Frontend: Press 'Cancel' button
   else Continue
-    User -> Frontend: Press 'Continue' button
+    User ->> Frontend: Press 'Continue' button
     Frontend ->> User: Show system dialog\nto give permission
     alt Not allow usage
-      User -> Frontend: Press 'Don't allow' button
+      User ->> Frontend: Press 'Don't allow' button
       Frontend -> Frontend: Continue without capability
     else Allow usage
-      User -> Frontend: Press 'Allow' button
+      User ->> Frontend: Press 'Allow' button
       Frontend -> Frontend: Continue with capability
     end
   end

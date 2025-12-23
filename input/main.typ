@@ -2208,14 +2208,15 @@ actor "User" as U
 boundary "BBP App " as UI
 boundary "Routing/Map Service" as MAP
 database "BBP Database" as DB
-== Open feature ==
-U -> UI : Open "Find Paths"
 activate UI
+activate U
+== Open feature ==
+U ->> UI : Open "Find Paths"
 UI -> U : Show search form
 == Submit query ==
-U -> UI : Enter start + destination
-activate DB
+U ->> UI : Enter start + destination
 UI -> DB : fetchPathMetadata(start, destination)
+activate DB
 DB --> UI: paths + metadata
 deactivate DB
 UI -> UI : rankPaths(paths, metadata)
@@ -2224,13 +2225,14 @@ activate MAP
 MAP --> UI : map
 deactivate MAP
 UI -> U : Display ranked list and render paths on map
-deactivate UI
 opt User is authenticated
-  U -> UI : Select a Path
+  U ->> UI : Select a Path
   UI -> U : Show “Start Recording” Button
-  U -> UI : Press “Start Recording” Button
+  U ->> UI : Press “Start Recording” Button
   UI -> U : Show Automatic Recording Page\nwith selected path displayed on the map
 end
+deactivate UI
+deactivate U
 ```
 #figure(
   browseCommunityPathSequenceDiagram,

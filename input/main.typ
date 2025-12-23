@@ -1765,8 +1765,6 @@ Frontend -> User: Show confirmation dialog
 User ->> Frontend: Press confirm button
 Frontend -> Frontend: deleteToken()
 Frontend -> User: Show homepage as unauthenticated user
-deactivate User
-deactivate Frontend
 ```
 #figure(
   userSignOutSequenceDiagram,
@@ -1783,12 +1781,12 @@ autonumber
 actor User
 boundary "BBP App" as Frontend
 entity "Capability Provider" as CP
+boundary "System Settings" as Settings
 activate User
 activate Frontend
-activate CP
-boundary "System Settings" as Settings
 Frontend -> Frontend: Needs device capability
 Frontend -> CP: getAuthorizationStatus
+activate CP
 alt Capability access is unavailable
   CP --> Frontend: unavailable
   Frontend -> Frontend: Continue without capability
@@ -1800,8 +1798,8 @@ else Capability access was denied
       User ->> Frontend: Press 'Cancel' button
       Frontend -> Frontend: Continue without capability
     else Authorize capability access
-      activate Settings
       User ->> Settings: Authorize capability access
+      activate Settings
       Settings -> CP: updateCapabilityAuthorization('authorized')
       deactivate Settings
       User ->> Frontend: Open application
@@ -1814,6 +1812,7 @@ else Capability access is authorized
   Frontend -> Frontend: Continue with capability
 else Capability access is not determined
   CP --> Frontend: notDetermined
+  deactivate CP
   Frontend -> User: Show a modal explaining\nwhy the capability is needed
   alt Cancel
     User ->> Frontend: Press 'Cancel' button
@@ -1830,8 +1829,6 @@ else Capability access is not determined
   end
 end
 deactivate CP
-deactivate User
-deactivate Frontend
 ```
 #figure(
   requestCapabilitySequenceDiagram,

@@ -1951,7 +1951,7 @@ control "Sensor API" as CP
 activate User
 activate Frontend
 activate CP
-User -> Frontend: Press "start" button
+User ->> Frontend: Press "start" button
 Frontend -> CP: startAccelerometerUpdates(handler)
 Frontend -> CP: startGyroUpdates(handler)
 loop Until recording stops
@@ -1960,16 +1960,16 @@ loop Until recording stops
   Frontend -> Frontend: detectObstacle(accelerometerData, gyroData)
   opt Obstacle is detected
     Frontend -> Frontend: Increment obstacle count
-    Frontend ->> User: Show obstacle confirmation dialog
+    Frontend -> User: Show obstacle confirmation dialog
     alt User confirms or ignores dialog
-      User -> Frontend: Press "confirm" button
+      User ->> Frontend: Press "confirm" button
     else User cancels
-      User -> Frontend: Press "cancel" button
+      User ->> Frontend: Press "cancel" button
       Frontend -> Frontend: Decrement obstacle count
     end
   end
 end
-User -> Frontend: Press "stop" button
+User ->> Frontend: Press "stop" button
 Frontend -> CP: stopAccelerometerUpdates()
 Frontend -> CP: stopGyroUpdates()
 deactivate CP

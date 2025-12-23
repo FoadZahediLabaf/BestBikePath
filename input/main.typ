@@ -1579,7 +1579,7 @@ activate UI
 U -> UI : Open "Manual Path Creation"
 UI -> U : Show form
 == Insert Street Segments ==
-loop Until all street segment are selected
+loop Until all street segment are inserted
   U -> UI : Insert street segment address
   activate MAP
   UI -> MAP : reverseGeocode(streetAddress)

@@ -2034,11 +2034,11 @@ database "BBP Database" as DB
 == Open manual creation ==
 activate U
 activate UI
-U -> UI : Open "Manual Path Creation"
+U ->> UI : Open "Manual Path Creation"
 UI -> U : Show form
 == Insert Street Segments ==
 loop Until all street segment are inserted
-  U -> UI : Insert street segment address
+  U ->> UI : Insert street segment address
   activate MAP
   UI -> MAP : reverseGeocode(streetAddress)
   MAP --> UI : streetLocation
@@ -2047,17 +2047,17 @@ loop Until all street segment are inserted
   activate MAP
   UI -> MAP : addLocationToMap(streetLocation)
   MAP -->> UI : updateShownMapArea
-  UI ->> U : Show map with updated area
+  UI -> U : Show map with updated area
 end
 deactivate MAP
 == Select Status == 
-U -> UI : Select path status
+U ->> UI : Select path status
 UI -> UI : Store path status
 == Set Privacy ==
-U -> UI : Set path privacy
+U ->> UI : Set path privacy
 UI -> UI : Store path privacy
 == Save ==
-U -> UI : Tap "Save"
+U ->> UI : Tap "Save"
 UI -> DB : savePath(streetLocations, status, privacy, date)
 activate DB
 DB --> UI : OK

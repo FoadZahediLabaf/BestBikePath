@@ -869,7 +869,6 @@ Since the app relies on motion and location device features, the interface will 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 #align(center)[
   #stack(dir: ltr, spacing: 5%)[
-    45%
   ][
     #block(width: 45%)[
       #figure(
@@ -878,7 +877,6 @@ Since the app relies on motion and location device features, the interface will 
       )
     ]
   ][
-    45%
   ]
 ]
 #align(center)[

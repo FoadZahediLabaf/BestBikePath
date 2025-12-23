@@ -1078,7 +1078,7 @@ All communication with back-end services must be authenticated and authorized, b
 #pagebreak()
 === Use Case Diagram
 
-#let useCaseDiagram = ```
+#let useCaseDiagram = ```plantuml
 "User" as user
 "Registered User" as ruser
 "Weather Service" as weather
@@ -2119,17 +2119,17 @@ UI -> U : Show form
 == Insert Street Segments ==
 loop Until all street segment are inserted
   U ->> UI : Insert street segment address
-  activate MAP
   UI -> MAP : reverseGeocode(streetAddress)
-  MAP --> UI : streetLocation
-  UI -> UI : Store street location
-  deactivate MAP
   activate MAP
+  MAP --> UI : streetLocation
+  deactivate MAP
+  UI -> UI : Store street location
   UI -> MAP : addLocationToMap(streetLocation)
+  activate MAP
   MAP -->> UI : updateShownMapArea
+  deactivate MAP
   UI -> U : Show map with updated area
 end
-deactivate MAP
 == Select Status == 
 U ->> UI : Select path status
 UI -> UI : Store path status
@@ -2143,8 +2143,6 @@ activate DB
 DB --> UI : OK
 deactivate DB
 UI -> U : Show path added to history
-deactivate U
-deactivate UI
 ```
 #figure(
   manualPathInserionSequenceDiagram,

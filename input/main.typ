@@ -235,8 +235,8 @@ An authenticated user presses the sign-out button. The app signs the user out of
 
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
-*System asks permission to use a device capabilities (GPS case)* \
-The authenticated user decides to record his first ride and taps the Start Recording button. A modal explaining why the app must access location data is displayed. The modal contains accept and cancel buttons. If the user selects the Cancel option, the modal is dismissed and the user remains on the home screen. If the  user selects the Accept option, the system presents the dialog requesting permission to access the location. If the user grants permission, the view to record the bike path is presented, otherwise the user remains in the home, and the next time this capability would be needed, he will be required to give permission through the device’s system settings app.
+*System asks permission to use a device capabilities (GPS case example)* \
+The authenticated user decides to record his first ride and taps the Start Recording button. A modal explaining why the app must access location data is displayed. The modal contains accept and cancel buttons. If the user selects the Cancel option, the modal is dismissed and the user remains on the home screen. If the  user selects the Continue option, the system presents the dialog requesting permission to access the location. If the user grants permission, the view to record the bike path is presented, otherwise the user remains in the home, and the next time this capability would be needed, he will be required to give permission through the device’s system settings app.
 The same flow of events will be replicated wherever other capabilities are required by the application.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
@@ -266,8 +266,8 @@ After having reached their destination, the user opens the BBP application, whic
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 *Manual Path Recording * \
-After navigating to the page dedicated to the manual creation of bike paths, the authenticated user specifies a starting point and destination of the path. The system displays the map and allows the user to define the bike path by selecting the streets and segments composing the route.
-Before saving the bike path, the user selects a status to associate with the path. The system stores the path in the user’s personal history, making it available for later review and optional publication.
+After navigating to the page dedicated to the manual creation of bike paths, the authenticated user specifies a starting point and destination of the path. The system displays the map and allows the user to define the bike path by selecting the streets composing the route.
+Before saving the bike path, the user selects a privacy and quality status to associate with the path. The system stores the path in the user’s personal history, making it available for later review and optional publication.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
@@ -283,11 +283,8 @@ After navigating to their history page, the user selects a bike path that is cur
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
-*Authenticated user searches for a path* \
-The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths and selects it. The user is presented with the option to start the automatic recording function or to simply follow the path without recording. Once the user selects one of the options, they will be redirected to a page displaying the map of the path, a timer, and other metrics
-
-*Unauthenticated user searches for a path* \
-The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user then chooses to follow one of the paths, selects and is redirected to a page displaying the map of the path, a timer, and other metrics
+*User searches for a path* \
+The user navigates to the browsing page and enters a starting point and destination. The highest-quality bike paths connecting the two points are displayed to the user, along with their respective rank. The user can select a path to view its details. If the user is authenticated, they are presented with the option to start the automatic recording function. If the user selects this option, they will be redirected to a page displaying the map with the selected path, a timer, and other metrics.
 
 #pagebreak()
 === Class Diagram
@@ -326,8 +323,8 @@ class AutomaticBikePath {
   distance: Double
   time: Double
   activeTime: Double
-  performance: Performance?
-  weather: Weather?
+  performance: Performance {optional}
+  weather: Weather {optional}
   computeStatus(): BikePathStatus
 }
 
@@ -2707,6 +2704,7 @@ assert UnavailableImpliesNoAction {
 - *Alloy* for formal analysis.
 - *GitHub* for project versioning and automate diagram creation.
 - *Google Docs* for collaborative writing.
+- *Xcode* and *SwiftUI* to create UI mocks.
 
 
 #show: backmatter.with()

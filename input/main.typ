@@ -2071,6 +2071,7 @@ deactivate UI
   kind: image,
   caption: [Manual Path Insertion Sequence Diagram]
 )
+
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 *UC12 Show Detailed view* 
@@ -2081,7 +2082,7 @@ boundary "BBP App " as App
 database "BBP Database" as db
 activate User
 activate App
-User -> App: Open application
+User ->> App: Open application
 App -> User: Show History Page 
 activate App
 activate db
@@ -2089,8 +2090,8 @@ App -> db: getPaths(user)
 db --> App: userPaths
 deactivate db
 App -> User: Show user paths 
-User -> App: Select path
-App --> User: Show Detailed view
+User ->> App: Select path
+App -> User: Show Detailed view
 activate db
 App -> db: getUserPathDetails(userPath)
 db --> App: userPathDetail

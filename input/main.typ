@@ -1825,7 +1825,7 @@ else Capability access is not determined
     User ->> Frontend: Press 'Cancel' button
   else Continue
     User ->> Frontend: Press 'Continue' button
-    Frontend ->> User: Show system dialog\nto give permission
+    Frontend -> User: Show system dialog\nto give permission
     alt Not allow usage
       User ->> Frontend: Press 'Don't allow' button
       Frontend -> Frontend: Continue without capability
@@ -1859,11 +1859,11 @@ loop Until recording stops
   alt User presses "resume" button
     User ->> Frontend: Press "resume" button
     Frontend -> Frontend: Resume timer
-    Frontend --> User: Show updated UI
+    Frontend -> User: Show updated UI
   else User presses "pause" button
     User ->> Frontend: Press "pause" button
     Frontend -> Frontend: Pause timer
-    Frontend --> User: Show updated UI
+    Frontend -> User: Show updated UI
   end
 end
 User ->> Frontend: Press "Stop Recording" button

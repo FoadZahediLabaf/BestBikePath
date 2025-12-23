@@ -1832,10 +1832,10 @@ UI -> DB : getPaths(user)
 activate DB
 DB --> UI : pathList
 deactivate DB
-UI --> U : Show user paths
+UI -> U : Show user paths
 == Delete trip ==
 U -> UI : Select path
-UI--> U: Show Detailed view
+UI-> U: Show Detailed view
 activate DB
 UI-> DB: getUserPathDetails(userPath)
 DB --> UI: userPathDetail
@@ -1854,7 +1854,7 @@ else User confirms deletion
   activate DB
   DB --> UI : pathList
   deactivate DB
-  UI --> U : show History Page
+  UI -> U : show History Page
 end
 deactivate UI
 ```
@@ -1864,6 +1864,7 @@ deactivate UI
   caption: [Delete Bike Path Sequence Diagram]
 )
 
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 *UC15 Browse Community Paths*
 #let browseCommunityPathSequenceDiagram = ```plantuml

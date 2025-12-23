@@ -1734,9 +1734,9 @@ control "Backend" as Backend
 database "Database" as DB
 activate User
 activate Frontend
-User -> Frontend: Press delete account button
-Frontend --> User: Show confirmation
-User -> Frontend: Press confirm button
+User ->> Frontend: Press delete account button
+Frontend -> User: Show confirmation
+User ->> Frontend: Press confirm button
 activate Backend
 Frontend -> Backend: deleteAccount(email)
 note over Frontend, Backend
@@ -1748,7 +1748,7 @@ DB --> Backend: 200 OK (true)
 deactivate DB
 Backend --> Frontend: 200 OK (true)
 deactivate Backend
-Frontend --> User: Show homepage as unauthenticated user
+Frontend -> User: Show homepage as unauthenticated user
 deactivate User
 deactivate Frontend
 ```

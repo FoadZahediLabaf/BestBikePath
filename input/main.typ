@@ -1688,20 +1688,20 @@ activate Frontend
 User ->> Frontend: Open account page
 Frontend -> User: Show email textfield
 User ->> Frontend: Insert email
-activate Backend
 Frontend -> Backend: userExists(email)
-activate DB
+activate Backend
 Backend -> DB: userExists(email)
+activate DB
 DB --> Backend: 200 OK (true)
 deactivate DB
 Backend --> Frontend: 200 OK (true)
 deactivate Backend
 Frontend -> User: Show password textfield
 User ->> Frontend: Insert password
-activate Backend
 Frontend -> Backend: signin(email, password)
-activate DB
+activate Backend
 Backend -> DB: getAccount(email)
+activate DB
 DB --> Backend: 200 OK (account)
 deactivate DB
 Backend -> Backend: checkCredentials(password, password)
@@ -1710,11 +1710,9 @@ alt Not valid credentials
   Frontend -> User: Show error
 else Valid credentials
   Backend --> Frontend: 200 OK (account, token)
+  deactivate Backend
   Frontend -> User: Show homepage as logged user
 end
-deactivate Backend
-deactivate User
-deactivate Frontend
 ```
 #figure(
   userSignInSequenceDiagram,
@@ -2572,7 +2570,7 @@ assert NoPrivatePathsInQueryResults {
 ) <alloy-community-path-browsing-world2>
 
 #pagebreak()
-#heading(level: 4, numbering: none,  outlined: false,  "Capability Management")
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
 In the following section we analyze the management capability permissions and requests for access. A capability represents any device feature requiring user authorization, such as localization services, motion sensors, and notifications.
 

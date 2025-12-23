@@ -1687,7 +1687,7 @@ deactivate UI
 activate User
 activate App
 User -> App: Open application
-App -> User: Show History page 
+App -> User: Show History Page 
 activate App
 activate db
 App -> db: getPaths(user)

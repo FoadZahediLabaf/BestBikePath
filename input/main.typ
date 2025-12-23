@@ -922,7 +922,7 @@ All communication with back-end services must be authenticated and authorized, b
             + The application continues without the capability.
           - Check permission again
             + User presses “Check permission”.
-            + The application requests the authorization status again (getAuthorizationStatus).
+            + The application requests the authorization status again.
             + If the capability is now authorized, the application continues with the capability.
       - If capability access is authorized:
           + The Capability Provider returns authorized.
@@ -1128,25 +1128,28 @@ All communication with back-end services must be authenticated and authorized, b
 )
 
 #pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 *UC11 Manual Path Insertion*
   columns: 2,
-  [*Name*], [Manual Path Insertion
-],
+  [*Name*], [Manual Path Insertion],
   [*Actors*], [Authenticated User],
   [*Entry Conditions*], [- User navigates to Manual Insertion page],
-  [*Event Flow*], [+The authenticated user accesses the functionality for manual bike path creation.
-+ The user specifies the starting point and the destination of the path.
-+ The system displays the map corresponding to the selected area.
-+ The user defines the bike path by selecting the streets segments composing the route.
-+ The user selects a status to associate with the bike path.
-+ The user saves the bike path.
-+ The system stores the bike path in the user’s personal history],
-  [*Exit Conditions*], [- A new bike path is stored in the database.],
-  [*Exceptions*], [- Internal Error prevents the path from being stored in the database
-- Missing Internet connection],
+  [*Event Flow*], [
+    + The authenticated user accesses the functionality for manual bike path creation.
+    + The user specifies the starting point and the destination of the path.
+    + The system displays the map corresponding to the selected area.
+    + The user defines the bike path by selecting the streets segments composing the route.
+    + The user selects a status to associate with the bike path.
+    + The user saves the bike path.
+    + The system stores the bike path in the user’s personal history],
+  [*Exit Conditions*], [
+    - A new bike path is stored in the database.
+  ],
+  [*Exceptions*], [
+    - Internal Error prevents the path from being stored in the database
+    - Missing Internet connection
+  ],
 #pagebreak()
-
-#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
@@ -1558,6 +1561,91 @@ App --> User: Home page
   kind: image,
   caption: [Stop Recording Sequence Diagram]
 )
+
+#pagebreak()
+*UC11 Manual Path Recording*
+#let ManualPathRecording = ```plantuml
+@startuml
+title UC - Manual Path Recording
+autonumber
+
+actor "Authenticated User" as U
+boundary "BBP App " as UI
+boundary "Map Service" as MAP
+database "BBP Database" as DB
+
+== Open manual creation ==
+activate U
+activate UI
+U -> UI : Open "Manual Path Creation"
+UI -> U : Show form (Start, Destination)
+
+== Insert start & destination ==
+U -> UI : Enter start + destination\nTap "Search Area"
+UI -> MAP : loadMapArea(start,destination)
+activate MAP
+MAP --> UI : mapData
+deactivate MAP
+UI --> U : Display map and enable\nstreet/segment selection
+
+== Define path and status ==
+U -> UI : Select streets/segments
+UI -> UI : Update selected route on map
+
+U -> UI : Select path status
+UI -> UI : Store status selection
+
+== Save ==
+U -> UI : Tap "Save"
+UI -> DB : storePath(user, route, status)
+activate DB
+DB --> UI : OK
+deactivate DB
+UI --> U : Show confirmation\nPath added to history
+
+deactivate U
+deactivate UI
+@enduml
+
+```
+#figure(
+  ManualPathRecording,
+  kind: image,
+  caption: [Manual Path Recording Sequence Diagram]
+)
+
+#pagebreak()
+*UC12 Manual Pause and Resume of Recording*
+
+#let ManualPauseAndResumeRecording = ```plantuml
+actor "Authenticated User" as U
+boundary "BBP App" as UI
+participant "Sensors/GPS" as S
+== Pause ==
+U -> UI : Tap "Pause"
+activate UI
+UI -> S : stopDataAcquisition()
+activate S
+S --> UI : Acquisition stopped
+deactivate S
+UI --> U : Show paused state\n(Resume button enabled)
+deactivate UI
+== Resume ==
+U -> UI : Tap "Resume"
+activate UI
+UI -> S : startDataAcquisition()
+activate S
+S --> UI : Acquisition started
+deactivate S
+UI --> U : Show recording state
+deactivate UI
+```
+#figure(
+  ManualPauseAndResumeRecording,
+  kind: image,
+  caption: [Manual Pause and Resume of Recording Sequence Diagram]
+)
+
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 

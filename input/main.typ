@@ -1583,7 +1583,7 @@ UI -> MAP : loadMapArea(start,destination)
 activate MAP
 MAP --> UI : mapData
 deactivate MAP
-UI --> U : Display map and enable\nstreet/segment selection
+UI -> U : Display map and enable\nstreet/segment selection
 == Define path and status ==
 U -> UI : Select streets/segments
 UI -> UI : Update selected route on map
@@ -1595,7 +1595,7 @@ UI -> DB : storePath(user, route, status)
 activate DB
 DB --> UI : OK
 deactivate DB
-UI --> U : Show confirmation\nPath added to history
+UI -> U : Show confirmation\nPath added to history
 deactivate U
 deactivate UI
 ```

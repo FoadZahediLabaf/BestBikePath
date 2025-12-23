@@ -1617,24 +1617,24 @@ activate Frontend
 User ->> Frontend: Open account page
 Frontend -> User: Show email textfield
 User ->> Frontend: Insert email
-activate Backend
 Frontend -> Backend: userExists(email)
-activate DB
+activate Backend
 Backend -> DB: userExists(email)
+activate DB
 DB --> Backend: 200 OK (false)
 deactivate DB
 Backend --> Frontend: 200 OK (false)
 deactivate Backend
 Frontend -> User: Show email verification textfield
-activate Backend
 Frontend -> Backend: sendVerificationCode(email)
+activate Backend
 Backend -> Backend: generateCode()
-activate KV
 Backend -> KV: save(code, email)\n[TTL: 1H]
+activate KV
 KV --> Backend: 201 Created
 deactivate KV
-activate SMTP
 Backend ->> SMTP: enqueueVerificationEmail(email, code)
+activate SMTP
 SMTP ->> User: Deliver verification email
 SMTP --> Backend: 200 OK
 deactivate SMTP
@@ -1642,10 +1642,10 @@ Backend --> Frontend: 200 OK
 deactivate Backend
 Frontend -> User: Show code sent banner
 User -> Frontend: Insert verification code
-activate Backend
 Frontend -> Backend: verifyCode(email, code)
-activate KV
+activate Backend
 Backend -> KV: getEmail(code)
+activate KV
 KV --> Backend: 200 OK (email)
 deactivate KV
 Backend -> Backend: checkEmail(email1, email2)
@@ -1653,15 +1653,15 @@ Backend --> Frontend: 200 OK
 deactivate Backend
 Frontend --> User: Show account signup form
 User ->> Frontend: Insert name, password\naccept consents & privacy
-activate Backend
 Frontend -> Backend: signup(name, email, password, code)
-activate KV
+activate Backend
 Backend -> KV: getEmail(code)
+activate KV
 KV --> Backend: 200 OK (email)
 deactivate KV
 Backend -> Backend: checkEmail(email1, email2)
-activate DB
 Backend -> DB: createAccount(name, email, password)
+activate DB
 DB --> Backend: 201 Created
 deactivate DB
 Backend --> Frontend: 201 Created (token)

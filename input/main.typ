@@ -1077,7 +1077,6 @@ All communication with back-end services must be authenticated and authorized, b
 
 #pagebreak()
 === Use Case Diagram
-#pagebreak()
 
 #let useCaseDiagram = ```
 "User" as user
@@ -1127,9 +1126,6 @@ rectangle "Best Bike Paths"{
     package "Community Bike Path Browsing"{
     usecase "Browse Community Paths"
     }
-
-
- 
 
 }
 
@@ -2078,11 +2074,11 @@ database "Database" as DB
 boundary "Weather API" as API
 activate User
 activate App
-activate Sensors
 User ->> App: Select "Stop Recording"
 App -> User: Request for confirmation
 User ->> App: Confirm
 App -> Sensors: Stop collecting data
+activate Sensors
 Sensors --> App: Confirmation
 deactivate Sensors
 App -> API: Meteorological data request
@@ -2094,8 +2090,8 @@ else Meteorological data unavailable
     deactivate API
 end
 App --> App: Compute path statistics
-activate DB
 App -> DB: Save path data 
+activate DB
 DB --> App: Path data saved
 deactivate DB
 App -> User: Show Homepage

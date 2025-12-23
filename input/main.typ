@@ -1684,6 +1684,10 @@ deactivate UI
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 *UC12 Show Detailed view* 
 #let showUserPathDetailedViewSequenceDiagram = ```plantuml
+autonumber
+actor "User" as User
+boundary "BBP App " as App
+database "BBP Database" as db
 activate User
 activate App
 User -> App: Open application
@@ -1718,6 +1722,10 @@ deactivate User
 #pagebreak()
 *UC13 Set Bike Path Privacy*
 #let setPrivacySequenceDiagram = ```plantuml
+autonumber
+actor "User" as User
+boundary "BBP App " as App
+database "BBP Database" as db
 activate User
 User -> App: Open application
 App -> User: Show History page 
@@ -1757,6 +1765,10 @@ deactivate App
 
 *UC14 Delete Bike Path*
 #let deleteBikePathSequenceDiagram = ```plantuml
+autonumber
+actor "User" as User
+boundary "BBP App " as App
+database "BBP Database" as db
 User -> App: Open application
 ```
 #figure(

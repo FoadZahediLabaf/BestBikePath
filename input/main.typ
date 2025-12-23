@@ -2171,9 +2171,10 @@ deactivate DB
 UI -> U : Show user paths
 == Delete trip ==
 U ->> UI : Select path
-activate DB
 UI-> DB: getUserPathDetails(userPath)
+activate DB
 DB --> UI: userPathDetail
+deactivate DB
 UI-> U: Show Path Details
 U ->> UI: Delete Path
 UI -> U : Show confirmation dialog

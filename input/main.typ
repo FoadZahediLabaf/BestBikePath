@@ -985,6 +985,7 @@ All communication with back-end services must be authenticated and authorized, b
   ],
 )
 
+#pagebreak()
 *UC7 Automatic Recording With Activity Detection*
 #table(
   columns: 2,
@@ -1127,55 +1128,7 @@ All communication with back-end services must be authenticated and authorized, b
 )
 
 #pagebreak()
-*UC11 Automatic Pause and Resume of Recording*
-#table(
-  columns: 2,
-  [*Name*], [Automatic Pause and Resume of Recording],
-  [*Actors*], [Authenticated User, Sensors, GPS],
-  [*Entry Conditions*], [
-- User stops biking and Automatic Recording is in progress
-  ],
-  [*Event Flow*], [
-+ User stops biking
-+ The application detects a decrease in velocity under a certain threshold
-+ The application stops the recording
-+ Optional: User visually confirms the recording has been paused
-  - User opens the application
-  - Application displays the current timestamp
-  - User puts their device away
-+User resumes biking
-+The application detects an increase in speed above a certain threshold
-+The application resumes the recording and the collection of data
-
-  ],
-  [*Exit Conditions*], [
-- Application resumes recording
-  ],
-  [*Exceptions*], [
-- Sensor data is unavailable
-- Sensor data doesn’t detect a stop
-- GPS data is unavailable
-
-  ],
-)
-
-#pagebreak()
-*UC12 Manual Pause and Resume of Recording*  
-columns: 2,
-  [*Name*], [Pause and Resume of Recording],
-  [*Actors*], [Pause and Resume of Recording],
-  [*Entry Conditions*], [The Automatic Recording session is currently in progress.],
-  [*Event Flow*], [+ The user presses the “Pause” button during an ongoing trip recording.
-+ The system suspends GPS and sensor data acquisition and freezes the update of trip statistics.
-+ The user presses the “Resume” button.
-+ The system restarts GPS and sensor data acquisition and continues updating the trip statistics.
-],
-  [*Exit Conditions*], [- Application resumes recording],
-  [*Exceptions*], [- Sensor data is unavailable
-- GPS data is unavailable],
-)
-#pagebreak()
-*UC13 Manual Path Insertion*
+*UC11 Manual Path Insertion*
   columns: 2,
   [*Name*], [Manual Path Insertion
 ],
@@ -1207,7 +1160,7 @@ columns: 2,
 #let accountCreationSequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 control "Capability Provider" as CP
 activate User
 activate Frontend
@@ -1269,7 +1222,7 @@ deactivate Frontend
 #let userSignInSequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 control "Backend" as Backend
 database "Database" as DB
 activate User
@@ -1316,7 +1269,7 @@ deactivate Frontend
 #let accountDeletionSequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 control "Backend" as Backend
 database "Database" as DB
 activate User
@@ -1350,7 +1303,7 @@ deactivate Frontend
 #let userSignOutSequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 activate User
 activate Frontend
 User ->> Frontend: Press logout account button
@@ -1373,7 +1326,7 @@ deactivate Frontend
 #let requestCapabilitySequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 entity "Capability Provider" as CP
 activate User
 activate Frontend
@@ -1465,7 +1418,7 @@ deactivate Frontend
 #let automaticRecordingManualActivityDetectionSequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 control "Sensor API" as CP
 activate User
 activate Frontend
@@ -1500,7 +1453,7 @@ deactivate Frontend
 #let manualObstacleInsertionSequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 activate User
 activate Frontend
 User ->> Frontend: Press 'start' button
@@ -1530,7 +1483,7 @@ deactivate Frontend
 #let automaticObstacleDetectionSequenceDiagram = ```plantuml
 autonumber
 actor User
-boundary "Frontend" as Frontend
+boundary "BBP App" as Frontend
 control "Sensor API" as CP
 activate User
 activate Frontend
@@ -1573,7 +1526,7 @@ autonumber
 skinparam SequenceMessageAlign center
 actor User
 boundary "BBP App" as App
-control "GPS/Sensors" as Sensors
+control "GPS/Sensor" as Sensors
 database "Database" as DB
 boundary "Weather API" as API
 activate User
@@ -1586,7 +1539,6 @@ App -> Sensors: Stop collecting data
 Sensors --> App: Confirmation
 deactivate Sensors
 App -> API: Meteorological data request
-App -> App: Compute path statistics
 alt Meteorological data available
     activate API
     API --> App: Meteorological data
@@ -1594,83 +1546,18 @@ else Meteorological data unavailable
     API --> App: Data unavailable
     deactivate API
 end
+App --> App: Compute path statistics
 activate DB
-App -> DB: Save path data
+App -> DB: Save path data 
 DB --> App: Path data saved
 deactivate DB
+App --> User: Home page
 ```
 #figure(
   stopRecordingSequenceDiagram,
   kind: image,
   caption: [Stop Recording Sequence Diagram]
 )
-
-#pagebreak()
-*UC11 Automatic Pause and Resume of Recording*
-#let AutomaticPauseAndResumeRecording = ```plantuml
-actor User
-boundary "BBP App" as App
-participant "Speed Sensor" as Sensor
-participant "GPS" as GPS
-== Automatic Pause ==
-Sensor -> App : Velocity decrease detected
-activate App
-App -> GPS : Pause data collection
-activate GPS
-GPS --> App : Data collection paused
-deactivate GPS
-opt User checks paused state
-  User -> App : Open application
-  App --> User : Show paused indicator
-end
-deactivate App
-== Automatic Resume ==
-Sensor -> App : Velocity increase detected
-activate App
-App -> GPS : Resume data collection
-activate GPS
-GPS --> App : Data collection resumed
-deactivate GPS
-deactivate App
-```
-#figure(
-  AutomaticPauseAndResumeRecording,
-  kind: image,
-  caption: [Automatic Pause and Resume of Recording Sequence Diagram]
-)
-
-#pagebreak()
-*UC12 Manual Pause and Resume of Recording*
-
-#let ManualPauseAndResumeRecording = ```plantuml
-actor "Authenticated User" as U
-boundary "BBP App" as UI
-participant "Sensors/GPS" as S
-== Pause ==
-U -> UI : Tap "Pause"
-activate UI
-UI -> S : stopDataAcquisition()
-activate S
-S --> UI : Acquisition stopped
-deactivate S
-UI --> U : Show paused state\n(Resume button enabled)
-deactivate UI
-== Resume ==
-U -> UI : Tap "Resume"
-activate UI
-UI -> S : startDataAcquisition()
-activate S
-S --> UI : Acquisition started
-deactivate S
-UI --> U : Show recording state
-deactivate UI
-```
-#figure(
-  ManualPauseAndResumeRecording,
-  kind: image,
-  caption: [Manual Pause and Resume of Recording Sequence Diagram]
-)
-
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 

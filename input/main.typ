@@ -1578,19 +1578,24 @@ activate U
 activate UI
 U -> UI : Open "Manual Path Creation"
 UI -> U : Show form
-== Define path and status ==
-U -> UI : Select streets/segments
-activate MAP
-UI -> MAP : reverseGeocode(streetAddress)
-MAP --> UI : streetLocations
-UI -> UI : Store streets locations
+== Insert Street Segments ==
+loop Until all street segment are selected
+  U -> UI : Insert street segment address
+  activate MAP
+  UI -> MAP : reverseGeocode(streetAddress)
+  MAP --> UI : streetLocation
+  UI -> UI : Store street location
+  deactivate MAP
+  activate MAP
+  UI -> MAP : addLocationToMap(streetLocation)
+  MAP -->> UI : updateShownMapArea
+  UI ->> U : Show map with updated area
+end
 deactivate MAP
-activate MAP
-UI -> MAP : loadMapArea(streetLocations)
-MAP -->> UI : updateMapArea
-deactivate MAP
+== Select Status == 
 U -> UI : Select path status
 UI -> UI : Store path status
+== Set Privacy ==
 U -> UI : Set path privacy
 UI -> UI : Store path privacy
 == Save ==
@@ -1607,39 +1612,6 @@ deactivate UI
   manualPathInserionSequenceDiagram,
   kind: image,
   caption: [Manual Path Insertion Sequence Diagram]
-)
-
-#pagebreak()
-*UC12 Manual Pause and Resume of Recording*
-
-#let ManualPauseAndResumeRecording = ```plantuml
-autonumber
-actor "Authenticated User" as U
-boundary "BBP App" as UI
-participant "Sensors/GPS" as S
-== Pause ==
-U -> UI : Tap "Pause"
-activate UI
-UI -> S : stopDataAcquisition()
-activate S
-S --> UI : Acquisition stopped
-deactivate S
-UI --> U : Show paused state\n(Resume button enabled)
-deactivate UI
-== Resume ==
-U -> UI : Tap "Resume"
-activate UI
-UI -> S : startDataAcquisition()
-activate S
-S --> UI : Acquisition started
-deactivate S
-UI --> U : Show recording state
-deactivate UI
-```
-#figure(
-  ManualPauseAndResumeRecording,
-  kind: image,
-  caption: [Manual Pause and Resume of Recording Sequence Diagram]
 )
 
 #pagebreak()

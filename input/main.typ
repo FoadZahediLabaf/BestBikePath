@@ -2074,25 +2074,24 @@ database "Database" as DB
 boundary "Weather API" as API
 activate User
 activate App
+activate Sensors
 User ->> App: Select "Stop Recording"
 App -> User: Request for confirmation
 User ->> App: Confirm
-App -> Sensors: Stop collecting data
-activate Sensors
-Sensors --> App: Confirmation
+App -> Sensors: stopUpdates()
 deactivate Sensors
-App -> API: Meteorological data request
+App -> API: getWeather(location, date)
 alt Meteorological data available
     activate API
-    API --> App: Meteorological data
+    API --> App: 200 OK (weatherData)
 else Meteorological data unavailable
     API --> App: Data unavailable
     deactivate API
 end
 App --> App: Compute path statistics
-App -> DB: Save path data 
+App -> DB: savePath(path) 
 activate DB
-DB --> App: Path data saved
+DB --> App: 200 OK
 deactivate DB
 App -> User: Show Homepage
 ```
@@ -2437,7 +2436,7 @@ The application should be able to run on the main mobile operating systems, spec
 = Formal Analysis Using Alloy
 The Alloy analysis of our BBP project allows for a formal demonstration of how the requirements defined in the previous section are both necessary and sufficient for the satisfaction of our initially defined goals.
 
-This analysis mainly focuses on the representation of some of the core functions provided by the application, such as the  “path browsing” functionality through which users are given bike path recommendations based on a quality score, and the publishing functionality that allows users to make their paths available to the public, as well as the way the system manages the validity of each recorded bike path.\
+This analysis mainly focuses on the representation of some of the core functions provided by the application, such as the  “path browsing” functionality through which users are given bike path recommendations based on a quality score, the publishing functionality that allows users to make their paths available to the public, as well as the way the system manages the validity of each recorded bike path, and the automatic recording functionality.\
 We also focus on the management of user permissions for accessing device capabilities (e.g., notifications, sensors, GPS) and the protection of sensitive user data.
 
 For the sake of simplicity and clarity, some elements that define our system have been simplified, allowing for better readability of both the code and the diagrams, while still capturing the essential constraints and behaviors. The main simplifications are listed below:

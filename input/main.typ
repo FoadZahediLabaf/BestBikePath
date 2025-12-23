@@ -40,20 +40,20 @@ BBP’s ultimate goal is to offer its users a valuable tool that streamlines the
 *G6*: Authenticated users want to be able to share their recorded bike paths with the community. \
 *G7*: Authenticated users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available. \
 *G8*: After specifying the start and destination, users want the ability to browse the paths (with the same starting point and destination) published by other authenticated users and ranked based on quality and data freshness. \
-*G9*: The users want to ride along paths compatible with bikes.
+*G9*: The users want to ride along paths that are compatible with bikes.
 
 == Scope
 The purpose of this application is to provide relevant and accurate information about bike paths. In order to do this, BBP offers a wide array of functionalities, such as the ability to collect information about the followed paths, either by allowing users to manually insert the data or through an automated recording function that interacts with the GPS and sensors of the device on which the app resides. The collected information will be securely stored in a remote database, and can optionally be made publicly available. \
 Users will be able to access and manage their stored information through the app.
-This data can then be used by the BBP app to further develop its recommendation system, which will suggest bike paths based on the evaluations provided by other users or computed by the system. \
-This application is primarily intended for authenticated users who, once authenticated within the system, will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unauthenticated users to partially access its functionalities, mainly the ability to browse publicly available bike paths. \
+This data can then be used by BBP to further develop its recommendation system, which will suggest bike paths based on the evaluations provided by other users or computed by the system. \
+This application is primarily intended for authenticated users who will be able to record or manually insert new bike paths to track their cycling experiences. However, the BBP app will also allow unauthenticated users to partially access its functionalities, mainly the ability to browse publicly available bike paths. \
 To enable automatic recordings of bike paths, the BBP application accesses the device’s GPS interface to determine the user’s exact location while biking, as well as other sensor interfaces to collect more relevant information associated with the travelled path. The app will also access an external API for the collection of meteorological data. \
 This application is therefore intended to run on a mobile device equipped with GPS, motion sensors, and internet connectivity for the automatic collection and the remote storage of data in the system’s database.
 
 === World Phenomena
 *WP1*: The user decides to take a bike trip. \
 *WP2*: Weather conditions change over time. \
-*WP3*: Accelerometer and gyroscope collects device motion data.GPS collects device location data. \
+*WP3*: Accelerometer and gyroscope collects device motion data. \
 *WP4*: GPS collects device location data. \
 *WP5*: Street infrastructure changes over time (new streets are built, existing streets are upgraded, downgraded, or decommissioned). \
 *WP6*: Path conditions change over time due to natural degradation, weather, or maintenance. \
@@ -73,7 +73,7 @@ This application is therefore intended to run on a mobile device equipped with G
 *SP5*: The user selects or inserts street segments of a bike path. \
 *SP6*: The user sets the status of the path. \
 *SP7*: The user sets the privacy of the path. \
-*SP8*: The user confirms or rejects obstacles by the system. \
+*SP8*: The user confirms or rejects obstacles detected by the system. \
 *SP9*: The user manually adds an obstacle. \
 *SP10*: The user deletes one of their bike paths. \
 *SP11*: The user selects a starting point and a destination when browsing community bike paths. \
@@ -1291,54 +1291,68 @@ All communication with back-end services must be authenticated and authorized, b
 autonumber
 actor User
 boundary "BBP App" as Frontend
-control "Capability Provider" as CP
+control "Backend" as Backend
+database "Database" as DB
+collections "KV Store" as KV
+queue "SMTP Server" as SMTP
 activate User
 activate Frontend
-activate CP
-Frontend -> Frontend: Needs device capability
-Frontend -> CP: getAuthorizationStatus
-alt Capability access is unavailable
-  CP --> Frontend: unavailable
-  Frontend -> Frontend: Continue without capability
-else Capability access was denied
-  CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining why the capability is needed and instructions to give\npermission in system settings
-  loop Until user presses 'Dismiss' or gives permission in settings
-    alt Continue
-      User -> Frontend: Press 'Dismiss' button
-      Frontend -> Frontend: Continue without capability
-    else Check
-      User -> Frontend: Press 'Check permission' button
-      Frontend -> CP: getAuthorizationStatus
-      note over Frontend, CP
-        Jump to 1
-      end note
-      Frontend -> Frontend: Continue with capability
-    end
-  end
-else Capability access is authorized
-  CP --> Frontend: authorized
-  Frontend -> Frontend: Continue with capability
-else Capability access is not determined
-  CP --> Frontend: notDetermined
-  Frontend ->> User: Show a modal explaining why the capability is needed
-  alt Dismiss modal
-    User -> Frontend: Press 'Dismiss' button
-  else Ask permission
-    User -> Frontend: Press 'Ask permission' button
-    Frontend ->> User: Show system dialog to give permission
-    alt Not allow usage
-      User -> Frontend: Press 'Not allow' button
-      Frontend -> Frontend: Continue without capability
-    else Allow usage
-      User -> Frontend: Press 'Allow' button
-      Frontend -> Frontend: Continue with capability
-    end
-  end
-end
-deactivate CP
+User -> Frontend: Open account page
+Frontend --> User: Show email textfield
+User -> Frontend: Insert email
+activate Backend
+Frontend -> Backend: userExists(email)
+activate DB
+Backend -> DB: userExists(email)
+DB --> Backend: 200 OK (false)
+deactivate DB
+Backend --> Frontend: 200 OK (false)
+deactivate Backend
+Frontend --> User: Show email verification textfield
+activate Backend
+Frontend -> Backend: sendVerificationCode(email)
+Backend -> Backend: generateCode()
+activate KV
+Backend -> KV: save(code, email)\n[TTL: 1H]
+KV --> Backend: 201 Created
+deactivate KV
+activate SMTP
+Backend ->> SMTP: enqueueVerificationEmail(email, code)
+SMTP ->> User: Deliver verification email
+SMTP --> Backend: 200 OK
+deactivate SMTP
+Backend --> Frontend: 200 OK
+deactivate Backend
+Frontend --> User: Show code sent banner
+User -> Frontend: Insert verification code
+activate Backend
+Frontend -> Backend: verifyCode(email, code)
+activate KV
+Backend -> KV: getEmail(code)
+KV --> Backend: 200 OK (email)
+deactivate KV
+Backend -> Backend: checkEmail(email1, email2)
+Backend --> Frontend: 200 OK
+deactivate Backend
+Frontend --> User: Show account signup form
+User -> Frontend: Insert name, password\naccept consents & privacy
+activate Backend
+Frontend -> Backend: signup(name, email, password, code)
+activate KV
+Backend -> KV: getEmail(code)
+KV --> Backend: 200 OK (email)
+deactivate KV
+Backend -> Backend: checkEmail(email1, email2)
+activate DB
+Backend -> DB: createAccount(name, email, password)
+DB --> Backend: 201 Created
+deactivate DB
+Backend --> Frontend: 201 Created (token)
+deactivate Backend
+Frontend --> User: Show homepage as logged user
 deactivate User
 deactivate Frontend
+
 ```
 
 #figure(
@@ -1514,6 +1528,7 @@ deactivate Frontend
   caption: [User Sign-Out Sequence Diagram]
 )
 
+#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 *UC6 Automatic Recording With Manual Controls*
 #let automaticRecordingManualControlsSequenceDiagram = ```plantuml

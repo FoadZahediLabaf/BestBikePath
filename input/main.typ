@@ -1,4 +1,4 @@
-#import "@local/polimi:1.0.0": *
+#import "@local/polimi:1.0.1": *
 #import "@local/plantuml:0.1.0"
 #import "@preview/pintorita:0.1.4"
 
@@ -9,7 +9,7 @@
 #show: polimi-thesis.with(
   title: "Best Bike Paths",
   subtitle: "Requirements Analysis and Specification Document",
-  author: "Foad Zahedi Labaf\nLorenzo Fiamingo\nAlexander Gabriel Fox",
+  author: "Lorenzo Fiamingo\nAlexander Gabriel Fox\nFoad Zahedi Labaf",
   advisor: "",
   coadvisor: "",
   tutor: "",
@@ -18,6 +18,10 @@
   language: "en",
   colored-headings: true,
 )
+
+#toc
+#list-of-figures
+#list-of-tables
 
 #show: mainmatter.with()
 
@@ -1318,7 +1322,7 @@ All communication with back-end services must be authenticated and authorized, b
     + The application subscribes to device activity recognition updates by calling the Sensor API.
     + While the recording session is active, the following loop repeats until the user stops the recording:
       - If the Sensor API detects cycling activity:
-        + The Sensor API notifies the application with cycling.
+        + The Sensor API notifies the application that the user is cycling.
         + The application starts or resumes the timer.
         + The application updates the UI to reflect the “recording” state.
       - If the Sensor API detects non-cycling activity (e.g., stationary, walking, etc.):
@@ -1350,7 +1354,6 @@ All communication with back-end services must be authenticated and authorized, b
     - User is on the recording screen.
   ],
   [*Event Flow*], [
-    + User presses the “Start” button.
     + User presses the “Start” button to begin recording.
     + While the recording session is active, the following steps may occur repeatedly until the recording stops:
       - User presses the “Add Obstacle” button.
@@ -1439,7 +1442,8 @@ All communication with back-end services must be authenticated and authorized, b
     - The application correctly saves the path data in the database.
   ],
   [*Exceptions*], [
-    - The application correctly saves the path data in the database.
+    - Internal Error prevents the system from saving the path in the database
+    - Missing Internet connection
   ],
 )
 #pagebreak()

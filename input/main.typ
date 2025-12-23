@@ -1858,8 +1858,6 @@ loop Until recording stops
   end
 end
 User ->> Frontend: Press "Stop Recording" button
-deactivate User
-deactivate Frontend
 ```
 #figure(
   automaticRecordingManualControlsSequenceDiagram,
@@ -1876,9 +1874,9 @@ boundary "BBP App" as Frontend
 control "Sensor API" as CP
 activate User
 activate Frontend
-activate CP
 User ->> Frontend: Press 'start' button
 Frontend -> CP: startActivityUpdates(handler)
+activate CP
 loop Until recording stops
   alt User starts biking
     CP ->> Frontend: cycling
@@ -1893,8 +1891,6 @@ end
 User -> Frontend: Press 'stop' button
 Frontend -> CP: stopActivityUpdates()
 deactivate CP
-deactivate User
-deactivate Frontend
 ```
 #figure(
   automaticRecordingManualActivityDetectionSequenceDiagram,
@@ -1923,8 +1919,6 @@ loop Until recording stops
   end
 end
 User ->> Frontend: Press 'stop' button
-deactivate User
-deactivate Frontend
 ```
 #figure(
   manualObstacleInsertionSequenceDiagram,

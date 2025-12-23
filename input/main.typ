@@ -1219,7 +1219,34 @@ All communication with back-end services must be authenticated and authorized, b
   ],
 )
 
-
+#pagebreak()
+*UC14 Delete Bike Path*
+#table(
+  columns: 2,
+  [*Name*], [Delete Bike Path],
+  [*Actors*], [Authenticated User],
+  [*Entry Conditions*], [ 
+    - User opens BBP app and has at least one stored trip in personal history.
+  ],
+  [*Event Flow*], [
+    + The user navigate to their History Page.
+    + The system displays the list of recorded paths.
+    + The user selects the desired path
+    + The system displays the path’s detailed view.
+    + The user presses the “Delete” button.
+    + The system asks for confirmation.
+    + The user confirms.
+    + The system deletes the path from the database.
+  ],
+  [*Exit Conditions*], [
+    - The selected path is deleted from the database.
+  ],
+  [*Exceptions*], [
+    - The path doesn’t exist in the database.
+    - Missing Internet connection.
+    - Internal error prevents the system from deleting the path from the database.
+  ],
+)
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
@@ -1759,17 +1786,48 @@ deactivate App
   caption: [Set Bike Path Privacy Sequence Diagram]
 )
 
-#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
-
 #pagebreak()
-
 *UC14 Delete Bike Path*
 #let deleteBikePathSequenceDiagram = ```plantuml
+title UC - Delete Path from System
 autonumber
-actor "User" as User
-boundary "BBP App " as App
-database "BBP Database" as db
-User -> App: Open application
+Activate User
+actor "Authenticated User" as U
+boundary "BBP App " as UI
+database "BBP Database" as DB
+== Open history ==
+U -> UI : Open History Page
+activate UI
+UI -> DB : getPaths(user)
+activate DB
+DB --> UI : pathList
+deactivate DB
+UI --> U : Show user paths
+== Delete trip ==
+U -> UI : Select path
+U -> App: Select path
+UI--> U: Show Detailed view
+activate db
+UI-> db: getUserPathDetails(userPath)
+db --> App: userPathDetail
+UI-> U: Show Path Details
+U -> UI: Delete Path
+UI --> U : Show confirmation dialog
+alt User cancels deletion
+  U -> UI : Tap "Cancel"
+else User confirms deletion
+  U -> UI : Tap "Confirm"
+  UI -> DB : deletePath(path)
+  activate DB
+  DB --> UI : OK
+  deactivate DB
+  UI -> DB : getPaths(user)
+  activate DB
+  DB --> UI : pathList
+  deactivate DB
+  UI --> U : show History Page
+end
+deactivate UI
 ```
 #figure(
   deleteBikePathSequenceDiagram,

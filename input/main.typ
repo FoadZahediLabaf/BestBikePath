@@ -1507,7 +1507,7 @@ else Capability access is not determined
     User -> Frontend: Press 'Cancel' button
   else Continue
     User -> Frontend: Press 'Continue' button
-    Frontend ->> User: Show system dialog to give permission
+    Frontend ->> User: Show system dialog\nto give permission
     alt Not allow usage
       User -> Frontend: Press 'Don't allow' button
       Frontend -> Frontend: Continue without capability

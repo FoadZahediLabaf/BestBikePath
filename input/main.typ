@@ -320,6 +320,8 @@ abstract class BikePath {
 class AutomaticBikePath {
   obstaclesCount: Int
   distance: Double
+  time: Double
+  activeTime: Double
   performance: Performance?
   weather: Weather?
   computeStatus(): BikePathStatus
@@ -1157,6 +1159,36 @@ All communication with back-end services must be authenticated and authorized, b
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+
+*UC12 Show Detailed View*
+#table(
+  columns: 2,
+  [*Name*], [View Detailed Information],
+  [*Actors*], [- Authenticated User],
+  [*Entry Conditions*], [- User opens BBP application on their device],
+  [*Event Flow*], [+ User navigates to their history page
+    + Application shows a list of paths associated with the user
+    + User selects a specific path to view more details
+    + The system displays the information:
+        - System displays the visual representation of the path on a map
+        - System displays the status of the path
+        - System displays the privacy status
+        - System displays the date
+        - Optional: System displays the total time
+        - Optional: System displays the active time
+        - Optional: System displays the average speed
+        - Optional: System displays the top speed
+        - Optional: System displays the total travelled distance
+        - Optional: System displays the obstacles that were encountered
+        - Optional: System displays meteorological data],
+  [*Exit Conditions*], [- User views the additional information],
+  [*Exceptions*], [
+    - Internal error prevents the system from fetching the data
+    - No internet connection],
+)
+
+
+#pagebreak()
 *UC13 Set Bike Path Privacy*
 #table(
   columns: 2,
@@ -1186,6 +1218,8 @@ All communication with back-end services must be authenticated and authorized, b
     - No internet connection
   ],
 )
+
+
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
@@ -1648,7 +1682,38 @@ deactivate UI
 )
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
-
+*UC12 Show Detailed view* 
+#let showUserPathDetailedViewSequenceDiagram = ```plantuml
+activate User
+activate App
+User -> App: Open application
+App -> User: Show History page 
+activate App
+activate db
+App -> db: getPaths(user)
+db --> App: userPaths
+deactivate db
+App -> User: Show user paths 
+User -> App: Select path
+App --> User: Show Detailed view
+activate db
+App -> db: getUserPathDetails(userPath)
+db --> App: userPathDetail
+App -> User: Show Path Details
+opt Performance data available
+    App -> User: Show Performance data
+end
+opt Meteorological data available
+    App -> User: Show Meteorological data
+end
+deactivate App
+deactivate User
+```
+#figure(
+  showUserPathDetailedViewSequenceDiagram,
+  kind: image,
+  caption: [Show Detailed View Sequence Diagram]
+)
 
 #pagebreak()
 *UC13 Set Bike Path Privacy*
@@ -1683,7 +1748,21 @@ deactivate App
 #figure(
   setPrivacySequenceDiagram,
   kind: image,
-  caption: [Manual Path Insertion Sequence Diagram]
+  caption: [Set Bike Path Privacy Sequence Diagram]
+)
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+#pagebreak()
+
+*UC14 Delete Bike Path*
+#let deleteBikePathSequenceDiagram = ```plantuml
+
+```
+#figure(
+  deleteBikePathSequenceDiagram,
+  kind: image,
+  caption: [Delete Bike Path Sequence Diagram]
 )
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")

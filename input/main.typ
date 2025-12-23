@@ -1789,9 +1789,8 @@ deactivate App
 #pagebreak()
 *UC14 Delete Bike Path*
 #let deleteBikePathSequenceDiagram = ```plantuml
-title UC - Delete Path from System
 autonumber
-Activate User
+activate User
 actor "Authenticated User" as U
 boundary "BBP App " as UI
 database "BBP Database" as DB

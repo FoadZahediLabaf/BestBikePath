@@ -1302,7 +1302,7 @@ alt Capability access is unavailable
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
   CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining why the capability is needed and instructions to give\npermission in system settings
+  Frontend ->> User: Show a modal explaining why the\ncapabilityis needed and instructions to\ngive permission in system settings
   loop Until user presses 'Dismiss' or gives permission in settings
     alt Continue
       User -> Frontend: Press 'Dismiss' button
@@ -1321,7 +1321,7 @@ else Capability access is authorized
   Frontend -> Frontend: Continue with capability
 else Capability access is not determined
   CP --> Frontend: notDetermined
-  Frontend ->> User: Show a modal explaining why the capability is needed
+  Frontend ->> User: Show a modal explaining why the\ncapability is needed
   alt Dismiss modal
     User -> Frontend: Press 'Dismiss' button
   else Ask permission

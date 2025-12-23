@@ -1667,8 +1667,6 @@ deactivate DB
 Backend --> Frontend: 201 Created (token)
 deactivate Backend
 Frontend -> User: Show homepage as logged user
-deactivate User
-deactivate Frontend
 ```
 
 #figure(

@@ -645,7 +645,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/account-management/home-unauthenticated.png", width: 66.7%),
-          caption: [Home page as unauthenticated user.]
+          caption: [Home page as unauthenticated user]
       )
     ]
   ][
@@ -653,7 +653,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/account-management/home-authenticated.png", width: 66.7%),
-          caption: [Home page as authenticated user.]
+          caption: [Home page as authenticated user]
       )
     ]
   ]
@@ -663,7 +663,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/account-management/account-unhauthenticated.png", width: 66.7%),
-          caption: [Account page as unauthenticated user.]
+          caption: [Account page as unauthenticated user]
       )
     ]
   ][
@@ -671,7 +671,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/account-management/account-unhauthenticated-filled.png", width: 66.7%),
-          caption: [Account page as authenticated user after entering data.]
+          caption: [Account page as authenticated user after entering data]
       )
     ]
   ]
@@ -681,7 +681,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/account-management/account-emailverification.png", width: 66.7%),
-          caption: [Account email verification page.]
+          caption: [Account email verification page]
       )
     ]
   ][
@@ -689,7 +689,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/account-management/account-emailverification-filled.png", width: 66.7%),
-          caption: [Account email verification page after entering data.]
+          caption: [Account email verification page after entering data]
       )
     ]
   ]
@@ -699,7 +699,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/account-management/account-signup.png", width: 66.7%),
-          caption: [Account sign-up page.]
+          caption: [Account sign-up page]
       )
     ]
   ][
@@ -707,7 +707,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/account-management/account-signup-filled.png", width: 66.7%),
-          caption: [Account sign-up page after entering data.]
+          caption: [Account sign-up page after entering data]
       )
     ]
   ]
@@ -717,21 +717,21 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 30%)[
       #figure(
         image("ui/account-management/account-signin.png"),
-          caption: [Account sign-up page.]
+          caption: [Account sign-up page]
       )
     ]
   ][
     #block(width: 30%)[
       #figure(
         image("ui/account-management/account-signin-filled.png"),
-          caption: [Account sign-up page after entering data.]
+          caption: [Account sign-up page after entering data]
       )
     ]
   ][
     #block(width: 30%)[
       #figure(
         image("ui/account-management/account-signin-wrongpassword.png"),
-          caption: [Account sign-in page after entering wrong password.]
+          caption: [Account sign-in page after entering wrong password]
       )
     ]
   ]
@@ -741,21 +741,21 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 30%)[
       #figure(
         image("ui/account-management/account-authorized.png"),
-          caption: [Account page as authorized user.]
+          caption: [Account page as authorized user]
       )
     ]
   ][
     #block(width: 30%)[
       #figure(
         image("ui/account-management/account-authorized-signoutconfirmation.png"),
-          caption: [Account page as authorized user sign-out confirmation dialog.]
+          caption: [Account page as authorized user sign-out confirmation dialog]
       )
     ]
   ][
     #block(width: 30%)[
       #figure(
         image("ui/account-management/account-authorized-deleteaccountconfirmation.png"),
-          caption: [Account page as authorized user delete account confirmation dialog.]
+          caption: [Account page as authorized user delete account confirmation dialog]
       )
     ]
   ]
@@ -768,7 +768,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/capability-management/requestcapability-notdetermined.png", width: 66.7%),
-          caption: [Request capability page when capability access is not determined.]
+          caption: [Request capability page when capability access is not determined]
       )
     ]
   ][
@@ -776,7 +776,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/capability-management/requestcapability-notdetermined-systemdialog.png", width: 66.7%),
-          caption: [System capability authorization dialog.]
+          caption: [System capability authorization dialog]
       )
     ]
   ]
@@ -786,7 +786,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/capability-management/requestcapability-denied.png", width: 66.7%),
-          caption: [Request capability page when capability access is denied.]
+          caption: [Request capability page when capability access is denied]
       )
     ]
   ][
@@ -794,7 +794,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/capability-management/requestcapability-unavailable.png", width: 66.7%),
-          caption: [Request capability page when capability access is unavailable.]
+          caption: [Request capability page when capability access is unavailable]
       )
     ]
   ]
@@ -807,21 +807,21 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 30%)[
       #figure(
         image("ui/automatic-path-recording/pathrecording-idle.png"),
-          caption: [Recording page before starting.]
+          caption: [Recording page before starting]
       )
     ]
   ][
     #block(width: 30%)[
       #figure(
         image("ui/automatic-path-recording/pathrecording-active.png"),
-          caption: [Recording page while active.]
+          caption: [Recording page while active]
       )
     ]
   ][
     #block(width: 30%)[
       #figure(
         image("ui/automatic-path-recording/pathrecording-obstaclealert.png"),
-          caption: [Recording page notification after an obstacle is detected or inserted by the user.]
+          caption: [Recording page notification after an obstacle is detected or inserted by the user]
       )
     ]
   ]
@@ -831,7 +831,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/automatic-path-recording/pathrecording-paused.png", width: 66.7%),
-          caption: [Recording page when paused.]
+          caption: [Recording page when paused]
       )
     ]
   ][
@@ -839,7 +839,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/automatic-path-recording/pathrecording-stopped.png", width: 66.7%),
-          caption: [Recording page when stopped.]
+          caption: [Recording page when stopped]
       )
     ]
   ]
@@ -852,7 +852,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/manual-path-insertion/pathinsertion.png", width: 66.7%),
-          caption: [Insertion page.]
+          caption: [Insertion page]
       )
     ]
   ][
@@ -860,7 +860,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/manual-path-insertion/pathinsertion-filled.png", width: 66.7%),
-          caption: [Insertion page after entering data.]
+          caption: [Insertion page after entering data]
       )
     ]
   ]
@@ -874,7 +874,7 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 45%)[
       #figure(
         image("ui/personal-path-history/history.png", width: 66.7%),
-          caption: [History in home page as authenticated user.]
+          caption: [History in home page as authenticated user]
       )
     ]
   ][
@@ -885,21 +885,21 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 30%)[
       #figure(
         image("ui/personal-path-history/history-detail.png"),
-          caption: [Personal path detail page.]
+          caption: [Personal path detail page]
       )
     ]
   ][
     #block(width: 30%)[
       #figure(
         image("ui/personal-path-history/history-detail-fullscreen.png"),
-          caption: [Personal path detail page in full-screen.]
+          caption: [Personal path detail page in full-screen]
       )
     ]
   ][
     #block(width: 30%)[
       #figure(
         image("ui/personal-path-history/history-detail-edited.png"),
-          caption: [Personal path detail page after being edited.]
+          caption: [Personal path detail page after being edited]
       )
     ]
   ]
@@ -912,21 +912,21 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 29%)[
       #figure(
         image("ui/community-paths-browsing/browsing-focused.png"),
-          caption: [Community browser page.]
+          caption: [Community browser page]
       )
     ]
   ][
     #block(width: 29%)[
       #figure(
         image("ui/community-paths-browsing/browsing-startentered.png"),
-          caption: [Community browser page after entering start location.]
+          caption: [Community browser page after entering start location]
       )
     ]
   ][
     #block(width: 29%)[
       #figure(
         image("ui/community-paths-browsing/browsing-endentered.png"),
-          caption: [Community browser page after entering end location.]
+          caption: [Community browser page after entering end location]
       )
     ]
   ]
@@ -936,21 +936,21 @@ Since the app relies on motion and location device features, the interface will 
     #block(width: 29%)[
       #figure(
         image("ui/community-paths-browsing/browsing-list.png"),
-          caption: [Community path list page.]
+          caption: [Community path list page]
       )
     ]
   ][
     #block(width: 29%)[
       #figure(
         image("ui/community-paths-browsing/browsing-detail-authenticated.png"),
-          caption: [Community path detail as authenticated user.]
+          caption: [Community path detail as authenticated user]
       )
     ]
   ][
     #block(width: 29%)[
       #figure(
         image("ui/community-paths-browsing/browsing-detail-unauthenticated.png"),
-          caption: [Community path detail as unauthenticated user.]
+          caption: [Community path detail as unauthenticated user]
       )
     ]
   ]
@@ -1866,7 +1866,6 @@ loop Until recording stops
     Frontend --> User: Show updated UI
   end
 end
-User ->> Frontend: Press "stop" button
 deactivate User
 deactivate Frontend
 ```

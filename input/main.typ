@@ -2267,7 +2267,6 @@ else User confirms deletion
   deactivate DB
   UI -> U : Show History Page
 end
-deactivate UI
 ```
 #figure(
   deleteBikePathSequenceDiagram,
@@ -2307,8 +2306,6 @@ opt User is authenticated
   U ->> UI : Press “Start Recording” Button
   UI -> U : Show Automatic Recording Page\nwith selected path displayed on the map
 end
-deactivate UI
-deactivate U
 ```
 #figure(
   browseCommunityPathSequenceDiagram,

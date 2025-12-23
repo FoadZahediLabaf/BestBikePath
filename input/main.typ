@@ -1880,7 +1880,7 @@ UI -> U : Show search form
 U -> UI : Enter start + destination
 activate DB
 UI -> DB : fetchPathMetadata(start, destination)
-DB - -> UI: paths + metadata
+DB --> UI: paths + metadata
 deactivate DB
 UI -> UI : rankPaths(paths, metadata)
 UI -> MAP : mapPaths(paths)
@@ -2003,9 +2003,12 @@ _Further details will be provided in the corresponding Design Document_
 === Security
 The application must ensure the protection of the users’ sensitive data. This should be guaranteed by hashing passwords and using a secure, encrypted connection to prevent man-in-the-middle attacks. 
 Network requests related to authentication-protected features should always be accompanied by a valid JWT, which will be verified by the server.
+
 The system should also employ mechanisms that protect the database against SQL injections.
 GPS data can be collected once the user gives explicit permission when prompted and only when the user enables automatic recording.
+
 All noise-filtering operations should happen on the client-side to reduce server load and minimize exposure of sensitive data on the network.
+
 While automatic recording is active, GPS data should be encrypted on the user’s device and eliminated from the user’s device when the data transfer is completed.
 On the server, location data must be stored securely and encrypted according to server-side policies.\
 
@@ -2022,7 +2025,9 @@ The application should be able to run on the main mobile operating systems, spec
 
 = Formal Analysis Using Alloy
 The Alloy analysis of our BBP project allows for a formal demonstration of how the requirements defined in the previous section are both necessary and sufficient for the satisfaction of our initially defined goals.
+
 This analysis mainly focuses on the representation of some of the core functions provided by the application, such as the  “path browsing” functionality through which users are given bike path recommendations based on a quality score, and the publishing functionality that allows users to make their paths available to the public, as well as the way the system manages the validity of each recorded bike path.
+
 For the sake of simplicity and clarity, some elements that define our system have been simplified, allowing for better readability of both the code and the diagrams, while still capturing the essential constraints and behaviors. The main simplifications are listed below:
 - There is no distinction between unauthenticated and authenticated users
 - GPS and sensor data is excluded from the bike path representations

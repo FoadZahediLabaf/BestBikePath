@@ -1526,10 +1526,10 @@ All communication with back-end services must be authenticated and authorized, b
     + The system displays the path detail view.
     + User sets privacy toggle.
       - Toggle is set to "Off":
-        + The user sets the privacy toggle on.
+        + The user sets the privacy toggle off and saves.
         + The application updates the database by setting the path status to “Private”.
       - Toggle is set to "On":
-        + The user sets the privacy toggle off.
+        + The user sets the privacy toggle on and saves.
         + The application updates the database by setting the path status to “Public”.
   ],
   [*Exit Conditions*], [
@@ -1614,9 +1614,9 @@ collections "KV Store" as KV
 queue "SMTP Server" as SMTP
 activate User
 activate Frontend
-User -> Frontend: Open account page
-Frontend --> User: Show email textfield
-User -> Frontend: Insert email
+User ->> Frontend: Open account page
+Frontend -> User: Show email textfield
+User ->> Frontend: Insert email
 activate Backend
 Frontend -> Backend: userExists(email)
 activate DB
@@ -1625,7 +1625,7 @@ DB --> Backend: 200 OK (false)
 deactivate DB
 Backend --> Frontend: 200 OK (false)
 deactivate Backend
-Frontend --> User: Show email verification textfield
+Frontend -> User: Show email verification textfield
 activate Backend
 Frontend -> Backend: sendVerificationCode(email)
 Backend -> Backend: generateCode()
@@ -1640,7 +1640,7 @@ SMTP --> Backend: 200 OK
 deactivate SMTP
 Backend --> Frontend: 200 OK
 deactivate Backend
-Frontend --> User: Show code sent banner
+Frontend -> User: Show code sent banner
 User -> Frontend: Insert verification code
 activate Backend
 Frontend -> Backend: verifyCode(email, code)
@@ -1652,7 +1652,7 @@ Backend -> Backend: checkEmail(email1, email2)
 Backend --> Frontend: 200 OK
 deactivate Backend
 Frontend --> User: Show account signup form
-User -> Frontend: Insert name, password\naccept consents & privacy
+User ->> Frontend: Insert name, password\naccept consents & privacy
 activate Backend
 Frontend -> Backend: signup(name, email, password, code)
 activate KV
@@ -1666,7 +1666,7 @@ DB --> Backend: 201 Created
 deactivate DB
 Backend --> Frontend: 201 Created (token)
 deactivate Backend
-Frontend --> User: Show homepage as logged user
+Frontend -> User: Show homepage as logged user
 deactivate User
 deactivate Frontend
 ```
@@ -1687,9 +1687,9 @@ control "Backend" as Backend
 database "Database" as DB
 activate User
 activate Frontend
-User -> Frontend: Open account page
-Frontend --> User: Show email textfield
-User -> Frontend: Insert email
+User ->> Frontend: Open account page
+Frontend -> User: Show email textfield
+User ->> Frontend: Insert email
 activate Backend
 Frontend -> Backend: userExists(email)
 activate DB
@@ -1698,8 +1698,8 @@ DB --> Backend: 200 OK (true)
 deactivate DB
 Backend --> Frontend: 200 OK (true)
 deactivate Backend
-Frontend --> User: Show password textfield
-User -> Frontend: Insert password
+Frontend -> User: Show password textfield
+User ->> Frontend: Insert password
 activate Backend
 Frontend -> Backend: signin(email, password)
 activate DB
@@ -1709,10 +1709,10 @@ deactivate DB
 Backend -> Backend: checkCredentials(password, password)
 alt Not valid credentials
   Backend --> Frontend: 401 Unauthorized
-  Frontend --> User: Show error
+  Frontend -> User: Show error
 else Valid credentials
   Backend --> Frontend: 200 OK (account, token)
-  Frontend --> User: Show homepage as logged user
+  Frontend -> User: Show homepage as logged user
 end
 deactivate Backend
 deactivate User
@@ -1866,6 +1866,7 @@ loop Until recording stops
     Frontend --> User: Show updated UI
   end
 end
+User ->> Frontend: Press "Stop Recording" button
 deactivate User
 deactivate Frontend
 ```

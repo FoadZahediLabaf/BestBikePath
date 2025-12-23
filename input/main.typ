@@ -28,7 +28,7 @@ Biking is an immensely beneficial activity, providing both physical and mental b
 Best Bike Paths aims to make biking a more rewarding experience by providing an intuitive software application that automatically records the paths that users take while exploring the world around them. 
 This app is able to automatically record these paths by accessing the various sensors and GPS of the user’s device, but also allows its users to manually add these paths.
 The application securely stores this information to allow its users to revisit their trips and track their progress as they increase their proficiency in this sport. 
-Best Bike Paths also allows users to publicly share these paths, allowing others to choose recommended bike paths based on their overall quality.
+These users will be able to publicly share these paths, allowing others to choose recommended bike paths based on their overall quality.
 BBP’s ultimate goal is to offer its users a valuable tool that streamlines the process of cataloging their bike trips and cultivates a community of bikers by allowing them to share their experiences.
 
 === Goals
@@ -39,7 +39,7 @@ BBP’s ultimate goal is to offer its users a valuable tool that streamlines the
 *G5*: Authenticated users want to retrieve all the collected data of their personal bike paths. \
 *G6*: Authenticated users want to be able to share their recorded bike paths with the community. \
 *G7*: Authenticated users want to enrich the data of their bike paths with relevant statistics (average speed, total distance, duration) and meteorological information, if available. \
-*G8*: After specifying the start and destination, all the users want the ability to browse the paths (with the same starting point and destination) published by other authenticated users and ranked based on quality and data freshness. \
+*G8*: After specifying the start and destination, users want the ability to browse the paths (with the same starting point and destination) published by other authenticated users and ranked based on quality and data freshness. \
 *G9*: The users want to ride along paths compatible with bikes.
 
 == Scope
@@ -1302,7 +1302,7 @@ alt Capability access is unavailable
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
   CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining why the\ncapabilityis needed and instructions to\ngive permission in system settings
+  Frontend ->> User: Show a modal explaining why the capability is needed and instructions to give\npermission in system settings
   loop Until user presses 'Dismiss' or gives permission in settings
     alt Continue
       User -> Frontend: Press 'Dismiss' button
@@ -1321,7 +1321,7 @@ else Capability access is authorized
   Frontend -> Frontend: Continue with capability
 else Capability access is not determined
   CP --> Frontend: notDetermined
-  Frontend ->> User: Show a modal explaining why the\ncapability is needed
+  Frontend ->> User: Show a modal explaining why the capability is needed
   alt Dismiss modal
     User -> Frontend: Press 'Dismiss' button
   else Ask permission
@@ -1469,7 +1469,7 @@ alt Capability access is unavailable
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
   CP --> Frontend: denied
-  Frontend ->> User: Show a modal explaining why the capability is needed \n and instructionsto give permission in system settings
+  Frontend ->> User: Show a modal explaining why the capability is needed\nand instructionsto give permission in system settings
   loop Until user presses 'Cancel' or authorize capability access in settings
     alt Continue
       User -> Frontend: Press 'Cancel' button
@@ -1514,8 +1514,6 @@ deactivate Frontend
   caption: [User Sign-Out Sequence Diagram]
 )
 
-
-#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 *UC6 Automatic Recording With Manual Controls*
 #let automaticRecordingManualControlsSequenceDiagram = ```plantuml

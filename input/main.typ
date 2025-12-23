@@ -914,18 +914,18 @@ All communication with back-end services must be authenticated and authorized, b
     + The application requests the current authorization status from the Capability Provider.
       - If capability access is unavailable:
         + The Capability Provider returns unavailable.
-        + The application continues without the capability.
+        + The application informs the user and continues without the capability.
       - If capability access was denied:
         + The Capability Provider returns denied.
         + The application displays a modal explaining why the capability is needed and provides instructions to enable permission in system settings.
         + The following loop repeats until the user either continues without the capability or enables permission in settings:
           - Continue without capability
-            + User presses “Continue”.
+            + User presses “Cancel”.
             + The application continues without the capability.
-          - Check permission again
-            + User presses “Check permission”.
-            + The application requests the authorization status again.
-            + If the capability is now authorized, the application continues with the capability.
+          - User authorize capability access.
+            + User authorize capability access in system settings.
+            + User reopen application.
+            + The application continues with the capability.
       - If capability access is authorized:
           + The Capability Provider returns authorized.
           + The application continues with the capability.
@@ -934,10 +934,10 @@ All communication with back-end services must be authenticated and authorized, b
           + The application shows a modal explaining why the capability is needed.
           + User chooses one of the following:
             - Deny permission
-              + User presses “Deny permission”.
+              + User presses “Cancel”.
               + The application continues without the capability.
             - Request permission
-              + User presses “Give permission”.
+              + User presses “Continue”.
               + The application shows the system permission dialog.
               + If the user denies in the system dialog, the application continues without the capability.
               + If the user grants in the system dialog, the application continues with the capability.
@@ -1461,6 +1461,7 @@ entity "Capability Provider" as CP
 activate User
 activate Frontend
 activate CP
+boundary "System Settings" as Settings
 Frontend -> Frontend: Needs device capability
 Frontend -> CP: getAuthorizationStatus
 alt Capability access is unavailable
@@ -1469,16 +1470,17 @@ alt Capability access is unavailable
 else Capability access was denied
   CP --> Frontend: denied
   Frontend ->> User: Show a modal explaining why the capability is needed and instructions\nto give permission in system settings
-  loop Until user presses 'Dismiss' or gives permission in settings
+  loop Until user presses 'Cancel' or authorize capability access in settings
     alt Continue
-      User -> Frontend: Press 'Dismiss' button
+      User -> Frontend: Press 'Cancel' button
       Frontend -> Frontend: Continue without capability
-    else Check
-      User -> Frontend: Press 'Check permission' button
-      Frontend -> CP: getAuthorizationStatus
-      note over Frontend,CP
-        Jump to 1
-      end note
+    else Authorize capability access
+      activate Settings
+      User -> Settings: Authorize capability access
+      Settings -> CP: updateCapabilityAuthorization('authorized')
+      deactivate Settings
+      User ->> Frontend: Open application
+      CP -> Frontend: updateCapabilityAuthorization('authorized')
       Frontend -> Frontend: Continue with capability
     end
   end
@@ -1488,10 +1490,10 @@ else Capability access is authorized
 else Capability access is not determined
   CP --> Frontend: notDetermined
   Frontend ->> User: Show a modal explaining why the capability is needed
-  alt Dismiss modal
-    User -> Frontend: Press 'Dismiss' button
-  else Ask permission
-    User -> Frontend: Press 'Ask permission' button
+  alt Cancel
+    User -> Frontend: Press 'Cancel' button
+  else Continue
+    User -> Frontend: Press 'Continue' button
     Frontend ->> User: Show system dialog to give permission
     alt Not allow usage
       User -> Frontend: Press 'Don't allow' button

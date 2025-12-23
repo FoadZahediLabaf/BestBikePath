@@ -1139,7 +1139,7 @@ All communication with back-end services must be authenticated and authorized, b
     + The authenticated user accesses the functionality for manual bike path creation.
     + The user specifies the starting point and the destination of the path.
     + The system displays the map corresponding to the selected area.
-    + The user defines the bike path by selecting the streets segments composing the route.
+    + The user defines the bike path by writing the streets segments address composing the route.
     + The user selects a status to associate with the bike path.
     + The user saves the bike path.
     + The system stores the bike path in the user’s personal history],
@@ -1149,6 +1149,7 @@ All communication with back-end services must be authenticated and authorized, b
   [*Exceptions*], [
     - Internal Error prevents the path from being stored in the database
     - Missing Internet connection
+    - User inserts streets that are not connected.
   ],
 )
 #pagebreak()
@@ -1539,7 +1540,7 @@ activate App
 activate Sensors
 User -> App: Select "Stop Recording"
 App -> User: Request for confirmation
-User --> App: Confirmation
+User -> App: Confirmation
 App -> Sensors: Stop collecting data
 Sensors --> App: Confirmation
 deactivate Sensors
@@ -1556,7 +1557,7 @@ activate DB
 App -> DB: Save path data 
 DB --> App: Path data saved
 deactivate DB
-App --> User: Home page
+App -> User: Show Homepage
 ```
 #figure(
   stopRecordingSequenceDiagram,
@@ -1565,10 +1566,10 @@ App --> User: Home page
 )
 
 #pagebreak()
-*UC11 Manual Path Recording*
-#let ManualPathRecording = ```plantuml
+*UC11 Manual Path Insertion*
+#let manualPathInserionSequenceDiagram = ```plantuml
 autonumber
-actor "Authenticated User" as U
+actor "User" as U
 boundary "BBP App " as UI
 boundary "Map Service" as MAP
 database "BBP Database" as DB
@@ -1576,39 +1577,43 @@ database "BBP Database" as DB
 activate U
 activate UI
 U -> UI : Open "Manual Path Creation"
-UI -> U : Show form (Start, Destination)
-== Insert start & destination ==
-U -> UI : Enter start + destination\nTap "Search Area"
-UI -> MAP : loadMapArea(start,destination)
-activate MAP
-MAP --> UI : mapData
-deactivate MAP
-UI -> U : Display map and enable\nstreet/segment selection
+UI -> U : Show form
 == Define path and status ==
 U -> UI : Select streets/segments
-UI -> UI : Update selected route on map
+activate MAP
+UI -> MAP : reverseGeocode(streetAddress)
+MAP --> UI : streetLocations
+UI -> UI : Store streets locations
+deactivate MAP
+activate MAP
+UI -> MAP : loadMapArea(streetLocations)
+MAP -->> UI : updateMapArea
+deactivate MAP
 U -> UI : Select path status
-UI -> UI : Store status selection
+UI -> UI : Store path status
+U -> UI : Set path privacy
+UI -> UI : Store path privacy
 == Save ==
 U -> UI : Tap "Save"
-UI -> DB : storePath(user, route, status)
+UI -> DB : savePath(streetLocations, status, privacy, date)
 activate DB
 DB --> UI : OK
 deactivate DB
-UI -> U : Show confirmation\nPath added to history
+UI -> U : Show path added to history
 deactivate U
 deactivate UI
 ```
 #figure(
-  ManualPathRecording,
+  manualPathInserionSequenceDiagram,
   kind: image,
-  caption: [Manual Path Recording Sequence Diagram]
+  caption: [Manual Path Insertion Sequence Diagram]
 )
 
 #pagebreak()
 *UC12 Manual Pause and Resume of Recording*
 
 #let ManualPauseAndResumeRecording = ```plantuml
+autonumber
 actor "Authenticated User" as U
 boundary "BBP App" as UI
 participant "Sensors/GPS" as S

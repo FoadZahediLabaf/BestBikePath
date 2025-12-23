@@ -1757,7 +1757,7 @@ deactivate App
 
 *UC14 Delete Bike Path*
 #let deleteBikePathSequenceDiagram = ```plantuml
-
+User -> App: Open application
 ```
 #figure(
   deleteBikePathSequenceDiagram,

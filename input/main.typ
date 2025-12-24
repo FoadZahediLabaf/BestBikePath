@@ -119,7 +119,7 @@ Specifically, the gyroscope of the device is responsible for measuring angular v
 The accelerometer is responsible for measuring the acceleration of the user during the trip and contributes both to obstacle detection and to the computation of the user’s velocity.
 
 *Obstacle*: An obstacle is a physical irregularity located along a bike path that may negatively affect the safety of cyclists.
-Obstacles can be automatically detected through the device’s motion sensors or manually reported by the user, and are used by the system to assess and compute the overall quality of the path.
+Obstacles can be automatically detected through the device’s motion sensors or manually reported by the user, and are used by the system to compute the overall quality of the path.
 
 *SMTP Server*: An SMTP server, or email service provider, is an external system responsible for sending transactional emails on behalf of the application.
 
@@ -264,13 +264,14 @@ The user navigates to the browsing page and enters a starting point and destinat
 #pagebreak()
 === Class Diagram
 
-The diagram models the main entities of the Best Bike Path application.
+The diagram models the main entities of the Best Bike Path application. \
+
 A `User` represents the account of an authenticated user that can create and own multiple `BikePath` objects.
 
-`BikePath` represents a single bike ride made by a user. It's an abstract class containing common route information, such as date, visibility, and route structure. \
-It can be specialized into two class: 
-- `AutomaticBikePath`, which is recorded by the device in automatic recording mode and may include `Performance` and `Weather` object that holds corresponding data, road quality status.
-- `ManualBikePath`, whose locations and road quality status is directly assigned by the user.
+`BikePath` represents a single bike ride performed by a user. It's an abstract class containing common route information, such as date, visibility, and route structure. \
+It can be specialized into two classes: 
+- `AutomaticBikePath`, which is recorded by the device in automatic recording mode and includes `Performance`, `Weather`, and other objects that hold relevant information about the trip.
+- `ManualBikePath`, whose locations and road quality status are directly assigned by the user.
 
 The road path is represented by an ordered array of `Location`s, which are used by map services to reconstruct the path and reverse geocode street names and directions.
 
@@ -2640,7 +2641,7 @@ For the sake of simplicity and clarity, some elements that define our system hav
 - The process through which a street is considered compatible is omitted
 - No distinction is made between different types of obstacles
 - Paths are  acyclic
-- Paths aren't necessarily formed by a connected sequence of street segments
+- Paths don't necessarily form a single linear chain of streets
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Path Browsing")
@@ -2673,7 +2674,7 @@ sig RecommendedPath{
 	//every path instance must have the same streets
 	all p1, p2 : instances | p1.streets = p2.streets
 
-	// the RecommendedPath streets must be equal to the streets of its instances
+	//the RecommendedPath streets must be equal to the streets of its instances
  streets = instances.streets
 	
 	//the alert badge of the RecommendedPath is active if it contains at least one street that is incompatible
@@ -2718,7 +2719,7 @@ fact Ownership{
 fact ValidPath {
   all p: Path | {
      some p.streets
-     //everything in the path must be reachable from start
+     //everything in the path must be reachable from the start
      all s: p.streets | s in p.start.^connectedTo
 
 	   all s:p.streets | s in p.streets.connectedTo
@@ -2774,8 +2775,8 @@ fact TopThreeBest {
 	all q: Query |
 		let matched = { p: RecommendedPath | start[p] = q.qStart and end[p] = q.qEnd } |
         
-    //No matched path outside the results has better quality
-		all p: matched - q.results | all r: q.results | r.quality <= p.quality and	#q.results <= 3
+  //No matched path outside the results has better     quality
+	 all p: matched - q.results | all r: q.results | r.quality <= p.quality and	#q.results <= 3
 }
 ```
 
@@ -2954,21 +2955,20 @@ assert UnavailableImpliesNoAction {
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Recording")
-This Alloy model formalizes the automatic recording workflow of the application as a single recording session per user, that evolves over discrete time steps. Each RecordingSession moves through a finite set of states (Idle, Recording, Paused, StopPending, Stopped, Cancelled) driven by explicit user commands and system actions.
+This Alloy model formalizes the automatic recording workflow of the application as a single recording session per user, which evolves over discrete time steps. Each RecordingSession moves through a finite set of states (Idle, Recording, Paused, StopPending, Stopped, Cancelled) driven by explicit user commands and system actions.
 Recording can start only when the user issues Start from Idle. During recording, the user can request stopping (StopReq), which transitions the session to StopPending, and only a subsequent confirmation (StopConfirm) completes the process by moving the session to Stopped. The user can also manually pause and resume the recording (Pause and Resume). When the user is not issuing commands (control=None), the system enforces two automatic behaviors:
-(1) GPS reliability control, where consecutive bad GPS accuracy during Recording increases a counter (badStreak) and triggers automatic cancellation when it reaches K;
-(2) speed-based control, where low speed pauses the recording and high speed resumes it, provided cancellation is not triggered.
-The model also describes the creation of a Trip: a trip is stored only when a session reaches Stopped, and cancelled sessions never generate a trip. Finally,in every step the next state is uniquely defined by the priority rules.
+- GPS reliability control, where consecutive bad GPS accuracy during Recording increases a counter (badStreak) and triggers automatic cancellation when it reaches K;
+- speed-based control, where low speed pauses the recording and high speed resumes it, provided cancellation is not triggered.
+The model also describes the creation of a Trip: a trip is stored only when a session reaches Stopped, and cancelled sessions never generate a trip. Finally, in every step the next state is uniquely defined by the priority rules.
 
 
 ```alloy
-// Automatic Recording
 enum RecState { Idle, Recording, Paused, StopPending, Stopped, Cancelled }
 enum Control  { None, Start, Pause, Resume, StopReq, StopConfirm }
 enum Speed    { Low, High }
 enum GpsAcc   { Good, Bad }
 
-// K = "15 seconds" 
+//K = "15 seconds" 
 fun K: one Int { 15 }
 
 sig User {}
@@ -2976,7 +2976,6 @@ sig User {}
 sig RecordingSession {
   user: one User,
 
-  // evolving attributes
   var state: one RecState,
   var control: one Control,
   var speed: one Speed,
@@ -2990,14 +2989,14 @@ var sig Trip {
 }
 
 
-// Structural constraint
+//Structural constraint
 
 fact OneSessionPerUser {
   all u: User | lone s: RecordingSession | s.user = u
 }
 
 
-// Initial conditions 
+//Initial conditions 
 
 fact Init {
   all s: RecordingSession |
@@ -3008,7 +3007,7 @@ fact Init {
 }
 
 
-// badStreak update (GPS reliability)
+//BadStreak is updated when the GPS accuracy is too low and resets if it doesn't reach K
 
 fact BadStreakUpdate {
   always all s: RecordingSession |
@@ -3185,7 +3184,7 @@ check AutoResumeCause for 2 but 5 Int, 6 steps
   caption: [`AutoResumeCause` assertion execution]
 )
 
-The following assertion shows that that a trip exists for a session only if that session is Stopped. Additionally, cancelled sessions never produce trips. This captures the persistence semantics: only successfully stopped recordings are saved.
+The following assertion shows that a trip exists for a session only if that session is stopped. Additionally, cancelled sessions never produce trips. This captures the persistence semantics: only successfully stopped recordings are saved.
 ```alloy
 assert TripIffStopped {
   always all s: RecordingSession |
@@ -3207,9 +3206,9 @@ check TripIffStopped for 2 but 5 Int, 6 steps
     columns: 4,
     table.header([], [*Foad Zahedi Labaf*], [*Lorenzo Fiamingo*], [*Alexander Gabriel Fox*]),
     [*Section 1*], [7], [8], [7],
-    [*Section 2*], [15], [10], [14],
-    [*Section 3*], [18], [23], [17],
-    [*Section 4*], [6], [5], [8],
+    [*Section 2*], [15], [10], [14.5],
+    [*Section 3*], [18], [25], [17],
+    [*Section 4*], [6], [6], [8.5],
   ),
   caption: [The number of hours each group member has worked for this document]
 )

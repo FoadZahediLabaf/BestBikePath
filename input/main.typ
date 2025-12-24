@@ -1843,227 +1843,6 @@ Frontend -> User: Show homepage as unauthenticated user
 )
 
 #pagebreak()
-=== Requirement Mapping
-
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G1*: Authenticated users want to automatically record bike path data while they are biking.
-  ]),
-  [
-    *R1*: The system shall allow an unauthenticated user to create an account. \
-    *R2*:	The system shall allow an unauthenticated user to sign into the app. \
-    *R3*:	The system shall allow an authenticated user to sign out from the app.\ 
-    *R4*:	The system shall allow an authenticated user to delete their account.\ 
-    *R5*:	The system shall request the user’s permission to use a device capability. \
-    *R6*:	The system shall properly handle user permission denial.\ 
-    *R7*: The system shall allow the authenticated user to start the automatic recording mode of a bike path.\
-    *R8*: The system shall use the GPS to track the user’s real-time position during the trip.\
-    *R9*: The system shall use the device’s sensors to collect information about obstacles and user speed.\
-    *R10*: The system shall display real-time trip data while the user is biking.\
-    *R13*: The system shall allow the authenticated user to manually stop the automatic recording.\
-    *R18*: The system shall cancel the recording if GPS accuracy drops below an acceptable threshold.\
-    *R19*: The system shall automatically pause recording when the user stops biking.\
-    *R20*: The system shall automatically resume recording when the user starts biking again.
-  ],
-  [
-    *D1*: Users have internet access when interacting with online services provided by BBP.\
-    *D3*: The GPS provides an accuracy measurement along with location data.\
-    *D4*: Sensors on the users’ devices operate correctly.\
-    *D6*: Users’ devices have sufficient battery, storage, and processing capability.
-  ],
-)
-
-#pagebreak()
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G2*: Authenticated users want to manually insert bike paths by specifying streets and status.
-  ]),
-  [
-    *R1*:	The system shall allow an unauthenticated user to create an account.\
-    *R2*: The system shall allow an unauthenticated user to sign into the app.\
-    *R3*: The system shall allow an authenticated user to sign out from the app.\
-    *R4*: The system shall allow an authenticated user to delete their account.\
-    *R23*: The system shall allow the authenticated user to manually create a bike path by inserting a starting point, destination, intermediary stops, and a status.
-  ],
-  [
-    *D1*: Users have internet access when interacting with online services provided by BBP.\
-    *D2*: The road network is correctly represented in the external map provider used by BBP.
-  ]
-)
-
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G3*: Authenticated users want to approve or reject obstacles detected by the system.
-  ]),
-  [
-    *R1*: The system shall allow an unauthenticated user to create an account.\
-    *R2*: The system shall allow an unauthenticated user to sign into the app.\
-    *R3*: The system shall allow an authenticated user to sign out from the app.\
-    *R4*: The system shall allow an authenticated user to delete their account.\
-    *R5*: The system shall request the user’s permission to use a device capability.\
-    *R6*: The system shall properly handle user permission denial.\
-    *R11*: The system shall prompt the user for confirmation of a detected obstacle while biking.
-  ],
-  [
-    *D1*: Sensors on the users’ devices operate correctly.
-  ]
-)
-
-#pagebreak()
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G4*: Authenticated users want to manually record an obstacle while they are biking.
-  ]),
-  [
-    *R1*: The system shall allow an unauthenticated user to create an account.\
-    *R2*: The system shall allow an unauthenticated user to sign into the app.\
-    *R3*: The system shall allow an authenticated user to sign out from the app.\
-    *R4*: The system shall allow an authenticated user to delete their account.\
-    *R12*: The system shall allow the authenticated user to manually insert an obstacle during a recording session.
-  ],
-  [
-    *D6*: Users’ devices have sufficient resources to support the application during biking.
-  ]
-)
-
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G5*: Authenticated users want to retrieve all the collected data of their personal bike paths.
-  ]),
-  [
-    *R1*: The system shall allow an unauthenticated user to create an account.\
-    *R2*: The system shall allow an unauthenticated user to sign into the app.\
-    *R3*: The system shall allow an authenticated user to sign out from the app.\
-    *R4*: The system shall allow an authenticated user to delete their account.\
-    *R24*: The system shall display a list of the user’s previously recorded bike paths in chronological order. \
-    *R25*: The system shall display all collected data of a personal bike path when the user visits its detailed page.
-  ],
-  [
-    *D1*: Users have internet access when interacting with online services provided by BBP. \
-    *D6*: Users’ devices have sufficient resources to display stored data.
-  ]
-)
-
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G6*: Authenticated users want to be able to share their recorded bike paths with the community.
-  ]),
-  [
-    *R1*:	The system shall allow an unauthenticated user to create an account.\
-    *R2*:	The system shall allow an unauthenticated user to sign into the app.\
-    *R3*:	The system shall allow an authenticated user to sign out from the app.\
-    *R4*:	The system shall allow an authenticated user to delete their account.\   
-    *R26*: The system shall allow the user to set the privacy status of a bike path.
-  ],
-  [
-    *D1*: Users have internet access when interacting with online services provided by BBP.
-  ]
-)
-
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G7*: Authenticated users want to enrich their bike paths with statistics and meteorological information.
-  ]),
-  [
-    *R1*:	The system shall allow an unauthenticated user to create an account. \
-    *R2*:	The system shall allow an unauthenticated user to sign into the app. \
-    *R3*:	The system shall allow an authenticated user to sign out from the app. \
-    *R4*:	The system shall allow an authenticated user to delete their account. \
-    *R5*:	The system shall request the user’s permission to use a device capability. \
-    *R6*:	The system shall properly handle user permission denial. \
-    *R10*: The system shall compute and display performance statistics such as speed, duration, and distance. \
-    *R16*: The system shall compute the status of a recorded path based on obstacle frequency.
-  ],
-  [
-    *D5*: Meteorological services provide accurate weather information. \
-    *D7*: Users’ device timestamps are accurate enough to correlate trip and weather data.
-  ]
-)
-
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G8*: After specifying start and destination, users want to browse ranked community bike paths.
-  ]),
-  [
-    *R28*: The system shall allow users to browse publicly available bike paths by specifying start and destination. \
-    *R29*: The system shall sort matching bike paths by system-computed quality score. \
-    *R30*: The system shall display the route map and quality score for each path.
-  ],
-  [
-    *D1*: Users have internet access when interacting with online services provided by BBP. \
-    *D2*: The external map provider correctly represents the road network.
-  ]
-)
-
-#table(
-  columns: 2*(1fr,),
-  stroke: (_, y) => (
-    x: 1pt,
-    top: if y <= 1 { 1pt } else { 0pt },
-    bottom: 1pt,
-  ),
-  table.cell(colspan: 2, [
-    *G9*: Users want to ride along paths that are compatible with bikes.
-  ]),
-  [
-    *R31*: The system shall display an alert if a selected path contains incompatible roads for biking. \
-    *R32*: The system shall allow the user to select a path as the suggested route for recording.
-  ],
-  [
-    *D2*: Road compatibility information is correctly represented by the map provider. \
-    *D8*: No major changes in traffic conditions or speed limits occur during the trip.
-  ]
-)
-
-#pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
 *UC5 Request Device Capability Permission*
@@ -2504,6 +2283,227 @@ end
   browseCommunityPathSequenceDiagram,
   kind: image,
   caption: [Browse Community Paths Sequence Diagram]
+)
+
+#pagebreak()
+=== Requirement Mapping
+
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G1*: Authenticated users want to automatically record bike path data while they are biking.
+  ]),
+  [
+    *R1*: The system shall allow an unauthenticated user to create an account. \
+    *R2*:	The system shall allow an unauthenticated user to sign into the app. \
+    *R3*:	The system shall allow an authenticated user to sign out from the app.\ 
+    *R4*:	The system shall allow an authenticated user to delete their account.\ 
+    *R5*:	The system shall request the user’s permission to use a device capability. \
+    *R6*:	The system shall properly handle user permission denial.\ 
+    *R7*: The system shall allow the authenticated user to start the automatic recording mode of a bike path.\
+    *R8*: The system shall use the GPS to track the user’s real-time position during the trip.\
+    *R9*: The system shall use the device’s sensors to collect information about obstacles and user speed.\
+    *R10*: The system shall display real-time trip data while the user is biking.\
+    *R13*: The system shall allow the authenticated user to manually stop the automatic recording.\
+    *R18*: The system shall cancel the recording if GPS accuracy drops below an acceptable threshold.\
+    *R19*: The system shall automatically pause recording when the user stops biking.\
+    *R20*: The system shall automatically resume recording when the user starts biking again.
+  ],
+  [
+    *D1*: Users have internet access when interacting with online services provided by BBP.\
+    *D3*: The GPS provides an accuracy measurement along with location data.\
+    *D4*: Sensors on the users’ devices operate correctly.\
+    *D6*: Users’ devices have sufficient battery, storage, and processing capability.
+  ],
+)
+
+#pagebreak()
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G2*: Authenticated users want to manually insert bike paths by specifying streets and status.
+  ]),
+  [
+    *R1*:	The system shall allow an unauthenticated user to create an account.\
+    *R2*: The system shall allow an unauthenticated user to sign into the app.\
+    *R3*: The system shall allow an authenticated user to sign out from the app.\
+    *R4*: The system shall allow an authenticated user to delete their account.\
+    *R23*: The system shall allow the authenticated user to manually create a bike path by inserting a starting point, destination, intermediary stops, and a status.
+  ],
+  [
+    *D1*: Users have internet access when interacting with online services provided by BBP.\
+    *D2*: The road network is correctly represented in the external map provider used by BBP.
+  ]
+)
+
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G3*: Authenticated users want to approve or reject obstacles detected by the system.
+  ]),
+  [
+    *R1*: The system shall allow an unauthenticated user to create an account.\
+    *R2*: The system shall allow an unauthenticated user to sign into the app.\
+    *R3*: The system shall allow an authenticated user to sign out from the app.\
+    *R4*: The system shall allow an authenticated user to delete their account.\
+    *R5*: The system shall request the user’s permission to use a device capability.\
+    *R6*: The system shall properly handle user permission denial.\
+    *R11*: The system shall prompt the user for confirmation of a detected obstacle while biking.
+  ],
+  [
+    *D1*: Sensors on the users’ devices operate correctly.
+  ]
+)
+
+#pagebreak()
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G4*: Authenticated users want to manually record an obstacle while they are biking.
+  ]),
+  [
+    *R1*: The system shall allow an unauthenticated user to create an account.\
+    *R2*: The system shall allow an unauthenticated user to sign into the app.\
+    *R3*: The system shall allow an authenticated user to sign out from the app.\
+    *R4*: The system shall allow an authenticated user to delete their account.\
+    *R12*: The system shall allow the authenticated user to manually insert an obstacle during a recording session.
+  ],
+  [
+    *D6*: Users’ devices have sufficient resources to support the application during biking.
+  ]
+)
+
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G5*: Authenticated users want to retrieve all the collected data of their personal bike paths.
+  ]),
+  [
+    *R1*: The system shall allow an unauthenticated user to create an account.\
+    *R2*: The system shall allow an unauthenticated user to sign into the app.\
+    *R3*: The system shall allow an authenticated user to sign out from the app.\
+    *R4*: The system shall allow an authenticated user to delete their account.\
+    *R24*: The system shall display a list of the user’s previously recorded bike paths in chronological order. \
+    *R25*: The system shall display all collected data of a personal bike path when the user visits its detailed page.
+  ],
+  [
+    *D1*: Users have internet access when interacting with online services provided by BBP. \
+    *D6*: Users’ devices have sufficient resources to display stored data.
+  ]
+)
+
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G6*: Authenticated users want to be able to share their recorded bike paths with the community.
+  ]),
+  [
+    *R1*:	The system shall allow an unauthenticated user to create an account.\
+    *R2*:	The system shall allow an unauthenticated user to sign into the app.\
+    *R3*:	The system shall allow an authenticated user to sign out from the app.\
+    *R4*:	The system shall allow an authenticated user to delete their account.\   
+    *R26*: The system shall allow the user to set the privacy status of a bike path.
+  ],
+  [
+    *D1*: Users have internet access when interacting with online services provided by BBP.
+  ]
+)
+
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G7*: Authenticated users want to enrich their bike paths with statistics and meteorological information.
+  ]),
+  [
+    *R1*:	The system shall allow an unauthenticated user to create an account. \
+    *R2*:	The system shall allow an unauthenticated user to sign into the app. \
+    *R3*:	The system shall allow an authenticated user to sign out from the app. \
+    *R4*:	The system shall allow an authenticated user to delete their account. \
+    *R5*:	The system shall request the user’s permission to use a device capability. \
+    *R6*:	The system shall properly handle user permission denial. \
+    *R10*: The system shall compute and display performance statistics such as speed, duration, and distance. \
+    *R16*: The system shall compute the status of a recorded path based on obstacle frequency.
+  ],
+  [
+    *D5*: Meteorological services provide accurate weather information. \
+    *D7*: Users’ device timestamps are accurate enough to correlate trip and weather data.
+  ]
+)
+
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G8*: After specifying start and destination, users want to browse ranked community bike paths.
+  ]),
+  [
+    *R28*: The system shall allow users to browse publicly available bike paths by specifying start and destination. \
+    *R29*: The system shall sort matching bike paths by system-computed quality score. \
+    *R30*: The system shall display the route map and quality score for each path.
+  ],
+  [
+    *D1*: Users have internet access when interacting with online services provided by BBP. \
+    *D2*: The external map provider correctly represents the road network.
+  ]
+)
+
+#table(
+  columns: 2*(1fr,),
+  stroke: (_, y) => (
+    x: 1pt,
+    top: if y <= 1 { 1pt } else { 0pt },
+    bottom: 1pt,
+  ),
+  table.cell(colspan: 2, [
+    *G9*: Users want to ride along paths that are compatible with bikes.
+  ]),
+  [
+    *R31*: The system shall display an alert if a selected path contains incompatible roads for biking. \
+    *R32*: The system shall allow the user to select a path as the suggested route for recording.
+  ],
+  [
+    *D2*: Road compatibility information is correctly represented by the map provider. \
+    *D8*: No major changes in traffic conditions or speed limits occur during the trip.
+  ]
 )
 
 #pagebreak()

@@ -1721,7 +1721,7 @@ deactivate KV
 Backend -> Backend: checkEmail(email1, email2)
 Backend --> Frontend: 200 OK
 deactivate Backend
-Frontend --> User: Show account signup form
+Frontend -> User: Show account signup form
 User ->> Frontend: Insert name, password\naccept consents & privacy
 Frontend -> Backend: signup(name, email, password, code)
 activate Backend

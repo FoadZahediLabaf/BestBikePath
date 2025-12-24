@@ -161,7 +161,8 @@ Obstacles can be automatically detected through the device’s motion sensors or
 == Version History
  
 - Version 1: 23/12/2025
-- Version 2: #datetime.today().display("[day]/[month]/[year]")
+- Version 2: 24/12/2025
+//- Version 3: #datetime.today().display("[day]/[month]/[year]")
 
 == Reference Documents
 

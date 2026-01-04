@@ -183,10 +183,10 @@ end
   caption: [Authentication (Sign In / Sign Up) Sequence Diagram]
 )
 #pagebreak()
-*[UC2] Start Automatic Recording*
-This sequence diagram shows the flow of messages for the Start Automatic Recording use case.
-An authenticated user starts a new recording session through the mobile application. Before starting the recording, the application verifies that the required permissions (e.g., location and motion sensors) are granted. If permissions are available, the Data Collection Manager activates GPS and motion sensors and starts collecting trip data. The collected data is filtered by the Data Preprocessing Manager and stored locally, while the Trip Statistics Manager continuously computes real-time statistics (e.g., time, distance, speed) that are displayed to the user during the ride.
-This use case causes the recording state to transition from Stopped to Recording.
+*[UC2] Start Automatic Recording* \ 
+This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
+An authenticated user starts a new recording session through the mobile application. Before starting the recording, the application verifies that the required permissions (e.g., location and motion sensors) are granted. If permissions are available, the Data Collection Manager activates GPS and motion sensors and starts collecting trip data. The collected data is filtered by the Data Preprocessing Manager and stored locally, while the Trip Statistics Manager continuously computes real-time statistics (e.g., time, distance, speed) that are displayed to the user during the ride. \
+This use case causes the recording state to transition from Stopped to Recording. \
 
 #let StartAutomaticRecordingSequenceDiagram = ```plantuml
 title UC2 - Start Automatic Recording
@@ -224,13 +224,38 @@ end
 )
 #pagebreak()
 
-#let SequenceDiagram = ```plantuml
+*[UC3] Automatic Pause and Resume* \
+This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case. \
+During an active automatic recording session, the mobile application continuously monitors the user’s activity in order to determine whether the user is currently biking or not. This monitoring is performed by the Trip Statistics Manager, which analyzes the preprocessed data provided by the Data Collection Manager (e.g., GPS updates and motion sensor data). \
+When the Trip Statistics Manager detects that the user has stopped biking, it triggers an automatic pause of the recording session by suspending data collection and pausing the trip timer shown in the user interface. \
+When biking activity is detected again, the Trip Statistics Manager triggers the automatic resumption of the recording session by reactivating data collection and restarting the trip timer. \
+This use case causes repeated transitions between the Recording and Paused states until the user explicitly stops the recording session. \
 
+#let AutomaticPauseResumeSequenceDiagram = ```plantuml
+title UC3 - Automatic Pause and Resume
+boundary "Mobile App" as App
+control "Trip Statistics Manager" as TSM
+control "Data Collection Manager" as DCM
+control "Data Preprocessing Manager" as DPM
+loop While recording session is active
+  DCM -> DPM : provideCollectedData()
+  DPM -> TSM : providePreprocessedData()
+  TSM -> TSM : evaluateUserActivity()
+  alt User stops biking
+    TSM -> DCM : pauseCollection()
+    TSM -> DPM : pauseProcessing()
+    TSM -> App : pauseTimerAndUI()
+  else User resumes biking
+    TSM -> DCM : resumeCollection()
+    TSM -> DPM : resumeProcessing()
+    TSM -> App : resumeTimerAndUI()
+  end
+end
 ```
 #figure(
-  SequenceDiagram,
+  AutomaticPauseResumeSequenceDiagram,
   kind: image,
-  caption: [ Sequence Diagram]
+  caption: [ Automatic Pause and Resume Sequence Diagram]
 )
 #pagebreak()
 

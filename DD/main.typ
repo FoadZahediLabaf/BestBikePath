@@ -291,7 +291,7 @@ end
 #figure(
   ManualPauseResumeSequenceDiagram,
   kind: image,
-  caption: [ManualPauseResumeSequenceDiagram Sequence Diagram]
+  caption: [Manual Pause and Resume Sequence Diagram]
 )
 #pagebreak()
 

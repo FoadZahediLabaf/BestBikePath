@@ -175,7 +175,8 @@ else Email not registered
   UMS -> DBMS : createUser(...)
   DBMS --> UMS : OK
   UMS --> App : registration success (+ token if defined)
-end ```
+end 
+```
 #figure(
   AuthenticationSequenceDiagram,
   kind: image,

@@ -145,7 +145,7 @@ boundary "Mobile App" as App
 control "Application Proxy" as Proxy
 control "API Gateway" as GW
 control "User Management Service" as UMS
-entity "DBMS" as DBMS
+database "Database" as DB
 entity "SMTP Server" as SMTP
 User -> App : Tap "Sign In"\nEnter email
 App -> Proxy : checkEmail(email)
@@ -182,7 +182,97 @@ end
   kind: image,
   caption: [Authentication (Sign In / Sign Up) Sequence Diagram]
 )
+#pagebreak()
+*[UC2] Start Automatic Recording*
+This sequence diagram shows the flow of messages for the Start Automatic Recording use case.
+An authenticated user starts a new recording session through the mobile application. Before starting the recording, the application verifies that the required permissions (e.g., location and motion sensors) are granted. If permissions are available, the Data Collection Manager activates GPS and motion sensors and starts collecting trip data. The collected data is filtered by the Data Preprocessing Manager and stored locally, while the Trip Statistics Manager continuously computes real-time statistics (e.g., time, distance, speed) that are displayed to the user during the ride.
+This use case causes the recording state to transition from Stopped to Recording.
 
+#let StartAutomaticRecordingSequenceDiagram = ```plantuml
+title UC2 - Start Automatic Recording
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Permission Manager" as PM
+control "Data Collection Manager" as DCM
+control "Data Preprocessing Manager" as DPM
+control "Trip Statistics Manager" as TSM
+database "Local Storage" as LS
+entity "GPS" as GPS
+entity "Accelerometer" as ACC
+entity "Gyroscope" as GYR
+User -> App : Tap "Start Recording"
+App -> PM : checkRequiredPermissions()
+PM --> App : granted
+App -> DCM : startCollection()
+DCM -> GPS : startLocationUpdates()
+DCM -> ACC : startUpdates()
+DCM -> GYR : startUpdates()
+loop While recording
+GPS --> DCM : location + accuracy
+ACC --> DCM : acceleration sample
+GYR --> DCM : gyroscope sample
+DCM -> DPM : preprocess(samples)
+DPM -> LS : store(preprocessedData)
+DPM -> TSM : notify(preprocessedData)
+TSM --> App : updateUI(stats)
+end
+```
+#figure(
+  StartAutomaticRecordingSequenceDiagram,
+  kind: image,
+  caption: [Start Automatic Recording Sequence Diagram]
+)
+#pagebreak()
+
+#let SequenceDiagram = ```plantuml
+
+```
+#figure(
+  SequenceDiagram,
+  kind: image,
+  caption: [ Sequence Diagram]
+)
+#pagebreak()
+
+#let SequenceDiagram = ```plantuml
+
+```
+#figure(
+  SequenceDiagram,
+  kind: image,
+  caption: [ Sequence Diagram]
+)
+#pagebreak()
+
+#let SequenceDiagram = ```plantuml
+
+```
+#figure(
+  SequenceDiagram,
+  kind: image,
+  caption: [ Sequence Diagram]
+)
+#pagebreak()
+
+#let SequenceDiagram = ```plantuml
+
+```
+#figure(
+  SequenceDiagram,
+  kind: image,
+  caption: [ Sequence Diagram]
+)
+#pagebreak()
+
+#let SequenceDiagram = ```plantuml
+
+```
+#figure(
+  SequenceDiagram,
+  kind: image,
+  caption: [ Sequence Diagram]
+)
+#pagebreak()
 
 
 == Component interfaces

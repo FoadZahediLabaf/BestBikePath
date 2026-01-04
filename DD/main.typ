@@ -132,22 +132,21 @@ All sequence diagrams represent only the main execution path. \
 The system frontend is represented exclusively by a Mobile Application (iOS/Android), as specified in the RASD. \
 Each runtime scenario corresponds directly to a use case defined in the RASD. Some use cases are included even when they do not introduce new backend components because they involve critical runtime interactions with device sensors, which are architecturally relevant for the system. \
 
+#pagebreak() 
 *[UC1] Authentication (Sign In / Sign Up)*\
 This sequence diagram shows the flow of messages for the Authentication use case, which covers both Account Creation (UC1) and User Sign In (UC2) as specified in the RASD. \
 The user initiates the authentication process through the mobile application by entering an email address. The request is forwarded to the backend through the Application Proxy and the API Gateway. The User Management Service checks whether the email is already registered in the DBMS. \
 If the email is already registered, the user proceeds with the sign-in flow by providing credentials; the system verifies them and returns an authentication token.
 Otherwise, the user proceeds with the sign-up flow: the system sends a verification code via the SMTP Server, the user inserts the code, and the system creates a new account in the DBMS. In both cases, the user completes authentication and can access restricted functionalities. \
 #let AuthenticationSequenceDiagram = ```plantuml
-title UC1–UC2 - Authentication (Sign In / Sign Up)
-
+title UC1- Authentication (Sign In / Sign Up)
 actor User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy
 control "API Gateway" as GW
 control "User Management Service" as UMS
-database DBMS
+entity "DBMS" as DBMS
 entity "SMTP Server" as SMTP
-
 User -> App : Tap "Sign In"\nEnter email
 App -> Proxy : checkEmail(email)
 Proxy -> GW
@@ -155,8 +154,7 @@ GW -> UMS : checkEmail(email)
 UMS -> DBMS : userExists(email)?
 DBMS --> UMS : exists / notExists
 UMS --> App : emailStatus(exists?)
-
-alt Email already registered (UC2)
+alt Email already registered 
   User -> App : Enter password\nConfirm sign-in
   App -> Proxy : signIn(email,password)
   Proxy -> GW
@@ -164,13 +162,12 @@ alt Email already registered (UC2)
   UMS -> DBMS : verifyCredentials(email,password)
   DBMS --> UMS : valid
   UMS --> App : authentication token
-else Email not registered (UC1)
+else Email not registered 
   App -> Proxy : requestVerificationCode(email)
   Proxy -> GW
   GW -> UMS : requestVerificationCode(email)
   UMS -> SMTP : sendVerificationCode(email, code)
   SMTP --> UMS : sent
-
   User -> App : Insert verification code\nEnter registration data
   App -> Proxy : createAccount(name,email,password,code)
   Proxy -> GW
@@ -178,9 +175,7 @@ else Email not registered (UC1)
   UMS -> DBMS : createUser(...)
   DBMS --> UMS : OK
   UMS --> App : registration success (+ token if defined)
-end
-
-```
+end ```
 #figure(
   AuthenticationSequenceDiagram,
   kind: image,

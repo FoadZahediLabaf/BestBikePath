@@ -258,47 +258,42 @@ end
   caption: [ Automatic Pause and Resume Sequence Diagram]
 )
 #pagebreak()
+*[UC4] Manual Pause and Resume* \ 
+This sequence diagram shows the flow of messages for the Manual Pause and Resume use case. \ 
+During an active recording session, the authenticated user may explicitly pause or resume the recording through the mobile application interface. \
+When the user selects the Pause action, the mobile application requests the suspension of data collection. The Data Collection Manager and the Data Preprocessing Manager suspend their activities, and the trip timer shown to the user is paused. \
+When the user selects the Resume action, data collection and preprocessing are reactivated, and the trip timer resumes.
+This use case causes explicit transitions between the Recording and Paused states, independently of automatic activity detection. \
+The manual pause and resume action has priority over automatic pause and resume action. \
 
-#let SequenceDiagram = ```plantuml
 
-```
-#figure(
-  SequenceDiagram,
-  kind: image,
-  caption: [ Sequence Diagram]
-)
-#pagebreak()
+#let ManualPauseResumeSequenceDiagram = ```plantuml
+title UC4 - Manual Pause and Resume
 
-#let SequenceDiagram = ```plantuml
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Data Collection Manager" as DCM
+control "Data Preprocessing Manager" as DPM
 
-```
-#figure(
-  SequenceDiagram,
-  kind: image,
-  caption: [ Sequence Diagram]
-)
-#pagebreak()
-
-#let SequenceDiagram = ```plantuml
-
-```
-#figure(
-  SequenceDiagram,
-  kind: image,
-  caption: [ Sequence Diagram]
-)
-#pagebreak()
-
-#let SequenceDiagram = ```plantuml
+alt User pauses recording
+  User -> App : Tap "Pause"
+  App -> DCM : pauseCollection()
+  App -> DPM : pauseProcessing()
+  App -> User : Show paused state
+else User resumes recording
+  User -> App : Tap "Resume"
+  App -> DCM : resumeCollection()
+  App -> DPM : resumeProcessing()
+  App -> User : Show recording state
+end
 
 ```
 #figure(
-  SequenceDiagram,
+  ManualPauseResumeSequenceDiagram,
   kind: image,
-  caption: [ Sequence Diagram]
+  caption: [ManualPauseResumeSequenceDiagram Sequence Diagram]
 )
 #pagebreak()
-
 
 == Component interfaces
 == Selected architectural styles and patterns

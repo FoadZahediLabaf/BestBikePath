@@ -25,31 +25,6 @@
 
 = Introduction
 
-#let automaticRecordingStateDiagram = ```plantuml
-hide empty description
-[*] --> Active: User is bikin
-Active --> Paused : Velocity drops\nbelow threshold
-Active --> Paused : User pauses\nrecording
-Paused --> Active : Velocity rises\nabove threshold
-Paused --> Active : User resumes recording
-Active --> Canceled : Sensor / GPS failure\nor inaccurate data
-Paused --> Canceled : Sensor / GPS failure\nor inaccurate data
-Paused --> [*] : User stops recording
-note on link
-Stop Recording use case
-end note
-note left of Active
-- Collect GPS data
-- Update trip metrics
-end note
-Canceled --> [*]
-```
-#figure(
-  automaticRecordingStateDiagram,
-  kind: image,
-  caption: [Automatic Recording State Diagram]
-)
-
 == Purpose
 
 == Scope
@@ -147,8 +122,73 @@ High-level components and their interaction
 == Component view
 == Deployment view
 == Runtime view
-You can use sequence diagrams to describe the way components interact
-to accomplish specific tasks typically related to your use cases
+This section describes the dynamic behavior of the Best Bike Paths (BBP) system by illustrating the flow of messages exchanged among architectural components for the most relevant use cases defined in the RASD. \
+The runtime view focuses on the main success scenarios and highlights how the system components collaborate to realize the required functionalities. \
+For clarity and consistency with the Software Architecture lectures, the following aspects are intentionally omitted: \
+authorization and access-control checks, \
+error handling and exceptional flows, \
+caching and optimization mechanisms.\ 
+All sequence diagrams represent only the main execution path. \
+The system frontend is represented exclusively by a Mobile Application (iOS/Android), as specified in the RASD. \
+Each runtime scenario corresponds directly to a use case defined in the RASD. Some use cases are included even when they do not introduce new backend components because they involve critical runtime interactions with device sensors, which are architecturally relevant for the system. \
+
+*[UC1] Authentication (Sign In / Sign Up)*\
+This sequence diagram shows the flow of messages for the Authentication use case, which covers both Account Creation (UC1) and User Sign In (UC2) as specified in the RASD. \
+The user initiates the authentication process through the mobile application by entering an email address. The request is forwarded to the backend through the Application Proxy and the API Gateway. The User Management Service checks whether the email is already registered in the DBMS. \
+If the email is already registered, the user proceeds with the sign-in flow by providing credentials; the system verifies them and returns an authentication token.
+Otherwise, the user proceeds with the sign-up flow: the system sends a verification code via the SMTP Server, the user inserts the code, and the system creates a new account in the DBMS. In both cases, the user completes authentication and can access restricted functionalities. \
+#let AuthenticationSequenceDiagram = ```plantuml
+title UC1–UC2 - Authentication (Sign In / Sign Up)
+
+actor User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "User Management Service" as UMS
+database DBMS
+entity "SMTP Server" as SMTP
+
+User -> App : Tap "Sign In"\nEnter email
+App -> Proxy : checkEmail(email)
+Proxy -> GW
+GW -> UMS : checkEmail(email)
+UMS -> DBMS : userExists(email)?
+DBMS --> UMS : exists / notExists
+UMS --> App : emailStatus(exists?)
+
+alt Email already registered (UC2)
+  User -> App : Enter password\nConfirm sign-in
+  App -> Proxy : signIn(email,password)
+  Proxy -> GW
+  GW -> UMS : signIn(email,password)
+  UMS -> DBMS : verifyCredentials(email,password)
+  DBMS --> UMS : valid
+  UMS --> App : authentication token
+else Email not registered (UC1)
+  App -> Proxy : requestVerificationCode(email)
+  Proxy -> GW
+  GW -> UMS : requestVerificationCode(email)
+  UMS -> SMTP : sendVerificationCode(email, code)
+  SMTP --> UMS : sent
+
+  User -> App : Insert verification code\nEnter registration data
+  App -> Proxy : createAccount(name,email,password,code)
+  Proxy -> GW
+  GW -> UMS : createAccount(name,email,password,code)
+  UMS -> DBMS : createUser(...)
+  DBMS --> UMS : OK
+  UMS --> App : registration success (+ token if defined)
+end
+
+```
+#figure(
+  AuthenticationSequenceDiagram,
+  kind: image,
+  caption: [Authentication (Sign In / Sign Up) Sequence Diagram]
+)
+
+
+
 == Component interfaces
 == Selected architectural styles and patterns
 Please explain which styles/patterns you used, why, and how
@@ -160,7 +200,7 @@ already done, possibly providing here some extensions if applicable.
 = Requirements Traceability
 Explain how the requirements you have defined in the RASD
 map to the design elements that you have defined in this document.
-= Implementation, Integration and Test Plan
+= Implementation, Integration And Test Plan
 Identify here the order in which you plan
 to implement the subcomponents of your system and the order in which you plan to integrate
 such subcomponents and test the integration.

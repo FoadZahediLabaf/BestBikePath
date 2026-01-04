@@ -179,12 +179,13 @@ The following reference materials were used for the preparation of this document
 - #link("https://developer.apple.com/documentation/weatherkit/")[Apple Inc., *WeatherKit Framework Documentation*, online documentation].
 
 == Document Structure
-1. *Introduction*: a description of the project that highlights the objectives that it aims to satisfy as well as the core interactions between the application and the environment in which it operates.
-2. *Overall Description*: a more detailed description of the functionalities provided by the application, including real-world scenarios and descriptions of the types of users that interact with the system.
-3. *Specific Requirements*: includes an overview of the main interfaces provided or used by the system as well as an exhaustive list and analysis of the main requirements that guarantee satisfaction of the project’s main objectives, including diagrams that describe the interaction between the system and the environment.
-4. *Formal analysis using Alloy*: a formal description of the domain and an analysis of some of the product’s requirements through Alloy in order to objectively determine the satisfaction of specific goals.
+
+1. *Introduction*: A description of the project that highlights the objectives that it aims to satisfy as well as the core interactions between the application and the environment in which it operates.
+2. *Overall Description*: A more detailed description of the functionalities provided by the application, including real-world scenarios and descriptions of the types of users that interact with the system.
+3. *Specific Requirements*: Includes an overview of the main interfaces provided or used by the system as well as an exhaustive list and analysis of the main requirements that guarantee satisfaction of the project’s main objectives, including diagrams that describe the interaction between the system and the environment.
+4. *Formal analysis using Alloy*: A formal description of the domain and an analysis of some of the product’s requirements through Alloy in order to objectively determine the satisfaction of specific goals.
 5. *Effort spent*: Includes the amount of time dedicated by each member for the realization of each section of the document.
-6. *References*: reference to documents or tools used for writing this document.
+6. *References*: Reference to documents or tools used for writing this document.
 
 = Overall Description
 

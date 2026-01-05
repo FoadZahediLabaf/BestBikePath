@@ -516,6 +516,46 @@ SetBikePathPrivacySequenceDiagram,
   caption: [Set Bike Path Privacy Sequence Diagram]
 )
 #pagebreak()
+*[UC11] Delete Bike Path* \
+This sequence diagram shows the flow of messages for the Delete Bike Path use case. \
+An authenticated user deletes one of their previously stored bike paths from their personal history. The user accesses the detailed view of the selected path and requests deletion. The mobile application shows a confirmation dialog to avoid accidental deletions; after confirmation, the deletion request is forwarded to the backend through the Application Proxy and the API Gateway. \
+The Personal Paths Service removes the path and its related stored data from the DBMS. Once the operation completes, the mobile application refreshes the history list and the deleted path is no longer available. \
+This use case causes a state transition of the selected path from Existing to Deleted in persistent storage. \ 
+
+#let DeleteBikePathSequenceDiagram = ```plantuml
+title UC11 - Delete Bike Path
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "Personal Paths Service" as PPS
+database "DBMS" as DB
+User -> App : Open path details
+User -> App : Tap "Delete Path"
+App -> User : Show confirmation dialog
+User -> App : Confirm deletion
+App -> Proxy : deletePath(pathId)
+Proxy -> GW : forwardRequest()
+GW -> PPS : deletePath(pathId)
+PPS -> DB : deletePath(pathId)
+DB --> PPS : OK
+PPS --> GW : OK
+GW --> App : deletion confirmed
+App -> Proxy : getUserPaths(userId)
+Proxy -> GW : forwardRequest()
+GW -> PPS : getUserPaths(userId)
+PPS -> DB : fetchPathsByUser(userId)
+DB --> PPS : updatedPathsList
+PPS --> GW : updatedPathsList
+GW --> App : showUpdatedHistory(updatedPathsList)
+```
+
+#figure(
+DeleteBikePathSequenceDiagram,
+  kind: image,
+  caption: [Delete Bike Path Sequence Diagram]
+)
+#pagebreak()
 
 == Component interfaces
 == Selected architectural styles and patterns

@@ -292,7 +292,7 @@ end
   caption: [Manual Pause and Resume Sequence Diagram]
 )
 #pagebreak()
-*[UC5] Stop Recording and Save Trip*
+*[UC5] Stop Recording and Save Trip* \
 This sequence diagram shows the flow of messages for the Stop Recording and Save Trip use case. \
 During an active recording session, the authenticated user ends the recording by selecting the Stop action in the mobile application and confirming the choice. The mobile application terminates GPS and sensor acquisition through the Data Collection Manager, finalizes the trip data stored locally, and prepares the trip package for persistence. \
 The trip package is then submitted to the backend through the Application Proxy and the API Gateway. The Path Recording Service optionally enriches the trip with meteorological information by invoking the Weather API and reconstructs the travelled route using the Maps API. The service computes the required trip indicators (e.g., statistics and path status) and stores the finalized path in the DBMS. Finally, the mobile application is notified of the successful operation and the path becomes available in the user’s personal history. \This use case causes the recording state to transition from Recording to Stopped. \
@@ -340,7 +340,7 @@ App -> User : Show saved / redirect to history
   caption: [ Stop Recording and Save Trip Sequence Diagram]
 )
 #pagebreak()
-*[UC6] Automatic Obstacle Detection*
+*[UC6] Automatic Obstacle Detection* \
 This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case. \
 During an active recording session, the mobile application continuously collects motion sensor data and preprocesses it. The Obstacle Detection Manager analyzes the preprocessed sensor stream to identify potential obstacles encountered along the ride. \
 When a potential obstacle is detected, the mobile application shows a timed confirmation notification to the user. If the user confirms the notification or does not respond within the allowed timeout, the obstacle is considered valid and is associated with the ongoing recording session. If the user rejects the notification, the obstacle is discarded. \
@@ -384,6 +384,29 @@ end
   AutomaticObstacleDetectionSequenceDiagram,
   kind: image,
   caption: [Automatic Obstacle Detection Sequence Diagram]
+)
+#pagebreak()
+*[UC7] Manual Obstacle Insertion* \
+This sequence diagram shows the flow of messages for the Manual Obstacle Insertion use case. \
+During an active recording session, the authenticated user may manually report an obstacle through the mobile application interface. When the user performs the “Add Obstacle” action, the application creates a new obstacle entry associated with the current recording session and stores it locally together with the trip data. The user interface is updated to reflect the new obstacle count. \
+This use case may occur multiple times while the recording state remains Recording, and it does not terminate or pause the recording session. \
+
+#let ManualObstacleInsertionSequenceDiagram = ```plantuml
+title UC7 - Manual Obstacle Insertion
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Obstacle Detection Manager" as ODM
+database "Local Storage" as LS
+User -> App : Tap "Add Obstacle"
+App -> ODM : registerManualObstacle()
+ODM -> LS : storeObstacle(currentTrip, obstacle)
+ODM --> App : updateObstacleCountUI()
+```
+
+#figure(
+ManualObstacleInsertionSequenceDiagram,
+  kind: image,
+  caption: [Manual Obstacle Insertion Sequence Diagram]
 )
 #pagebreak()
 

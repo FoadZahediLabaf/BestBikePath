@@ -556,6 +556,46 @@ DeleteBikePathSequenceDiagram,
   caption: [Delete Bike Path Sequence Diagram]
 )
 #pagebreak()
+*[UC12] Browse Community Paths* \
+This sequence diagram shows the flow of messages for the Browse Community Paths use case. \
+A user (authenticated or not) searches for bike paths between an origin and a destination through the mobile application. The request is forwarded to the backend through the Application Proxy and the API Gateway and handled by the Path Recommendation Service. \
+The service retrieves candidate public paths from the DBMS and computes a ranking according to the path quality and available metadata, as defined in the RASD. The ranked results are returned to the mobile application, which visualizes them on a map using the Maps API. If a path contains incompatible roads, the mobile application highlights this information to the user. \
+If the user is authenticated, they may select one of the suggested community paths and start a new recording session with the selected path shown as a suggested route. \
+This use case does not modify community data; it only reads and visualizes public paths. \
+
+#let BrowseCommunityPathsSequenceDiagram = ```plantuml
+title UC12 - Browse Community Paths
+actor User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "Path Recommendation Service" as PRS
+database "DBMS" as DB
+entity "Maps API" as MAPI
+User -> App : Open "Find Paths"\nEnter origin + destination\nTap "Search"
+App -> Proxy : searchCommunityPaths(origin, destination)
+Proxy -> GW : forwardRequest()
+GW -> PRS : searchCommunityPaths(origin, destination)
+PRS -> DB : fetchPublicCandidatePaths(origin, destination)
+DB --> PRS : candidatePaths + metadata
+PRS -> PRS : rankPaths(candidatePaths, metadata)
+PRS --> GW : rankedPaths + compatibilityInfo
+GW --> App : rankedPaths + compatibilityInfo
+App -> MAPI : renderPathsOnMap(rankedPaths)
+MAPI --> App : map updated
+App -> User : Show ranked list\nHighlight incompatible roads
+opt User is authenticated
+  User -> App : Select suggested path
+  App -> User : Open recording screen\nwith suggested route
+end
+```
+
+#figure(
+BrowseCommunityPathsSequenceDiagram,
+  kind: image,
+  caption: [Browse Community Paths Sequence Diagram]
+)
+#pagebreak()
 
 == Component interfaces
 == Selected architectural styles and patterns

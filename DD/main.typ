@@ -454,7 +454,6 @@ This use case does not modify stored data; it only reads and visualizes informat
 
 #let ShowDetailedViewSequenceDiagram = ```plantuml
 title UC9 - Show Detailed View (Personal History)
-
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy
@@ -491,7 +490,7 @@ An authenticated user changes the visibility of one of their previously stored b
 The mobile application forwards the update request to the backend through the Application Proxy and the API Gateway. The Personal Paths Service updates the privacy attribute of the selected path in the DBMS. Once the operation is completed, the mobile application is notified and reflects the updated visibility status. \
 This use case causes a state transition of the path visibility between Private and Public, without modifying the recorded path data. \
 
-#let Set BikePathPrivacySequenceDiagram = ```plantuml
+#let SetBikePathPrivacySequenceDiagram = ```plantuml
 title UC10 - Set Bike Path Privacy
 actor "Authenticated User" as User
 boundary "Mobile App" as App

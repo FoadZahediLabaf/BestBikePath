@@ -269,12 +269,10 @@ The manual pause and resume action has priority over automatic pause and resume 
 
 #let ManualPauseResumeSequenceDiagram = ```plantuml
 title UC4 - Manual Pause and Resume
-
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 control "Data Collection Manager" as DCM
 control "Data Preprocessing Manager" as DPM
-
 alt User pauses recording
   User -> App : Tap "Pause"
   App -> DCM : pauseCollection()
@@ -286,7 +284,6 @@ else User resumes recording
   App -> DPM : resumeProcessing()
   App -> User : Show recording state
 end
-
 ```
 #figure(
   ManualPauseResumeSequenceDiagram,

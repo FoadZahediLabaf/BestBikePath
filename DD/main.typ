@@ -340,6 +340,53 @@ App -> User : Show saved / redirect to history
   caption: [ Stop Recording and Save Trip Sequence Diagram]
 )
 #pagebreak()
+*[UC6] Automatic Obstacle Detection*
+This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case. \
+During an active recording session, the mobile application continuously collects motion sensor data and preprocesses it. The Obstacle Detection Manager analyzes the preprocessed sensor stream to identify potential obstacles encountered along the ride. \
+When a potential obstacle is detected, the mobile application shows a timed confirmation notification to the user. If the user confirms the notification or does not respond within the allowed timeout, the obstacle is considered valid and is associated with the ongoing recording session. If the user rejects the notification, the obstacle is discarded. \
+The accepted obstacle is stored locally together with the trip data and contributes to the obstacle statistics of the current recording. \
+This use case does not terminate the recording session; it can occur multiple times while the recording state remains Recording. \
+
+#let AutomaticObstacleDetectionSequenceDiagram = ```plantuml
+title UC6 - Automatic Obstacle Detection
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Data Collection Manager" as DCM
+control "Data Preprocessing Manager" as DPM
+control "Obstacle Detection Manager" as ODM
+database "Local Storage" as LS
+loop While recording session is active
+  DCM -> DPM : provideCollectedSensorData()
+  DPM -> ODM : providePreprocessedSensorData()
+  ODM -> ODM : detectObstacle()
+  alt Obstacle detected
+    ODM -> App : showTimedConfirmationAlert()
+    opt User confirms
+      App -> ODM : confirmObstacle()
+    end
+    opt User rejects
+      App -> ODM : rejectObstacle()
+    end
+    opt User ignores (timeout)
+      ODM -> ODM : autoAcceptObstacle()
+    end
+    alt Accepted
+      ODM -> LS : storeObstacle(currentTrip, obstacle)
+      ODM -> App : updateObstacleCountUI()
+    else Rejected
+      ODM -> App : discardObstacle()
+    end
+  end
+end
+```
+
+#figure(
+  AutomaticObstacleDetectionSequenceDiagram,
+  kind: image,
+  caption: [Automatic Obstacle Detection Sequence Diagram]
+)
+#pagebreak()
+
 == Component interfaces
 == Selected architectural styles and patterns
 Please explain which styles/patterns you used, why, and how

@@ -252,6 +252,7 @@ loop While recording session is active
   end
 end
 ```
+
 #figure(
   AutomaticPauseResumeSequenceDiagram,
   kind: image,
@@ -265,7 +266,6 @@ When the user selects the Pause action, the mobile application requests the susp
 When the user selects the Resume action, data collection and preprocessing are reactivated, and the trip timer resumes.
 This use case causes explicit transitions between the Recording and Paused states, independently of automatic activity detection. \
 The manual pause and resume action has priority over automatic pause and resume action. \
-
 
 #let ManualPauseResumeSequenceDiagram = ```plantuml
 title UC4 - Manual Pause and Resume
@@ -285,13 +285,61 @@ else User resumes recording
   App -> User : Show recording state
 end
 ```
+
 #figure(
   ManualPauseResumeSequenceDiagram,
   kind: image,
   caption: [Manual Pause and Resume Sequence Diagram]
 )
 #pagebreak()
+*[UC5] Stop Recording and Save Trip*
+This sequence diagram shows the flow of messages for the Stop Recording and Save Trip use case. \
+During an active recording session, the authenticated user ends the recording by selecting the Stop action in the mobile application and confirming the choice. The mobile application terminates GPS and sensor acquisition through the Data Collection Manager, finalizes the trip data stored locally, and prepares the trip package for persistence. \
+The trip package is then submitted to the backend through the Application Proxy and the API Gateway. The Path Recording Service optionally enriches the trip with meteorological information by invoking the Weather API and reconstructs the travelled route using the Maps API. The service computes the required trip indicators (e.g., statistics and path status) and stores the finalized path in the DBMS. Finally, the mobile application is notified of the successful operation and the path becomes available in the user’s personal history. \This use case causes the recording state to transition from Recording to Stopped. \
 
+#let StopRecordingSaveTripSequenceDiagram = ```plantuml
+title UC5 - Stop Recording and Save Trip
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Data Collection Manager" as DCM
+database "Local Storage" as LS
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "Path Recording Service" as PRS
+database "DBMS" as DB
+entity "Weather API" as WAPI
+entity "Maps API" as MAPI
+User -> App : Tap "Stop Recording"
+App -> User : Show confirmation dialog
+User -> App : Confirm
+App -> DCM : stopLocationAndSensorUpdates()
+DCM --> App : stopped
+App -> LS : finalizeTripPackage()
+App -> Proxy : submitRecordedTrip(tripPackage)
+Proxy -> GW : forwardRequest()
+GW -> PRS : submitRecordedTrip(tripPackage)
+opt Meteorological enrichment
+  PRS -> WAPI : getWeather(location, time)
+  WAPI --> PRS : weather data
+end
+opt Route reconstruction
+  PRS -> MAPI : reconstructRoute(locations[])
+  MAPI --> PRS : route/streets
+end
+PRS -> PRS : computeStatisticsAndStatus()
+PRS -> DB : storeTrip(userId, tripData)
+DB --> PRS : OK
+PRS --> GW : OK
+GW --> App : OK
+App -> User : Show saved / redirect to history
+```
+
+#figure(
+  StopRecordingSaveTripSequenceDiagram,
+  kind: image,
+  caption: [ Stop Recording and Save Trip Sequence Diagram]
+)
+#pagebreak()
 == Component interfaces
 == Selected architectural styles and patterns
 Please explain which styles/patterns you used, why, and how

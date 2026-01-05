@@ -446,6 +446,77 @@ ManualPathInsertionSequenceDiagram,
   caption: [Manual Path Insertion Sequence Diagram]
 )
 #pagebreak()
+*[UC9] Show Detailed View (Personal History)* \
+This sequence diagram shows the flow of messages for the Show Detailed View use case. \
+An authenticated user accesses their personal history through the mobile application. The application requests the list of the user’s recorded paths from the backend through the Application Proxy and the API Gateway. The Personal Paths Service retrieves the user’s paths from the DBMS (typically ordered by date) and returns the list to the mobile application. \
+After the user selects a specific path, the mobile application requests the corresponding detailed information. The Personal Paths Service retrieves the complete data for the selected path from the DBMS, including route information and stored indicators. If available, the returned details may also include contextual information such as meteorological data associated with that trip. The mobile application then displays the detailed view to the user. \ 
+This use case does not modify stored data; it only reads and visualizes information. \ 
+
+#let ShowDetailedViewSequenceDiagram = ```plantuml
+title UC9 - Show Detailed View (Personal History)
+
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "Personal Paths Service" as PPS
+database "DBMS" as DB
+User -> App : Open "History"
+App -> Proxy : getUserPaths(userId)
+Proxy -> GW : forwardRequest()
+GW -> PPS : getUserPaths(userId)
+PPS -> DB : fetchPathsByUser(userId)
+DB --> PPS : pathsList
+PPS --> GW : pathsList
+GW --> App : showPaths(pathsList)
+User -> App : Select a path
+App -> Proxy : getPathDetails(pathId)
+Proxy -> GW : forwardRequest()
+GW -> PPS : getPathDetails(pathId)
+PPS -> DB : fetchPathDetails(pathId)
+DB --> PPS : pathDetails
+PPS --> GW : pathDetails
+GW --> App : showDetails(pathDetails)
+```
+
+#figure(
+ShowDetailedViewSequenceDiagram,
+  kind: image,
+  caption: [Show Detailed View Sequence Diagram]
+)
+#pagebreak()
+*[UC10] Set Bike Path Privacy* \
+This sequence diagram shows the flow of messages for the Set Bike Path Privacy use case. \
+An authenticated user changes the visibility of one of their previously stored bike paths by updating its privacy status. The user accesses the detailed view of a path through the mobile application and selects the desired privacy level (public or private). \
+The mobile application forwards the update request to the backend through the Application Proxy and the API Gateway. The Personal Paths Service updates the privacy attribute of the selected path in the DBMS. Once the operation is completed, the mobile application is notified and reflects the updated visibility status. \
+This use case causes a state transition of the path visibility between Private and Public, without modifying the recorded path data. \
+
+#let Set BikePathPrivacySequenceDiagram = ```plantuml
+title UC10 - Set Bike Path Privacy
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "Personal Paths Service" as PPS
+database "DBMS" as DB
+User -> App : Open path details
+User -> App : Change privacy setting\n(Public / Private)
+App -> Proxy : setPathPrivacy(pathId, visibility)
+Proxy -> GW : forwardRequest()
+GW -> PPS : setPathPrivacy(pathId, visibility)
+PPS -> DB : updatePrivacy(pathId, visibility)
+DB --> PPS : OK
+PPS --> GW : OK
+GW --> App : confirmation
+App -> User : Show updated privacy state
+```
+
+#figure(
+SetBikePathPrivacySequenceDiagram,
+  kind: image,
+  caption: [Set Bike Path Privacy Sequence Diagram]
+)
+#pagebreak()
 
 == Component interfaces
 == Selected architectural styles and patterns

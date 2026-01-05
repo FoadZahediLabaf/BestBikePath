@@ -409,6 +409,43 @@ ManualObstacleInsertionSequenceDiagram,
   caption: [Manual Obstacle Insertion Sequence Diagram]
 )
 #pagebreak()
+*[UC8] Manual Path Insertion* \
+This sequence diagram shows the flow of messages for the Manual Path Insertion use case. \ An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate stops through the mobile application. For each inserted location, the mobile application interacts with an external Maps API to translate the provided address into geographic coordinates and to visualize the path on the map. \
+After defining the complete path, the user selects the desired path quality status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service validates and stores the path in the DBMS, making it available in the user’s personal history. \
+This use case does not involve sensor data acquisition and does not affect the recording state. \
+
+#let ManualPathInsertionSequenceDiagram = ```plantuml
+title UC8 - Manual Path Insertion
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+entity "Maps API" as MAPI
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "Path Recording Service" as PRS
+database "DBMS" as DB
+User -> App : Open "Manual Path Creation"
+loop For each inserted location
+  User -> App : Insert address
+  App -> MAPI : reverseGeocode(address)
+  MAPI --> App : coordinates
+  App -> App : updateMap(coordinates)
+end
+User -> App : Select status and privacy
+User -> App : Tap "Save Path"
+App -> Proxy : submitManualPath(pathData)
+Proxy -> GW : forwardRequest()
+GW -> PRS : submitManualPath(pathData)
+PRS -> DB : storeManualPath(userId, pathData)
+DB --> PRS : OK
+PRS --> App : confirmation
+```
+
+#figure(
+ManualPathInsertionSequenceDiagram,
+  kind: image,
+  caption: [Manual Path Insertion Sequence Diagram]
+)
+#pagebreak()
 
 == Component interfaces
 == Selected architectural styles and patterns

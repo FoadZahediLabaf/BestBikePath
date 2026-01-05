@@ -596,6 +596,29 @@ BrowseCommunityPathsSequenceDiagram,
   caption: [Browse Community Paths Sequence Diagram]
 )
 #pagebreak()
+*[UC13] Sign Out* \
+This sequence diagram shows the flow of messages for the Sign Out use case. \ 
+An authenticated user ends their session by selecting the logout action in the mobile application. Since authentication is managed through a token/session stored locally on the device, signing out is performed by removing the locally stored authentication information. \ 
+After the token is deleted, the mobile application returns to an unauthenticated state and the user can no longer access restricted functionalities until they authenticate again. \ 
+This use case causes the authentication state to transition from Authenticated to Unauthenticated, without modifying any persistent data in the backend. \
+
+#let SignOutSequenceDiagram = ```plantuml
+title UC13 - Sign Out
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+User -> App : Tap "Logout"
+App -> User : Show confirmation dialog
+User -> App : Confirm
+App -> App : clearLocalToken()/clearSession()
+App -> User : Show unauthenticated state
+```
+
+#figure(
+SignOutSequenceDiagram,
+  kind: image,
+  caption: [Sign Out Sequence Diagram]
+)
+#pagebreak()
 
 == Component interfaces
 == Selected architectural styles and patterns

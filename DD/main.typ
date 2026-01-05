@@ -619,6 +619,40 @@ SignOutSequenceDiagram,
   caption: [Sign Out Sequence Diagram]
 )
 #pagebreak()
+*[UC14] Account Deletion* \
+This sequence diagram shows the flow of messages for the Account Deletion use case. \
+An authenticated user requests the deletion of their account through the mobile application. The application shows a confirmation dialog to prevent accidental deletions. After confirmation, the request is forwarded to the backend through the Application Proxy and the API Gateway. \
+The User Management Service removes the user account and the related account data from the DBMS. Once the deletion is completed, the mobile application is notified and the user is returned to an unauthenticated state, since the account no longer exists. \
+This use case causes the authentication state to transition from Authenticated to Unauthenticated and permanently removes the user account from persistent storage. \
+
+#let AccountDeletionSequenceDiagram = ```plantuml
+title UC14 - Account Deletion
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "User Management Service" as UMS
+database "DBMS" as DB
+User -> App : Tap "Delete Account"
+App -> User : Show confirmation dialog
+User -> App : Confirm deletion
+App -> Proxy : deleteAccount(userId)
+Proxy -> GW : forwardRequest()
+GW -> UMS : deleteAccount(userId)
+UMS -> DB : deleteAccountData(userId)
+DB --> UMS : OK
+UMS --> GW : OK
+GW --> App : deletion confirmed
+App -> App : clearLocalSession()
+App -> User : Show unauthenticated state
+```
+
+#figure(
+AccountDeletionSequenceDiagram,
+  kind: image,
+  caption: [Account Deletion Sequence Diagram]
+)
+#pagebreak()
 
 == Component interfaces
 == Selected architectural styles and patterns

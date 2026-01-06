@@ -648,11 +648,9 @@ DeleteBikePathSequenceDiagram,
 )
 #pagebreak()
 *[UC12] Browse Community Paths* \
-This sequence diagram shows the flow of messages for the Browse Community Paths use case. \
-A user (authenticated or not) searches for bike paths between an origin and a destination through the mobile application. The request is forwarded to the backend through the Application Proxy and the API Gateway and handled by the Path Recommendation Service. \
-The service retrieves candidate public paths from the DBMS and computes a ranking according to the path quality and available metadata, as defined in the RASD. The ranked results are returned to the mobile application, which visualizes them on a map using the Maps API. If a path contains incompatible roads, the mobile application highlights this information to the user. \
-If the user is authenticated, they may select one of the suggested community paths and start a new recording session with the selected path shown as a suggested route. \
-This use case does not modify community data; it only reads and visualizes public paths. \
+This sequence diagram shows the flow of messages for the Browse Community Paths use case.
+A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves public paths from the DBMS, computes a ranking based on quality and freshness, and returns the ranked paths to the mobile application.
+The application visualizes the recommended paths using the Maps API and highlights any incompatible road segments. \
 
 #let BrowseCommunityPathsSequenceDiagram = ```plantuml
 title UC12 - Browse Community Paths
@@ -661,24 +659,17 @@ boundary "Mobile App" as App
 control "Application Proxy" as Proxy
 control "API Gateway" as GW
 control "Path Recommendation Service" as PRS
-database "DBMS" as DB
+entity "DBMS" as DBMS
 entity "Maps API" as MAPI
-User -> App : Open "Find Paths"\nEnter origin + destination\nTap "Search"
-App -> Proxy : searchCommunityPaths(origin, destination)
-Proxy -> GW : forwardRequest()
-GW -> PRS : searchCommunityPaths(origin, destination)
-PRS -> DB : fetchPublicCandidatePaths(origin, destination)
-DB --> PRS : candidatePaths + metadata
-PRS -> PRS : rankPaths(candidatePaths, metadata)
-PRS --> GW : rankedPaths + compatibilityInfo
-GW --> App : rankedPaths + compatibilityInfo
-App -> MAPI : renderPathsOnMap(rankedPaths)
-MAPI --> App : map updated
-App -> User : Show ranked list\nHighlight incompatible roads
-opt User is authenticated
-  User -> App : Select suggested path
-  App -> User : Open recording screen\nwith suggested route
-end
+User -> App : Search paths
+App -> Proxy : searchPaths(origin, destination)
+Proxy -> GW
+GW -> PRS : searchPaths(origin, destination)
+PRS -> DBMS : fetchPublicPaths(origin, destination)
+DBMS --> PRS : candidatePaths
+PRS -> PRS : rankPaths()
+PRS --> App : rankedPaths
+App -> MAPI : renderPaths(rankedPaths)
 ```
 
 #figure(

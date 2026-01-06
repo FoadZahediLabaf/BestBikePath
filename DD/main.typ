@@ -590,10 +590,9 @@ ShowDetailedViewSequenceDiagram,
 )
 #pagebreak()
 *[UC10] Set Bike Path Privacy* \
-This sequence diagram shows the flow of messages for the Set Bike Path Privacy use case. \
-An authenticated user changes the visibility of one of their previously stored bike paths by updating its privacy status. The user accesses the detailed view of a path through the mobile application and selects the desired privacy level (public or private). \
-The mobile application forwards the update request to the backend through the Application Proxy and the API Gateway. The Personal Paths Service updates the privacy attribute of the selected path in the DBMS. Once the operation is completed, the mobile application is notified and reflects the updated visibility status. \
-This use case causes a state transition of the path visibility between Private and Public, without modifying the recorded path data. \
+This sequence diagram shows the flow of messages for the Set Path Privacy use case.
+An authenticated user changes the visibility of one of their stored paths by updating its privacy level. The request is forwarded to the Personal Paths Service, which updates the privacy attribute of the selected path in the DBMS.
+This use case causes a transition of the path visibility state between Public and Private. \
 
 #let SetBikePathPrivacySequenceDiagram = ```plantuml
 title UC10 - Set Bike Path Privacy
@@ -602,17 +601,14 @@ boundary "Mobile App" as App
 control "Application Proxy" as Proxy
 control "API Gateway" as GW
 control "Personal Paths Service" as PPS
-database "DBMS" as DB
-User -> App : Open path details
-User -> App : Change privacy setting\n(Public / Private)
-App -> Proxy : setPathPrivacy(pathId, visibility)
-Proxy -> GW : forwardRequest()
-GW -> PPS : setPathPrivacy(pathId, visibility)
-PPS -> DB : updatePrivacy(pathId, visibility)
-DB --> PPS : OK
-PPS --> GW : OK
-GW --> App : confirmation
-App -> User : Show updated privacy state
+entity "DBMS" as DBMS
+User -> App : Change privacy setting
+App -> Proxy : updatePrivacy(pathId, visibility)
+Proxy -> GW
+GW -> PPS : updatePrivacy(pathId, visibility)
+PPS -> DBMS : updatePrivacy(pathId, visibility)
+DBMS --> PPS : OK
+PPS --> App : confirmation
 ```
 
 #figure(

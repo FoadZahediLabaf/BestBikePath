@@ -266,7 +266,8 @@ All sequence diagrams represent only the main execution path. \
 The system frontend is represented exclusively by a Mobile Application (iOS/Android), as specified in the RASD. \
 Each runtime scenario corresponds directly to a use case defined in the RASD. Some use cases are included even when they do not introduce new backend components because they involve critical runtime interactions with device sensors, which are architecturally relevant for the system. \
 
-#pagebreak() 
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
 *UC1 Account Creation* \
 This sequence diagram shows the flow of messages for the Account Creation use case . \
 The user initiates authentication through the mobile application by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS. \
@@ -399,24 +400,52 @@ userSignOutSequenceDiagram,
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
-
 *UC5 Request Device Capability Permission*
+
+This sequence diagram shows how the system verifies and obtains the permissions required to access a device capability, for example the user’s location access.
+When the user initiates the recording function, the mobile application requests the Permission Manager to check if it has access authorization to the user’s location obtained through the device GPS.
+
+If the permission is missing, the mobile application shows a modal to the user.
+Here, the user can see which capability the app needs to access and why.
+
+*Not Determined Permission* \
+If the capability is available and the user has never denied the authorization (from the system dialog), and the user decides to give their permission, the system dialog is shown and the user can allow the app to use the capability through the system dialog.
+Otherwise, the user can close the modal and not use the app feature.
+
+*Denied Permission* \
+If the capability is available and the user has denied the authorization (from the system dialog), and the user decides to give their permission, they must open the settings and change the access authorization status manually.
+Otherwise, the user can close the modal and not use the app feature.
+
+*Unavailable Permission* \
+If the capability is unavailable, the user can just close the modal and not use the app feature.
+
 #let requestCapabilitySequenceDiagram = ```plantuml
 autonumber
 actor User
 boundary "BBP App" as Frontend
+entity "Permission Manager" as PM
 entity "Capability Provider" as CP
 boundary "System Settings" as Settings
 activate User
 activate Frontend
 Frontend -> Frontend: Needs device capability
-Frontend -> CP: getAuthorizationStatus
+Frontend -> PM: getAuthorizationStatus
+activate PM
+PM -> CP: getAuthorizationStatus
 activate CP
 alt Capability access is unavailable
-  CP --> Frontend: unavailable
+  CP --> PM: unavailable
+  deactivate CP
+  PM --> Frontend: unavailable
+  deactivate PM
   Frontend -> Frontend: Continue without capability
 else Capability access was denied
-  CP --> Frontend: denied
+  activate CP
+  activate PM
+  CP --> PM: denied
+  deactivate CP
+  PM --> Frontend: denied
+  deactivate PM
   Frontend -> User: Show a modal explaining\nwhy the capability is needed\nand instructionsto give\npermission in system settings
   loop Until user presses 'Cancel' or authorize capability access in settings
     alt Continue
@@ -427,28 +456,70 @@ else Capability access was denied
       activate Settings
       Settings -> CP: updateCapabilityAuthorization('authorized')
       deactivate Settings
+      activate CP
       User ->> Frontend: Open application
-      CP -> Frontend: updateCapabilityAuthorization('authorized')
+      CP -> PM: updateCapabilityAuthorization('authorized')
+      deactivate CP
+      activate PM
+      PM -> Frontend: updateCapabilityAuthorization('authorized')
+      deactivate PM
       Frontend -> Frontend: Continue with capability
     end
   end
+  Frontend -> Frontend: Continue
 else Capability access is authorized
-  CP --> Frontend: authorized
+  activate PM
+  activate CP
+  CP --> PM: authorized
+  deactivate CP
+  PM --> Frontend: authorized
+  deactivate PM
   Frontend -> Frontend: Continue with capability
 else Capability access is not determined
-  CP --> Frontend: notDetermined
+  activate PM
+  activate CP
+  CP --> PM: notDetermined
   deactivate CP
+  PM --> Frontend: notDetermined
+  deactivate PM
   Frontend -> User: Show a modal explaining\nwhy the capability is needed
   alt Cancel
     User ->> Frontend: Press 'Cancel' button
   else Continue
     User ->> Frontend: Press 'Continue' button
-    Frontend -> User: Show system dialog\nto give permission
+    Frontend -> PM: askAuthorization
+    activate PM
+    PM -> CP: askAuthorization
+    deactivate PM
+    activate CP
+    CP -> Settings: askAuthorization
+    deactivate CP
+    activate Settings
+    Settings -> User: Show system dialog to give permission
     alt Not allow usage
-      User ->> Frontend: Press 'Don't allow' button
+      User ->> Settings: Press 'Don't allow' button
+      Settings -> CP: updateCapabilityAuthorization('denied')
+      deactivate Settings
+      activate CP
+      User ->> Frontend: Open application
+      CP -> PM: updateCapabilityAuthorization('denied')
+      deactivate CP
+      activate PM
+      PM -> Frontend: updateCapabilityAuthorization('denied')
+      deactivate PM
       Frontend -> Frontend: Continue without capability
     else Allow usage
-      User ->> Frontend: Press 'Allow' button
+      activate Settings
+      User ->> Settings: Press 'Allow' button
+      Settings -> CP: updateCapabilityAuthorization('authorized')
+      deactivate Settings
+      activate CP
+      User ->> Frontend: Open application
+      CP -> PM: updateCapabilityAuthorization('authorized')
+      deactivate CP
+      activate PM
+      PM -> Frontend: updateCapabilityAuthorization('authorized')
+      deactivate PM
       Frontend -> Frontend: Continue with capability
     end
   end

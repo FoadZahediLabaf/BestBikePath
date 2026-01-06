@@ -568,7 +568,6 @@ This use case does not modify stored data; it only reads and visualizes informat
 
 #let ShowDetailedViewSequenceDiagram = ```plantuml
 title UC9 - Show Personal History
-title UC8 - Show Personal History
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy

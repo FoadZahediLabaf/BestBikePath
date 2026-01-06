@@ -223,6 +223,38 @@ The DBMS will manage all the user-associated data, including account information
 The KV store is used to temporarily persist key–value pairs required for short-lived operations, like generating OTP code for the email verification.
 
 == Deployment view
+The goal of the deployment view is to describe the physical realization of the system’s logical components and the execution environments in which they operate. This view also highlights the physical nodes of the system, the communication links between them, and the protocols used for interaction.
+Furthermore, it defines the system’s physical boundaries with respect to external services and illustrates the use of replication mechanisms, explaining how they contribute to scalability, availability, and fault tolerance.
+
+*User Device* \
+The user’s device is a mobile device on which the front-end application is installed. The application represents the primary interface between the user and the system’s back-end services and is responsible for managing user interactions with the functionalities offered by the BBP platform. The communication between the mobile application and the back-end services occurs exclusively over HTTPS, ensuring data protection through transport-layer encryption. The user’s device will therefore require a stable internet connection for browsing, storing path data, and performing account-related operations.
+
+*Firewall* \
+All HTTPS requests attempting to access the BBP infrastructure are first processed by a network firewall. The firewall inspects packet headers, including IP addresses, ports, and communication protocols, to block suspicious connections and mitigate attacks such as IP spoofing and certain types of DoS.
+
+*Application Proxy* \
+An application proxy, situated immediately after the firewall, is primarily responsible for applying application-level filtering techniques to incoming HTTPS traffic. By performing deep inspection of requests and responses (after decryption), it can detect and block malicious content, such as SQL injections or malware, and mitigate application-layer DoS attacks through rate-limiting strategies.
+
+*API Gateway* \
+The API Gateway is another back-end component that is responsible for receiving HTTP requests and routing them to the corresponding microservices.
+The API Gateway can also perform request composition, enabling the construction of HTTP requests that require interaction with multiple microservices. 
+To maximize performance and maintain separation of concerns, authentication logic is handled by the User Management Service, while the gateway will deal with token validation.
+
+*Load Balancer* \
+Load balancers are software components that specialize in distributing network traffic to the back-end servers, thereby avoiding the formation of bottlenecks and improving scalability of the architecture. Each load balancer receives HTTPS requests from the API Gateway and manages the traffic directed towards a certain cluster of servers by implementing a least-connections approach.
+
+*Application Server* \
+The application servers host the BBP back-end microservices and are replicated to ensure high availability, scalability, and performance. Each microservice runs on multiple servers, which connect to load balancers distributing traffic between them. Among all the microservices, the Path Recommendation Manager requires particularly high replication and scaling capacity, as it is the most computationally intensive service and serves both authenticated and unauthenticated users. Communication between servers occurs over HTTPS.
+
+*DBMS Server* \
+The DBMS server will interact exclusively with the system’s backend application servers and will not communicate with external entities. Replication will be implemented to enhance scalability and fault tolerance, though it introduces additional complexity in database management and may slightly reduce performance due to the mechanisms required to maintain consistency across database replicas.
+
+*KV Server* \
+The KV Server is responsible for managing the KV store and will also be replicated to ensure scalability and fault tolerance using the same techniques employed for the other database servers.
+
+*External Servers* \
+The application will also interact with various services hosted externally by third-party providers, such as the Maps Service, the SMTP Server, and the Weather Service.
+
 == Runtime view
 This section describes the dynamic behavior of the Best Bike Paths (BBP) system by illustrating the flow of messages exchanged among architectural components for the most relevant use cases defined in the RASD. \
 The runtime view focuses on the main success scenarios and highlights how the system components collaborate to realize the required functionalities. \

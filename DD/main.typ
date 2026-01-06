@@ -589,13 +589,43 @@ ShowDetailedViewSequenceDiagram,
   caption: [Show Detailed View Sequence Diagram]
 )
 #pagebreak()
-*[UC10] Set Bike Path Privacy* \
+*[UC10] Show Path Detailed View* \
+This sequence diagram shows the flow of messages for the Show Path Detailed View use case. \
+After selecting a path from the personal history, the user requests detailed information about the selected path. The mobile application forwards the request to the Personal Paths Service, which retrieves the complete path data from the DBMS, including coordinates, statistics, obstacles, and associated metadata. \
+The mobile application then visualizes the retrieved information on the map. \
+#let ShowPathDetailedViewSequenceDiagram = ```plantuml
+title UC10 - Show Path Detailed View
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "Personal Paths Service" as PPS
+entity "DBMS" as DBMS
+entity "Maps API" as MAPI
+User -> App : Select path
+App -> Proxy : getPathDetails(pathId)
+Proxy -> GW
+GW -> PPS : getPathDetails(pathId)
+PPS -> DBMS : fetchPathDetails(pathId)
+DBMS --> PPS : pathDetails
+PPS --> App : pathDetails
+App -> MAPI : renderPath(pathDetails)
+```
+
+#figure(
+ShowPathDetailedViewSequenceDiagram,
+  kind: image,
+  caption: [Show Path Detailed View Sequence Diagram]
+)
+#pagebreak()
+
+*[UC11] Set Bike Path Privacy* \
 This sequence diagram shows the flow of messages for the Set Path Privacy use case.
 An authenticated user changes the visibility of one of their stored paths by updating its privacy level. The request is forwarded to the Personal Paths Service, which updates the privacy attribute of the selected path in the DBMS.
 This use case causes a transition of the path visibility state between Public and Private. \
 
 #let SetBikePathPrivacySequenceDiagram = ```plantuml
-title UC10 - Set Bike Path Privacy
+title UC11 - Set Bike Path Privacy
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy
@@ -617,13 +647,13 @@ SetBikePathPrivacySequenceDiagram,
   caption: [Set Bike Path Privacy Sequence Diagram]
 )
 #pagebreak()
-*[UC11] Delete Bike Path* \
+*[UC12] Delete Bike Path* \
 This sequence diagram shows the flow of messages for the Delete Path use case.
 An authenticated user deletes one of their previously stored paths. After user confirmation, the deletion request is forwarded to the Personal Paths Service, which removes the path from the DBMS.
  \ 
 
 #let DeleteBikePathSequenceDiagram = ```plantuml
-title UC11 - Delete Bike Path
+title UC12 - Delete Bike Path
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy
@@ -647,13 +677,13 @@ DeleteBikePathSequenceDiagram,
   caption: [Delete Bike Path Sequence Diagram]
 )
 #pagebreak()
-*[UC12] Browse Community Paths* \
+*[UC13] Browse Community Paths* \
 This sequence diagram shows the flow of messages for the Browse Community Paths use case.
 A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves public paths from the DBMS, computes a ranking based on quality and freshness, and returns the ranked paths to the mobile application.
 The application visualizes the recommended paths using the Maps API and highlights any incompatible road segments. \
 
 #let BrowseCommunityPathsSequenceDiagram = ```plantuml
-title UC12 - Browse Community Paths
+title UC13 - Browse Community Paths
 actor User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy
@@ -678,12 +708,12 @@ BrowseCommunityPathsSequenceDiagram,
   caption: [Browse Community Paths Sequence Diagram]
 )
 #pagebreak()
-*[UC13] Sign Out* \
+*[UC14] Sign Out* \
 This sequence diagram shows the flow of messages for the Sign Out use case.
 The authenticated user signs out by removing the locally stored authentication token. No interaction with backend services is required. \
 
 #let SignOutSequenceDiagram = ```plantuml
-title UC13 - Sign Out
+title UC14 - Sign Out
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 User -> App : Tap logout
@@ -697,12 +727,12 @@ SignOutSequenceDiagram,
   caption: [Sign Out Sequence Diagram]
 )
 #pagebreak()
-*[UC14] Account Deletion* \
+*[UC15] Account Deletion* \
 This sequence diagram shows the flow of messages for the Account Deletion use case.
 The authenticated user permanently deletes their account. After confirmation, the request is forwarded to the User Management Service, which removes the user account and all related data from the DBMS. The user is then returned to an unauthenticated state. \
 
 #let AccountDeletionSequenceDiagram = ```plantuml
-title UC14 - Account Deletion
+title UC15 - Account Deletion
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy

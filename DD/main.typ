@@ -428,45 +428,40 @@ end
 )
 #pagebreak()
 *[UC5] Stop Recording and Save Trip* \
-This sequence diagram shows the flow of messages for the Stop Recording and Save Trip use case. \
-During an active recording session, the authenticated user ends the recording by selecting the Stop action in the mobile application and confirming the choice. The mobile application terminates GPS and sensor acquisition through the Data Collection Manager, finalizes the trip data stored locally, and prepares the trip package for persistence. \
-The trip package is then submitted to the backend through the Application Proxy and the API Gateway. The Path Recording Service optionally enriches the trip with meteorological information by invoking the Weather API and reconstructs the travelled route using the Maps API. The service computes the required trip indicators (e.g., statistics and path status) and stores the finalized path in the DBMS. Finally, the mobile application is notified of the successful operation and the path becomes available in the user’s personal history. \This use case causes the recording state to transition from Recording to Stopped. \
+This sequence diagram shows the flow of messages for the Stop Recording and Save Trip use case.
+The user stops the recording session and confirms the action. The mobile application requests the Sensor Data Collection Manager to terminate sensor acquisition and finalizes the trip package stored in local storage.
+The trip package is then submitted to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the trip in the DBMS. If needed, the service may enrich the stored trip with meteorological information obtained through the Weather API. The mobile application is notified of success and the path becomes available in the user’s personal history.
+This use case causes the recording state to transition from Recording to Stopped. \
 
 #let StopRecordingSaveTripSequenceDiagram = ```plantuml
+@startuml
 title UC5 - Stop Recording and Save Trip
 actor "Authenticated User" as User
 boundary "Mobile App" as App
-control "Data Collection Manager" as DCM
-database "Local Storage" as LS
+control "Sensor Data Collection Manager" as SDCM
+entity "Local Storage" as LS
 control "Application Proxy" as Proxy
 control "API Gateway" as GW
 control "Path Recording Service" as PRS
-database "DBMS" as DB
+entity "DBMS" as DBMS
 entity "Weather API" as WAPI
-entity "Maps API" as MAPI
 User -> App : Tap "Stop Recording"
-App -> User : Show confirmation dialog
-User -> App : Confirm
-App -> DCM : stopLocationAndSensorUpdates()
-DCM --> App : stopped
+App -> User : show confirmation dialog
+User -> App : confirm
+App -> SDCM : stopCollection()
+SDCM --> App : stopped
 App -> LS : finalizeTripPackage()
 App -> Proxy : submitRecordedTrip(tripPackage)
-Proxy -> GW : forwardRequest()
+Proxy -> GW
 GW -> PRS : submitRecordedTrip(tripPackage)
-opt Meteorological enrichment
-  PRS -> WAPI : getWeather(location, time)
+opt meteorological enrichment if needed
+  PRS -> WAPI : getWeather(tripContext)
   WAPI --> PRS : weather data
 end
-opt Route reconstruction
-  PRS -> MAPI : reconstructRoute(locations[])
-  MAPI --> PRS : route/streets
-end
-PRS -> PRS : computeStatisticsAndStatus()
-PRS -> DB : storeTrip(userId, tripData)
-DB --> PRS : OK
-PRS --> GW : OK
-GW --> App : OK
-App -> User : Show saved / redirect to history
+PRS -> DBMS : storeTrip(userId, tripData)
+DBMS --> PRS : OK
+PRS --> App : confirmation
+@enduml
 ```
 
 #figure(

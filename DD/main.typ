@@ -325,39 +325,42 @@ end
 )
 #pagebreak()
 *[UC2] Start Automatic Recording* \ 
-This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
-An authenticated user starts a new recording session through the mobile application. Before starting the recording, the application verifies that the required permissions (e.g., location and motion sensors) are granted. If permissions are available, the Data Collection Manager activates GPS and motion sensors and starts collecting trip data. The collected data is filtered by the Data Preprocessing Manager and stored locally, while the Trip Statistics Manager continuously computes real-time statistics (e.g., time, distance, speed) that are displayed to the user during the ride. \
-This use case causes the recording state to transition from Stopped to Recording. \
+This sequence diagram shows the flow of messages for the Start Automatic Recording use case.
+An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data.
+During the recording, the Sensor Data Collection Manager samples data periodically and provides it to the Trip Statistics Manager, which computes real-time statistics (e.g., speed and distance) shown in the user interface. The same collected stream is also provided to the Obstacle Detection Manager to support obstacle detection during the trip. Collected trip data is stored locally until the session ends.
+This use case causes the recording state to transition from Stopped to Recording.
+ \
 
 #let StartAutomaticRecordingSequenceDiagram = ```plantuml
 title UC2 - Start Automatic Recording
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 control "Permission Manager" as PM
-control "Data Collection Manager" as DCM
-control "Data Preprocessing Manager" as DPM
+control "Sensor Data Collection Manager" as SDCM
 control "Trip Statistics Manager" as TSM
-database "Local Storage" as LS
+control "Obstacle Detection Manager" as ODM
+entity "Local Storage" as LS
 entity "GPS" as GPS
-entity "Accelerometer" as ACC
 entity "Gyroscope" as GYR
+entity "Accelerometer" as ACC
 User -> App : Tap "Start Recording"
-App -> PM : checkRequiredPermissions()
+App -> PM : checkPermissions()
 PM --> App : granted
-App -> DCM : startCollection()
-DCM -> GPS : startLocationUpdates()
-DCM -> ACC : startUpdates()
-DCM -> GYR : startUpdates()
+App -> SDCM : startCollection()
+SDCM -> GPS : startUpdates()
+SDCM -> GYR : startUpdates()
+SDCM -> ACC : startUpdates()
 loop While recording
-GPS --> DCM : location + accuracy
-ACC --> DCM : acceleration sample
-GYR --> DCM : gyroscope sample
-DCM -> DPM : preprocess(samples)
-DPM -> LS : store(preprocessedData)
-DPM -> TSM : notify(preprocessedData)
-TSM --> App : updateUI(stats)
+  GPS --> SDCM : location sample
+  GYR --> SDCM : angular velocity sample
+  ACC --> SDCM : acceleration sample
+  SDCM -> LS : appendTripData(sample)
+  SDCM -> TSM : provideData(sample)
+  SDCM -> ODM : provideData(sample)
+  TSM --> App : updateUI(stats)
 end
 ```
+
 #figure(
   StartAutomaticRecordingSequenceDiagram,
   kind: image,

@@ -267,10 +267,10 @@ The system frontend is represented exclusively by a Mobile Application (iOS/Andr
 Each runtime scenario corresponds directly to a use case defined in the RASD. Some use cases are included even when they do not introduce new backend components because they involve critical runtime interactions with device sensors, which are architecturally relevant for the system. \
 
 #pagebreak() 
-*[UC1] Authentication (Sign In / Sign Up)*\
-This sequence diagram shows the flow of messages for the Authentication use case, which covers both account creation and sign in as specified in the RASD.
-The user initiates authentication through the mobile application by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS.
-If the email is registered, the user provides credentials and the service verifies them. If valid, the service issues a JSON Web Token (JWT), which is returned to the mobile application and used to authenticate subsequent requests.
+*[UC1] Authentication (Sign In / Sign Up)* \
+This sequence diagram shows the flow of messages for the Authentication use case, which covers both account creation and sign in as specified in the RASD. \
+The user initiates authentication through the mobile application by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS. \
+If the email is registered, the user provides credentials and the service verifies them. If valid, the service issues a JSON Web Token (JWT), which is returned to the mobile application and used to authenticate subsequent requests. \
 If the email is not registered, the User Management Service generates a verification code, stores it temporarily in the KV Storage, and sends it to the user via the SMTP Server. After the user inserts the received code and provides the registration data, the service validates the code, creates the user in the DBMS, and returns a JWT. \
 
 #let AuthenticationSequenceDiagram = ```plantuml
@@ -325,11 +325,10 @@ end
 )
 #pagebreak()
 *[UC2] Start Automatic Recording* \ 
-This sequence diagram shows the flow of messages for the Start Automatic Recording use case.
-An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data.
-During the recording, the Sensor Data Collection Manager samples data periodically and provides it to the Trip Statistics Manager, which computes real-time statistics (e.g., speed and distance) shown in the user interface. The same collected stream is also provided to the Obstacle Detection Manager to support obstacle detection during the trip. Collected trip data is stored locally until the session ends.
-This use case causes the recording state to transition from Stopped to Recording.
- \
+This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
+An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data. \
+During the recording, the Sensor Data Collection Manager samples data periodically and provides it to the Trip Statistics Manager, which computes real-time statistics (e.g., speed and distance) shown in the user interface. The same collected stream is also provided to the Obstacle Detection Manager to support obstacle detection during the trip. Collected trip data is stored locally until the session ends. \
+This use case causes the recording state to transition from Stopped to Recording. \
 
 #let StartAutomaticRecordingSequenceDiagram = ```plantuml
 title UC2 - Start Automatic Recording
@@ -369,11 +368,10 @@ end
 #pagebreak()
 
 *[UC3] Automatic Pause and Resume* \
-This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case.
-During an active recording session, the mobile application monitors the ongoing trip to determine whether the user is currently biking. This monitoring is performed by the Trip Statistics Manager, which evaluates the stream of sensor data provided by the Sensor Data Collection Manager.
-When a stop is detected, the Trip Statistics Manager triggers the automatic pause of the session by requesting the Sensor Data Collection Manager to suspend acquisition and by pausing the timer shown in the UI. When activity is detected again, the Trip Statistics Manager triggers the resumption of acquisition and the UI timer.
-This use case causes repeated transitions between Recording and Paused states until the user explicitly stops the session.
- \
+This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case. \
+During an active recording session, the mobile application monitors the ongoing trip to determine whether the user is currently biking. This monitoring is performed by the Trip Statistics Manager, which evaluates the stream of sensor data provided by the Sensor Data Collection Manager. \
+When a stop is detected, the Trip Statistics Manager triggers the automatic pause of the session by requesting the Sensor Data Collection Manager to suspend acquisition and by pausing the timer shown in the UI. \ When activity is detected again, the Trip Statistics Manager triggers the resumption of acquisition and the UI timer. \
+This use case causes repeated transitions between Recording and Paused states until the user explicitly stops the session.\
 
 #let AutomaticPauseResumeSequenceDiagram = ```plantuml
 title UC3 - Automatic Pause and Resume
@@ -400,10 +398,9 @@ end
 )
 #pagebreak()
 *[UC4] Manual Pause and Resume* \ 
-This sequence diagram shows the flow of messages for the Manual Pause and Resume use case.
-During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer.
-This use case causes explicit transitions between Recording and Paused states.
- \
+This sequence diagram shows the flow of messages for the Manual Pause and Resume use case. \
+During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer. \
+This use case causes explicit transitions between Recording and Paused states. \
 
 #let ManualPauseResumeSequenceDiagram = ```plantuml
 title UC4 - Manual Pause and Resume
@@ -428,9 +425,9 @@ end
 )
 #pagebreak()
 *[UC5] Stop Recording and Save Trip* \
-This sequence diagram shows the flow of messages for the Stop Recording and Save Trip use case.
-The user stops the recording session and confirms the action. The mobile application requests the Sensor Data Collection Manager to terminate sensor acquisition and finalizes the trip package stored in local storage.
-The trip package is then submitted to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the trip in the DBMS. If needed, the service may enrich the stored trip with meteorological information obtained through the Weather API. The mobile application is notified of success and the path becomes available in the user’s personal history.
+This sequence diagram shows the flow of messages for the Stop Recording and Save Trip use case. \
+The user stops the recording session and confirms the action. The mobile application requests the Sensor Data Collection Manager to terminate sensor acquisition and finalizes the trip package stored in local storage. \
+The trip package is then submitted to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the trip in the DBMS. If needed, the service may enrich the stored trip with meteorological information obtained through the Weather API. The mobile application is notified of success and the path becomes available in the user’s personal history \
 This use case causes the recording state to transition from Recording to Stopped. \
 
 #let StopRecordingSaveTripSequenceDiagram = ```plantuml
@@ -469,8 +466,8 @@ PRS --> App : confirmation
 )
 #pagebreak()
 *[UC6] Automatic Obstacle Detection* \
-This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case.
-During an active recording session, the Sensor Data Collection Manager samples motion sensor data and forwards it to the Obstacle Detection Manager. The Obstacle Detection Manager analyzes the received sensor stream to detect potential obstacles.
+This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case. \
+During an active recording session, the Sensor Data Collection Manager samples motion sensor data and forwards it to the Obstacle Detection Manager. The Obstacle Detection Manager analyzes the received sensor stream to detect potential obstacles. \
 When an obstacle is detected, the user is notified through the UI and can confirm or reject it. If the user confirms or does not respond within a timeout, the obstacle is associated with the current trip and stored locally together with the trip data; otherwise it is discarded. The recording continues in any case. \
 
 #let AutomaticObstacleDetectionSequenceDiagram = ```plantuml
@@ -502,8 +499,8 @@ end
 )
 #pagebreak()
 *[UC7] Manual Obstacle Insertion* \
-This sequence diagram shows the flow of messages for the Manual Obstacle Insertion use case.
-During an active recording session, the authenticated user manually reports an obstacle through the mobile application. The obstacle is associated with the current trip and stored locally together with the trip data.
+This sequence diagram shows the flow of messages for the Manual Obstacle Insertion use case. \
+During an active recording session, the authenticated user manually reports an obstacle through the mobile application. The obstacle is associated with the current trip and stored locally together with the trip data. \
 This use case does not interrupt the recording session. \
 
 #let ManualObstacleInsertionSequenceDiagram = ```plantuml
@@ -525,9 +522,9 @@ ManualObstacleInsertionSequenceDiagram,
 )
 #pagebreak()
 *[UC8] Manual Path Insertion* \
-This sequence diagram shows the flow of messages for the Manual Path Insertion use case.
-An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate locations through the mobile application. For each inserted location, the application interacts with the Maps API to translate street names into geographic coordinates and to visualize the path on the map.
-Once the path definition is completed, the user selects the path status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the path data in the DBMS, making it available in the user’s personal history.
+This sequence diagram shows the flow of messages for the Manual Path Insertion use case. \
+An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate locations through the mobile application. For each inserted location, the application interacts with the Maps API to translate street names into geographic coordinates and to visualize the path on the map. \
+Once the path definition is completed, the user selects the path status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the path data in the DBMS, making it available in the user’s personal history. \
 This use case does not involve sensor data acquisition and does not affect the recording state. \
 
 #let ManualPathInsertionSequenceDiagram = ```plantuml
@@ -563,8 +560,10 @@ ManualPathInsertionSequenceDiagram,
 )
 #pagebreak()
 *[UC9] Show Personal History* \
- information and stored indicators. If available, the returned details may also include contextual information such as meteorological data associated with that trip. The mobile application then displays the detailed view to the user. \ 
-This use case does not modify stored data; it only reads and visualizes information. \ 
+This sequence diagram shows the flow of messages for the Show Personal History use case. \
+An authenticated user accesses the personal history section of the application. The mobile application requests the list of paths associated with the user through the Application Proxy and the API Gateway. \
+The Personal Paths Service retrieves the list of stored paths from the DBMS and returns it to the mobile application, which displays the paths to the user. \
+This use case only involves read operations and does not modify stored data.\
 
 #let ShowDetailedViewSequenceDiagram = ```plantuml
 title UC9 - Show Personal History
@@ -620,8 +619,8 @@ ShowPathDetailedViewSequenceDiagram,
 #pagebreak()
 
 *[UC11] Set Bike Path Privacy* \
-This sequence diagram shows the flow of messages for the Set Path Privacy use case.
-An authenticated user changes the visibility of one of their stored paths by updating its privacy level. The request is forwarded to the Personal Paths Service, which updates the privacy attribute of the selected path in the DBMS.
+This sequence diagram shows the flow of messages for the Set Path Privacy use case. \
+An authenticated user changes the visibility of one of their stored paths by updating its privacy level. The request is forwarded to the Personal Paths Service, which updates the privacy attribute of the selected path in the DBMS. \
 This use case causes a transition of the path visibility state between Public and Private. \
 
 #let SetBikePathPrivacySequenceDiagram = ```plantuml
@@ -648,9 +647,8 @@ SetBikePathPrivacySequenceDiagram,
 )
 #pagebreak()
 *[UC12] Delete Bike Path* \
-This sequence diagram shows the flow of messages for the Delete Path use case.
-An authenticated user deletes one of their previously stored paths. After user confirmation, the deletion request is forwarded to the Personal Paths Service, which removes the path from the DBMS.
- \ 
+This sequence diagram shows the flow of messages for the Delete Path use case. \
+An authenticated user deletes one of their previously stored paths. After user confirmation, the deletion request is forwarded to the Personal Paths Service, which removes the path from the DBMS. \ 
 
 #let DeleteBikePathSequenceDiagram = ```plantuml
 title UC12 - Delete Bike Path
@@ -678,8 +676,8 @@ DeleteBikePathSequenceDiagram,
 )
 #pagebreak()
 *[UC13] Browse Community Paths* \
-This sequence diagram shows the flow of messages for the Browse Community Paths use case.
-A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves public paths from the DBMS, computes a ranking based on quality and freshness, and returns the ranked paths to the mobile application.
+This sequence diagram shows the flow of messages for the Browse Community Paths use case. \
+A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves public paths from the DBMS, computes a ranking based on quality and freshness, and returns the ranked paths to the mobile application. \
 The application visualizes the recommended paths using the Maps API and highlights any incompatible road segments. \
 
 #let BrowseCommunityPathsSequenceDiagram = ```plantuml
@@ -709,7 +707,7 @@ BrowseCommunityPathsSequenceDiagram,
 )
 #pagebreak()
 *[UC14] Sign Out* \
-This sequence diagram shows the flow of messages for the Sign Out use case.
+This sequence diagram shows the flow of messages for the Sign Out use case. \
 The authenticated user signs out by removing the locally stored authentication token. No interaction with backend services is required. \
 
 #let SignOutSequenceDiagram = ```plantuml
@@ -728,7 +726,7 @@ SignOutSequenceDiagram,
 )
 #pagebreak()
 *[UC15] Account Deletion* \
-This sequence diagram shows the flow of messages for the Account Deletion use case.
+This sequence diagram shows the flow of messages for the Account Deletion use case. \
 The authenticated user permanently deletes their account. After confirmation, the request is forwarded to the User Management Service, which removes the user account and all related data from the DBMS. The user is then returned to an unauthenticated state. \
 
 #let AccountDeletionSequenceDiagram = ```plantuml
@@ -765,10 +763,10 @@ Please explain which styles/patterns you used, why, and how
 = User Interface Design
 === User Interfaces
 
-As already stated in the RASD, Best Bike Paths will be an app for mobile devices (iOS and Android). 
-The User Interface will be optimized for touch screens and will follow their platform device guidelines (Human Interface Guidelines for iOS and Material Design for Android). Compliance with these standards ensures a consistent user experience and facilitates the implementation of accessibility best practices.
-User interaction occurs through touch input, gestures, and native UI components.
-Since the app relies on motion and location device features, the interface will include UI elements to request permission to interact with these device capabilities, following the platform-specific guidelines.
+As already stated in the RASD, Best Bike Paths will be an app for mobile devices (iOS and Android).  \
+The User Interface will be optimized for touch screens and will follow their platform device guidelines (Human Interface Guidelines for iOS and Material Design for Android). Compliance with these standards ensures a consistent user experience and facilitates the implementation of accessibility best practices. \
+User interaction occurs through touch input, gestures, and native UI components. \
+Since the app relies on motion and location device features, the interface will include UI elements to request permission to interact with these device capabilities, following the platform-specific guidelines. \
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")

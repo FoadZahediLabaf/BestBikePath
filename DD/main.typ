@@ -380,7 +380,25 @@ AccountDeletionSequenceDiagram,
   kind: image,
   caption: [Account Deletion Sequence Diagram]
 )
+
 #pagebreak()
+*UC4 User Sign Out* \
+This sequence diagram shows the flow of messages for the Sign Out use case. \
+The authenticated user signs out by removing the locally stored authentication token. No interaction with Backend services is required. \
+
+#let signOutSequenceDiagram = ```plantuml
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+User -> App : Tap logout
+App -> App : clearLocalToken()
+App -> User : Show unauthenticated state
+```
+
+#figure(
+signOutSequenceDiagram,
+  kind: image,
+  caption: [Sign Out Sequence Diagram]
+)
 
 #pagebreak()
 *[UC2] Start Automatic Recording* \ 
@@ -765,25 +783,7 @@ BrowseCommunityPathsSequenceDiagram,
   caption: [Browse Community Paths Sequence Diagram]
 )
 #pagebreak()
-*[UC14] Sign Out* \
-This sequence diagram shows the flow of messages for the Sign Out use case. \
-The authenticated user signs out by removing the locally stored authentication token. No interaction with backend services is required. \
 
-#let SignOutSequenceDiagram = ```plantuml
-title UC14 - Sign Out
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-User -> App : Tap logout
-App -> App : clearLocalToken()
-App -> User : Show unauthenticated state
-```
-
-#figure(
-SignOutSequenceDiagram,
-  kind: image,
-  caption: [Sign Out Sequence Diagram]
-)
-#pagebreak()
 
 
 == Component interfaces

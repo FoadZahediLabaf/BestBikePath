@@ -306,7 +306,6 @@ UMS -> DBMS : createUser(...)
 DBMS --> UMS : OK
 UMS --> App : JWT token
 ```
-
 #figure(
   accountCreationSequenceDiagram,
   kind: image,
@@ -423,7 +422,7 @@ If the capability is unavailable, the user can just close the modal and not use 
 autonumber
 actor User
 boundary "BBP App" as Frontend
-entity "Permission Manager" as PM
+control "Permission Manager" as PM
 entity "Capability Provider" as CP
 boundary "System Settings" as Settings
 activate User

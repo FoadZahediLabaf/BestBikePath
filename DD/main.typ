@@ -320,7 +320,6 @@ The user initiates authentication through the mobile application by entering an 
 Since the email provided is registered, the user provides credentials and the service verifies them. If valid, the service issues a JSON Web Token (JWT), which is returned to the mobile application and used to authenticate subsequent requests. \
 
 #let AuthenticationSequenceDiagram = ```plantuml
-title UC1 - Authentication (Sign In / Sign Up)
 actor User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy
@@ -352,6 +351,36 @@ end
   kind: image,
   caption: [Authentication (Sign In / Sign Up) Sequence Diagram]
 )
+
+#pagebreak()
+*UC3 Account Deletion* \
+This sequence diagram shows the flow of messages for the Account Deletion use case. \
+The authenticated user permanently deletes their account. After confirmation, the request is forwarded to the User Management Service, which removes the user account and all related data from the DBMS. The user is then returned to an unauthenticated state. \
+
+#let AccountDeletionSequenceDiagram = ```plantuml
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "User Management Service" as UMS
+entity "DBMS" as DBMS
+User -> App : Request account deletion
+App -> User : Show confirmation
+User -> App : Confirm
+App -> Proxy : deleteAccount(userId)
+Proxy -> GW
+GW -> UMS : deleteAccount(userId)
+UMS -> DBMS : removeUserData(userId)
+DBMS --> UMS : OK
+UMS --> App : deletion confirmed
+```
+
+#figure(
+AccountDeletionSequenceDiagram,
+  kind: image,
+  caption: [Account Deletion Sequence Diagram]
+)
+#pagebreak()
 
 #pagebreak()
 *[UC2] Start Automatic Recording* \ 
@@ -755,35 +784,7 @@ SignOutSequenceDiagram,
   caption: [Sign Out Sequence Diagram]
 )
 #pagebreak()
-*[UC15] Account Deletion* \
-This sequence diagram shows the flow of messages for the Account Deletion use case. \
-The authenticated user permanently deletes their account. After confirmation, the request is forwarded to the User Management Service, which removes the user account and all related data from the DBMS. The user is then returned to an unauthenticated state. \
 
-#let AccountDeletionSequenceDiagram = ```plantuml
-title UC15 - Account Deletion
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
-control "User Management Service" as UMS
-entity "DBMS" as DBMS
-User -> App : Request account deletion
-App -> User : Show confirmation
-User -> App : Confirm
-App -> Proxy : deleteAccount(userId)
-Proxy -> GW
-GW -> UMS : deleteAccount(userId)
-UMS -> DBMS : removeUserData(userId)
-DBMS --> UMS : OK
-UMS --> App : deletion confirmed
-```
-
-#figure(
-AccountDeletionSequenceDiagram,
-  kind: image,
-  caption: [Account Deletion Sequence Diagram]
-)
-#pagebreak()
 
 == Component interfaces
 == Selected architectural styles and patterns

@@ -319,7 +319,7 @@ This sequence diagram shows the flow of messages for the User Sign In use case. 
 The user initiates authentication through the mobile application by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS. \
 Since the email provided is registered, the user provides credentials and the service verifies them. If valid, the service issues a JSON Web Token (JWT), which is returned to the mobile application and used to authenticate subsequent requests. \
 
-#let AuthenticationSequenceDiagram = ```plantuml
+#let userSignInSequenceDiagram = ```plantuml
 actor User
 boundary "Mobile App" as App
 control "Application Proxy" as Proxy
@@ -347,7 +347,7 @@ end
 ```
 
 #figure(
-  AuthenticationSequenceDiagram,
+  userSignInSequenceDiagram,
   kind: image,
   caption: [Authentication (Sign In / Sign Up) Sequence Diagram]
 )
@@ -386,7 +386,7 @@ AccountDeletionSequenceDiagram,
 This sequence diagram shows the flow of messages for the Sign Out use case. \
 The authenticated user signs out by removing the locally stored authentication token. No interaction with Backend services is required. \
 
-#let signOutSequenceDiagram = ```plantuml
+#let userSignOutSequenceDiagram = ```plantuml
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 User -> App : Tap logout
@@ -395,7 +395,7 @@ App -> User : Show unauthenticated state
 ```
 
 #figure(
-signOutSequenceDiagram,
+userSignOutSequenceDiagram,
   kind: image,
   caption: [Sign Out Sequence Diagram]
 )

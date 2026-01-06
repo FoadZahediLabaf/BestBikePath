@@ -24,6 +24,9 @@
 #show: mainmatter.with()
 
 = Introduction
+When engaging in any sport or physical activity, people quickly realize how important it is to log their performance, which helps maintain motivation and enables steady progress over time. \
+It is also important to share this knowledge with the community, allowing less knowledgeable users to make safer and more informed decisions. \
+The primary goal of the Best Bike Paths application is to provide its users with an intuitive software application that addresses both these needs. Specifically, it helps cyclists track their own routes while also discovering the safest and most reliable paths previously traveled by fellow users. \
 
 == Purpose
 

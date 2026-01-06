@@ -86,7 +86,9 @@ Obstacles can be automatically detected through the device’s motion sensors or
 *IEEE*: Institute of Electrical and Electronics Engineers \
 *JSON*: JavaScript Object Notation\
 *JWT*: JSON Web Token \
+*KV*: Key-Value \
 *ODM*: Obstacle Detection Manager \
+*PM*: Permission Manager \
 *REST*: Representational State Transfer \
 *SDCM/DCM*: Sensor Data Collection Manager \
 *SQL*: Structured Query Language \
@@ -149,7 +151,77 @@ Security is enforced through an application proxy and a firewall to enforce both
   caption: [Architecture Diagram]
 )
 
+#pagebreak()
 == Component view
+
+#heading(level: 4, numbering: none,  outlined: false,  "Frontend Components")
+*Mobile App* \
+The mobile application provides functionalities such as the ability to follow bike paths on a map and to automatically record said path by interacting with the device’s GPS, gyroscope, and accelerometer. The application must maintain a certain amount of free storage to allow the collection of path data while the recording is ongoing.
+The app interacts with the system’s back-end through HTTP/S requests, which are routed directly to the API Gateway and then forwarded to the corresponding microservices.
+
+*Sensor Data Collection Manager* \
+The Sensor Data Collection Manager is a client-side component of the mobile BBP application and is responsible for the retrieval of raw sensor data from the GPS, gyroscope, and accelerometer of the user’s device. Data collection begins when the user starts an automatic recording session and terminates when the user ends the recording. During the trip, data is periodically sampled from the device’s modules and forwarded to the Obstacle Detection Manager. During the recording, data collection is occasionally paused and resumed when the system detects that the user has temporarily stopped or resumed cycling.
+
+*Obstacle Detection Manager* \
+The Obstacle Detection Manager is a client-side component of the mobile application and is responsible for detecting obstacles during the recorded trip. Detection is performed by analyzing the preprocessed data supplied by the Sensor Data Collection Manager.
+When an obstacle is detected, the Obstacle Detection Manager generates a corresponding event to notify the user through the UI to prompt them for confirmation or rejection. 
+
+*Trip Statistics Manager* \
+The Trip Statistics Manager is a component residing on the mobile app and is responsible for computing real-time statistics about the current trip.
+This module retrieves data from the Sensor Data Collection Manager and calculates relevant performance statistics, including average speed, top speed, current speed, and total distance traveled.
+When the application is opened during the trip recording, the app should display the statistics computed by this module.
+
+*Permission Manager* \
+The Permission Manager is a client-side component responsible for managing access to device sensors, including GPS, gyroscope, and accelerometer. It verifies whether the necessary permissions have been granted and prompts the user if any permissions are missing.
+This component notifies dependent modules, such as the Sensor Data Collection Manager, Obstacle Detection Manager, and Trip Statistics Manager, about the current permission state.
+
+*Local Storage* \
+The user’s device must provide a sufficient amount of available storage to temporarily retain path data during the automatic recording of a bike trip. Upon completion of the recording and successful persistence of the data in the database, the locally stored data is permanently deleted.
+
+*GPS* \
+The GPS is a hardware component of the user's device responsible for collecting data regarding the positioning of the user. 
+The application will obtain this data by communicating with the corresponding Location API according to the OS (iOS or Android). The Sensor Data Collection Manager will be responsible for retrieving this data from the GPS.
+
+*Gyroscope* \
+The gyroscope is a built-in component of the mobile device on which the app resides, and its purpose is to periodically measure its angular velocity. This data is provided to the Sensor Data Collection Manager and will then be used to detect obstacles based on the sudden fluctuations that will be caused by the obstacle.
+
+*Accelerometer* \
+The accelerometer is another hardware component of the user's device and is responsible for providing measurements of the user's acceleration along the three axes in order to determine the speed at which the user is moving and to detect obstacles. The raw acceleration data is sent to the Sensor Data Collection Manager.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Backend Components")
+
+*User Management Service* \
+The User Management Service is a microservice primarily responsible for handling user account registration and authentication.
+During registration, users are required to provide an account name, an email address, and a password. Email verification is performed through an external email service to confirm the validity of the provided address. 
+Once authenticated,  the service issues a JSON Web Token, which will be used by the client to authenticate requests.
+
+*Personal Paths Service* \
+The Personal Paths Service is a back-end microservice responsible for managing access to user-specific bike path data stored in the system’s database. It enforces authorization policies to ensure that users can only retrieve their own path information and provides endpoints for querying personal paths data and statistics, and supports operations such as sorting and pagination.
+
+*Path Recommendation Service* \
+This microservice is responsible for computing aggregated quality scores for community bike paths and for providing a ranked list of the highest-quality paths connecting the two points specified by a user.
+The overall quality of a community path depends on the quality scores and recency of the single path instances that are recorded in the database. The visual representation of the recommended paths, including their ranking, is handled entirely by the UI.
+
+*Path Recording Service* \
+The Path Recording Service receives new paths from the users, whether automatically recorded or manually inserted, and is responsible for saving them in the database.
+When automatically recorded, the path data will contain relevant performance statistics and weather data, computed by the client-side if available, which will also be stored in the database. 
+If the path was manually inserted, the path data will contain the quality status and the coordinates of the path, geocoded from the street names specified by the user using the Maps API.
+
+*Weather API* \
+The weather API is an external service that will provide additional meteorological data to enrich the trip information before saving it to the database
+
+*Maps API* \
+The Maps API will be used by the front-end of the application to give a visual representation of the bike paths and to geocode and reverse geocode location data, enabling the mapping between geographic coordinates and the street segments that constitute a given path.
+
+*SMTP Server* \
+The SMTP Server is an external service that will be used by the system to assist the authentication process via e-mail during the creation of a new user account.
+
+*DBMS* \
+The DBMS will manage all the user-associated data, including account information as well as path-related data, such as coordinates, obstacles, performance metrics, and other relevant data.
+
+*KV Store* \
+The KV store is used to temporarily persist key–value pairs required for short-lived operations, like generating OTP code for the email verification.
+
 == Deployment view
 == Runtime view
 This section describes the dynamic behavior of the Best Bike Paths (BBP) system by illustrating the flow of messages exchanged among architectural components for the most relevant use cases defined in the RASD. \

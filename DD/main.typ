@@ -268,9 +268,9 @@ Each runtime scenario corresponds directly to a use case defined in the RASD. So
 
 #pagebreak() 
 *UC1 Account Creation* \
-This sequence diagram shows the flow of messages for the Account Creation use case. \
+This sequence diagram shows the flow of messages for the Account Creation use case . \
 The user initiates authentication through the mobile application by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS. \
-If the email is not registered, the User Management Service generates a verification code, stores it temporarily in the KV Storage, and sends it to the user via the SMTP Server. After the user enters the received code and provides the registration data, the service validates the code, creates the user in the DBMS, and returns a JWT the user can use to authenticate their subsequent requests. \
+Since the email provided is not registered, the User Management Service generates a verification code, stores it temporarily in the KV Storage, and sends it to the user via the SMTP Server. After the user enters the received code and provides the registration data, the service validates the code, creates the user in the DBMS, and returns a JWT the user can use to authenticate their subsequent requests. \
 
 #let accountCreationSequenceDiagram = ```plantuml
 actor User
@@ -287,7 +287,7 @@ App -> Proxy : checkEmail(email)
 Proxy -> GW
 GW -> UMS : checkEmail(email)
 UMS -> DBMS : userExists(email)?
-DBMS --> UMS : exists / notExists
+DBMS --> UMS : exists
 UMS --> App : emailStatus
 App -> Proxy : requestVerificationCode(email)
 Proxy -> GW
@@ -314,11 +314,10 @@ UMS --> App : JWT token
 
 
 #pagebreak() 
-*[UC1] Authentication (Sign In / Sign Up)* \
-This sequence diagram shows the flow of messages for the Authentication use case, which covers both account creation and sign in as specified in the RASD. \
+*UC2 User Sign In* \
+This sequence diagram shows the flow of messages for the User Sign In use case. \
 The user initiates authentication through the mobile application by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS. \
-If the email is registered, the user provides credentials and the service verifies them. If valid, the service issues a JSON Web Token (JWT), which is returned to the mobile application and used to authenticate subsequent requests. \
-If the email is not registered, the User Management Service generates a verification code, stores it temporarily in the KV Storage, and sends it to the user via the SMTP Server. After the user inserts the received code and provides the registration data, the service validates the code, creates the user in the DBMS, and returns a JWT. \
+Since the email provided is registered, the user provides credentials and the service verifies them. If valid, the service issues a JSON Web Token (JWT), which is returned to the mobile application and used to authenticate subsequent requests. \
 
 #let AuthenticationSequenceDiagram = ```plantuml
 title UC1 - Authentication (Sign In / Sign Up)
@@ -336,32 +335,15 @@ App -> Proxy : checkEmail(email)
 Proxy -> GW
 GW -> UMS : checkEmail(email)
 UMS -> DBMS : userExists(email)?
-DBMS --> UMS : exists / notExists
+DBMS --> UMS : notExists
 UMS --> App : emailStatus
-alt Email already registered
-  User -> App : Enter password
-  App -> Proxy : signIn(email,password)
-  Proxy -> GW
-  GW -> UMS : signIn(email,password)
-  UMS -> DBMS : verifyCredentials(email,password)
-  DBMS --> UMS : valid
-  UMS --> App : JWT token
-else Email not registered
-  App -> Proxy : requestVerificationCode(email)
-  Proxy -> GW
-  GW -> UMS : requestVerificationCode(email)
-  UMS -> KV : storeOTP(email, code)
-  UMS -> SMTP : sendVerificationCode(email, code)
-  SMTP --> UMS : sent
-  User -> App : Insert verification code
-  User -> App : Enter registration data
-  App -> Proxy : createAccount(name,email,password,code)
-  Proxy -> GW
-  GW -> UMS : createAccount(...)
-  UMS -> KV : validateOTP(email, code)
-  UMS -> DBMS : createUser(...)
-  DBMS --> UMS : OK
-  UMS --> App : JWT token
+User -> App : Enter password
+App -> Proxy : signIn(email,password)
+Proxy -> GW
+GW -> UMS : signIn(email,password)
+UMS -> DBMS : verifyCredentials(email,password)
+DBMS --> UMS : valid
+UMS --> App : JWT token
 end
 ```
 

@@ -398,6 +398,70 @@ userSignOutSequenceDiagram,
 )
 
 #pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+*UC5 Request Device Capability Permission*
+#let requestCapabilitySequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "BBP App" as Frontend
+entity "Capability Provider" as CP
+boundary "System Settings" as Settings
+activate User
+activate Frontend
+Frontend -> Frontend: Needs device capability
+Frontend -> CP: getAuthorizationStatus
+activate CP
+alt Capability access is unavailable
+  CP --> Frontend: unavailable
+  Frontend -> Frontend: Continue without capability
+else Capability access was denied
+  CP --> Frontend: denied
+  Frontend -> User: Show a modal explaining\nwhy the capability is needed\nand instructionsto give\npermission in system settings
+  loop Until user presses 'Cancel' or authorize capability access in settings
+    alt Continue
+      User ->> Frontend: Press 'Cancel' button
+      Frontend -> Frontend: Continue without capability
+    else Authorize capability access
+      User ->> Settings: Authorize capability access
+      activate Settings
+      Settings -> CP: updateCapabilityAuthorization('authorized')
+      deactivate Settings
+      User ->> Frontend: Open application
+      CP -> Frontend: updateCapabilityAuthorization('authorized')
+      Frontend -> Frontend: Continue with capability
+    end
+  end
+else Capability access is authorized
+  CP --> Frontend: authorized
+  Frontend -> Frontend: Continue with capability
+else Capability access is not determined
+  CP --> Frontend: notDetermined
+  deactivate CP
+  Frontend -> User: Show a modal explaining\nwhy the capability is needed
+  alt Cancel
+    User ->> Frontend: Press 'Cancel' button
+  else Continue
+    User ->> Frontend: Press 'Continue' button
+    Frontend -> User: Show system dialog\nto give permission
+    alt Not allow usage
+      User ->> Frontend: Press 'Don't allow' button
+      Frontend -> Frontend: Continue without capability
+    else Allow usage
+      User ->> Frontend: Press 'Allow' button
+      Frontend -> Frontend: Continue with capability
+    end
+  end
+end
+deactivate CP
+```
+#figure(
+  requestCapabilitySequenceDiagram,
+  kind: image,
+  caption: [User Sign-Out Sequence Diagram]
+)
+
+#pagebreak()
 *[UC2] Start Automatic Recording* \ 
 This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
 An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data. \

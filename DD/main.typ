@@ -24,19 +24,20 @@
 #show: mainmatter.with()
 
 = Introduction
+
+
+== Purpose
 When engaging in any sport or physical activity, people quickly realize how important it is to log their performance, which helps maintain motivation and enables steady progress over time. \
 It is also important to share this knowledge with the community, allowing less knowledgeable users to make safer and more informed decisions. \
 The primary goal of the Best Bike Paths application is to provide its users with an intuitive software application that addresses both these needs. Specifically, it helps cyclists track their own routes while also discovering the safest and most reliable paths previously traveled by fellow users. \
 
-== Purpose
+== Scope
 The BBP application allows its users to interact with its constantly evolving database of bike paths recorded by others. After specifying a starting point and destination, the system will provide the user with a visual representation of the highest-quality bike paths connecting the two points. The quality of a bike path depends on a variety of parameters, including the frequency of encountered obstacles and the freshness of the collected data.
 Once a path is selected, the user can view it on a map and follow it during their ride.
 Authenticated users will be able to access the additional features, such as the automatic recording function, which collects data from the GPS, gyroscope, and accelerometer of the device while the user is travelling along the path and stores the data once the recording ends. The collected information will be processed by the system, allowing the user to view performance-related data and additional qualitative information about the travelled path after navigating to the corresponding section of the application. 
 Additionally, the users will also be allowed to manually insert bike paths by specifying the necessary information, such as street names, obstacles, and status.
 To maximize the performance of this application, a three-tiered architecture will be adopted, assigning to each tier the implementation of the presentation, application, and data layers, respectively. To optimize server load and response time, a microservice approach will be used for the back-end of the application.
 Additional details regarding the application functions and architectural decisions will be provided in the following section.
-
-== Scope
 
 == Definitions, Acronyms, Abbreviations
 
@@ -991,6 +992,7 @@ The map shows the path route, start marker, end marker and, if the path was adde
 The modal shows all the available path information, the path route status stepper (if path was manually added), the path privacy status toggle, the record new path button and the delete button. \
 When the user edits the path information (with the toggle or the stepper), the confirm button on the trailing section of the modal navigation bar is enabled, as in @ui-personal-path-history-history-detail-edited. \
 When the user starts a new path from here, a bike path recording session begins, with the selected path displayed on the map as a suggested route for the user to follow.
+If the path is not optimal for biking (for example, it contains an highway) an alert is shown.
 
 #pagebreak()
 #align(center)[
@@ -1040,7 +1042,7 @@ The user enters an end location, as in @ui-community-paths-browsing-browsing-end
 
 *Community Path List Page* \
 After the user tap the confirm button, the app loads their results in a list, ranked by a path quality score, as in @ui-community-paths-browsing-browsing-list. \
-The list rows display the path route in the map, its quality score and, if the path is not optimal for bike (for example, it contains an highway), an alert is shown.
+The list rows display the path route in the map, its quality score and, if the path is not optimal for biking (for example, it contains an highway), an alert is shown.
 When the user select a path row, the full-screen map shows the path and the confirm button on the trailing section of the modal navigation bar is enabled.
 
 *Community Path Detail Page* \
@@ -1048,7 +1050,7 @@ When the user tap the confirm button, a modal sheet is shown as in @ui-community
 The map shows the path route, start marker, end marker and, if the path was added manually, all the locations provided by the user to compose it. \
 The modal shows all the publicly available path information and if the user is authenticated the record new path button. \
 When the user starts a new path from here, a bike path recording session begins, with the selected path displayed on the map as a suggested route for the user to follow.
-If the path is not optimal for bike (for example, it contains an highway) an alert is shown.
+If the path is not optimal for biking (for example, it contains an highway) an alert is shown.
 
 
 #pagebreak()

@@ -343,13 +343,12 @@ GW -> UMS : signIn(email,password)
 UMS -> DBMS : verifyCredentials(email,password)
 DBMS --> UMS : valid
 UMS --> App : JWT token
-end
 ```
 
 #figure(
   userSignInSequenceDiagram,
   kind: image,
-  caption: [Authentication (Sign In / Sign Up) Sequence Diagram]
+  caption: [Account Creation Sequence Diagram]
 )
 
 #pagebreak()

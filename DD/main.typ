@@ -434,7 +434,6 @@ The trip package is then submitted to the backend through the Application Proxy 
 This use case causes the recording state to transition from Recording to Stopped. \
 
 #let StopRecordingSaveTripSequenceDiagram = ```plantuml
-@startuml
 title UC5 - Stop Recording and Save Trip
 actor "Authenticated User" as User
 boundary "Mobile App" as App
@@ -461,7 +460,6 @@ end
 PRS -> DBMS : storeTrip(userId, tripData)
 DBMS --> PRS : OK
 PRS --> App : confirmation
-@enduml
 ```
 
 #figure(
@@ -471,39 +469,26 @@ PRS --> App : confirmation
 )
 #pagebreak()
 *[UC6] Automatic Obstacle Detection* \
-This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case. \
-During an active recording session, the mobile application continuously collects motion sensor data and preprocesses it. The Obstacle Detection Manager analyzes the preprocessed sensor stream to identify potential obstacles encountered along the ride. \
-When a potential obstacle is detected, the mobile application shows a timed confirmation notification to the user. If the user confirms the notification or does not respond within the allowed timeout, the obstacle is considered valid and is associated with the ongoing recording session. If the user rejects the notification, the obstacle is discarded. \
-The accepted obstacle is stored locally together with the trip data and contributes to the obstacle statistics of the current recording. \
-This use case does not terminate the recording session; it can occur multiple times while the recording state remains Recording. \
+This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case.
+During an active recording session, the Sensor Data Collection Manager samples motion sensor data and forwards it to the Obstacle Detection Manager. The Obstacle Detection Manager analyzes the received sensor stream to detect potential obstacles.
+When an obstacle is detected, the user is notified through the UI and can confirm or reject it. If the user confirms or does not respond within a timeout, the obstacle is associated with the current trip and stored locally together with the trip data; otherwise it is discarded. The recording continues in any case. \
 
 #let AutomaticObstacleDetectionSequenceDiagram = ```plantuml
 title UC6 - Automatic Obstacle Detection
 actor "Authenticated User" as User
 boundary "Mobile App" as App
-control "Data Collection Manager" as DCM
-control "Data Preprocessing Manager" as DPM
+control "Sensor Data Collection Manager" as SDCM
 control "Obstacle Detection Manager" as ODM
-database "Local Storage" as LS
+entity "Local Storage" as LS
 loop While recording session is active
-  DCM -> DPM : provideCollectedSensorData()
-  DPM -> ODM : providePreprocessedSensorData()
+  SDCM -> ODM : provideData(stream)
   ODM -> ODM : detectObstacle()
-  alt Obstacle detected
-    ODM -> App : showTimedConfirmationAlert()
-    opt User confirms
-      App -> ODM : confirmObstacle()
-    end
-    opt User rejects
-      App -> ODM : rejectObstacle()
-    end
-    opt User ignores (timeout)
-      ODM -> ODM : autoAcceptObstacle()
-    end
-    alt Accepted
+  alt obstacle detected
+    ODM -> App : showConfirmationAlert()
+    alt confirmed or timeout
       ODM -> LS : storeObstacle(currentTrip, obstacle)
       ODM -> App : updateObstacleCountUI()
-    else Rejected
+    else rejected
       ODM -> App : discardObstacle()
     end
   end
@@ -517,20 +502,20 @@ end
 )
 #pagebreak()
 *[UC7] Manual Obstacle Insertion* \
-This sequence diagram shows the flow of messages for the Manual Obstacle Insertion use case. \
-During an active recording session, the authenticated user may manually report an obstacle through the mobile application interface. When the user performs the “Add Obstacle” action, the application creates a new obstacle entry associated with the current recording session and stores it locally together with the trip data. The user interface is updated to reflect the new obstacle count. \
-This use case may occur multiple times while the recording state remains Recording, and it does not terminate or pause the recording session. \
+This sequence diagram shows the flow of messages for the Manual Obstacle Insertion use case.
+During an active recording session, the authenticated user manually reports an obstacle through the mobile application. The obstacle is associated with the current trip and stored locally together with the trip data.
+This use case does not interrupt the recording session. \
 
 #let ManualObstacleInsertionSequenceDiagram = ```plantuml
 title UC7 - Manual Obstacle Insertion
 actor "Authenticated User" as User
 boundary "Mobile App" as App
 control "Obstacle Detection Manager" as ODM
-database "Local Storage" as LS
-User -> App : Tap "Add Obstacle"
+entity "Local Storage" as LS
+User -> App : Add obstacle
 App -> ODM : registerManualObstacle()
 ODM -> LS : storeObstacle(currentTrip, obstacle)
-ODM --> App : updateObstacleCountUI()
+ODM --> App : update UI
 ```
 
 #figure(
@@ -540,8 +525,9 @@ ManualObstacleInsertionSequenceDiagram,
 )
 #pagebreak()
 *[UC8] Manual Path Insertion* \
-This sequence diagram shows the flow of messages for the Manual Path Insertion use case. \ An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate stops through the mobile application. For each inserted location, the mobile application interacts with an external Maps API to translate the provided address into geographic coordinates and to visualize the path on the map. \
-After defining the complete path, the user selects the desired path quality status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service validates and stores the path in the DBMS, making it available in the user’s personal history. \
+This sequence diagram shows the flow of messages for the Manual Path Insertion use case.
+An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate locations through the mobile application. For each inserted location, the application interacts with the Maps API to translate street names into geographic coordinates and to visualize the path on the map.
+Once the path definition is completed, the user selects the path status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the path data in the DBMS, making it available in the user’s personal history.
 This use case does not involve sensor data acquisition and does not affect the recording state. \
 
 #let ManualPathInsertionSequenceDiagram = ```plantuml
@@ -552,21 +538,21 @@ entity "Maps API" as MAPI
 control "Application Proxy" as Proxy
 control "API Gateway" as GW
 control "Path Recording Service" as PRS
-database "DBMS" as DB
-User -> App : Open "Manual Path Creation"
-loop For each inserted location
-  User -> App : Insert address
-  App -> MAPI : reverseGeocode(address)
+entity "DBMS" as DBMS
+User -> App : Open manual path creation
+loop For each location
+  User -> App : Insert street/location
+  App -> MAPI : geocode(address)
   MAPI --> App : coordinates
-  App -> App : updateMap(coordinates)
+  App -> App : update map
 end
 User -> App : Select status and privacy
-User -> App : Tap "Save Path"
+User -> App : Save path
 App -> Proxy : submitManualPath(pathData)
-Proxy -> GW : forwardRequest()
+Proxy -> GW
 GW -> PRS : submitManualPath(pathData)
-PRS -> DB : storeManualPath(userId, pathData)
-DB --> PRS : OK
+PRS -> DBMS : storePath(pathData)
+DBMS --> PRS : OK
 PRS --> App : confirmation
 ```
 

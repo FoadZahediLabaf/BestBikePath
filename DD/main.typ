@@ -29,15 +29,17 @@
 == Purpose
 When engaging in any sport or physical activity, people quickly realize how important it is to log their performance, which helps maintain motivation and enables steady progress over time. \
 It is also important to share this knowledge with the community, allowing less knowledgeable users to make safer and more informed decisions. \
+
 The primary goal of the Best Bike Paths application is to provide its users with an intuitive software application that addresses both these needs. Specifically, it helps cyclists track their own routes while also discovering the safest and most reliable paths previously traveled by fellow users. \
 
 == Scope
-The BBP application allows its users to interact with its constantly evolving database of bike paths recorded by others. After specifying a starting point and destination, the system will provide the user with a visual representation of the highest-quality bike paths connecting the two points. The quality of a bike path depends on a variety of parameters, including the frequency of encountered obstacles and the freshness of the collected data.
-Once a path is selected, the user can view it on a map and follow it during their ride.
-Authenticated users will be able to access the additional features, such as the automatic recording function, which collects data from the GPS, gyroscope, and accelerometer of the device while the user is travelling along the path and stores the data once the recording ends. The collected information will be processed by the system, allowing the user to view performance-related data and additional qualitative information about the travelled path after navigating to the corresponding section of the application. 
-Additionally, the users will also be allowed to manually insert bike paths by specifying the necessary information, such as street names, obstacles, and status.
-To maximize the performance of this application, a three-tiered architecture will be adopted, assigning to each tier the implementation of the presentation, application, and data layers, respectively. To optimize server load and response time, a microservice approach will be used for the back-end of the application.
-Additional details regarding the application functions and architectural decisions will be provided in the following section.
+The BBP application allows its users to interact with its constantly evolving database of bike paths recorded by others. After specifying a starting point and destination, the system will provide the user with a visual representation of the highest-quality bike paths connecting the two points. The quality of a bike path depends on a variety of parameters, including the frequency of encountered obstacles and the freshness of the collected data. \  
+
+Authenticated users will be able to access the additional features, such as the automatic recording function, which collects data from the GPS, gyroscope, and accelerometer of the device while the user is travelling along the path and stores the data once the recording ends. The collected information will be processed by the system, allowing the user to view performance-related data and additional qualitative information about the travelled path after navigating to the corresponding section of the application. \
+Additionally, the users will also be allowed to manually insert bike paths by specifying the necessary information, such as street names, obstacles, and status. 
+
+To maximize the performance of this application, a three-tiered architecture will be adopted, assigning to each tier the implementation of the presentation, application, and data layers, respectively. To optimize server load and response time, a microservice approach will be used for the back-end of the application. \
+Additional details regarding the application functions and architectural decisions will be provided in the following section. \
 
 == Definitions, Acronyms, Abbreviations
 
@@ -84,10 +86,13 @@ Obstacles can be automatically detected through the device’s motion sensors or
 *IEEE*: Institute of Electrical and Electronics Engineers \
 *JSON*: JavaScript Object Notation\
 *JWT*: JSON Web Token \
+*ODM*: Obstacle Detection Manager \
 *REST*: Representational State Transfer \
+*SDCM/DCM*: Sensor Data Collection Manager \
 *SQL*: Structured Query Language \
 *SMTP*: Simple Mail Transfer Protocol \
 *TLS*: Transport Layer Security \
+*TSM*: Trip Statistics Manager \
 *Wi-Fi*: Wireless Fidelity \
 
 === Abbreviations
@@ -127,8 +132,23 @@ The following reference materials were used for the preparation of this document
 7. *References*: Reference to documents or tools used for writing this document.
 
 = Architectural Design
-== Overview
-High-level components and their interaction
+== Overview: High-Level Components
+As stated in the previous section, the system will follow a three-tiered architecture, with each tier implementing a specific layer of the application: presentation, application, and data.
+The first tier implements the user interface and collects data from the device’s sensors.  \
+
+The second tier is represented by the back-end of the application, and will implement the core functions that are necessary to meet the goals that were previously outlined in the Requirements and Specifications Document (RASD).  \
+The application tier will adopt a microservice architecture, dividing responsibilities across separate services, each providing a specific function to the client. Compared to a monolithic approach, this architecture improves scalability while also reducing deployment complexity. This choice will also help minimize tight coupling between modules, build a fault-tolerant system, and allow its components to degrade gracefully. \
+The microservice approach helps mitigate bottlenecks, particularly for computationally intensive operations such as the Path Recommendation service. \
+
+The third tier implements the data layer, primarily responsible for storing bike path information as well as user profiles and account data. To ensure scalability and fault tolerance, both the second and third tiers will be replicated. \
+Communication with external services occurs via REST APIs, while client-server interactions are managed through an API gateway, which routes requests to the appropriate microservices. To prevent bottlenecks, load balancers distribute HTTP/S requests across the replicated servers.
+Security is enforced through an application proxy and a firewall to enforce both application-level and network-level security, respectively. \
+
+#figure(
+  image("diagrams/architecture.drawio.png"),
+  caption: [Architecture Diagram]
+)
+
 == Component view
 == Deployment view
 == Runtime view

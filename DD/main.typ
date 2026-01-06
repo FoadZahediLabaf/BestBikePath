@@ -274,37 +274,105 @@ The user initiates authentication through the mobile application by entering an 
 Since the email provided is not registered, the User Management Service generates a verification code, stores it temporarily in the KV Storage, and sends it to the user via the SMTP Server. After the user enters the received code and provides the registration data, the service validates the code, creates the user in the DBMS, and returns a JWT the user can use to authenticate their subsequent requests. \
 
 #let accountCreationSequenceDiagram = ```plantuml
+autonumber
 actor User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
+boundary "BBP App" as Frontend
+control "Application Proxy" as AP
+control "API Gateway" as AG
 control "User Management Service" as UMS
-entity "DBMS" as DBMS
-entity "KV Storage" as KV
-entity "SMTP Server" as SMTP
-User -> App : Tap "Sign In"
-User -> App : Enter email
-App -> Proxy : checkEmail(email)
-Proxy -> GW
-GW -> UMS : checkEmail(email)
-UMS -> DBMS : userExists(email)?
-DBMS --> UMS : exists
-UMS --> App : emailStatus
-App -> Proxy : requestVerificationCode(email)
-Proxy -> GW
-GW -> UMS : requestVerificationCode(email)
-UMS -> KV : storeOTP(email, code)
-UMS -> SMTP : sendVerificationCode(email, code)
-SMTP --> UMS : sent
-User -> App : Insert verification code
-User -> App : Enter registration data
-App -> Proxy : createAccount(name,email,password,code)
-Proxy -> GW
-GW -> UMS : createAccount(...)
-UMS -> KV : validateOTP(email, code)
-UMS -> DBMS : createUser(...)
-DBMS --> UMS : OK
-UMS --> App : JWT token
+database "Database" as DB
+collections "KV Store" as KV
+queue "SMTP Server" as SMTP
+activate User
+activate Frontend
+User ->> Frontend: Open account pUMSe
+Frontend -> User: Show email textfield
+User ->> Frontend: Insert email
+Frontend -> AP: userExists(email)
+activate AP
+AP -> AG: userExists(email)
+activate AG
+AG -> UMS: userExists(email)
+activate UMS
+UMS -> DB: userExists(email)
+activate DB
+DB --> UMS: 200 OK (false)
+deactivate DB
+UMS --> AG: 200 OK (false)
+deactivate UMS
+AG --> AP: 200 OK (false)
+deactivate AG
+AP --> Frontend: 200 OK (false)
+deactivate AP
+Frontend -> User: Show email verification textfield
+Frontend -> AP: sendVerificationCode(email)
+activate AP
+AP -> AG: sendVerificationCode(email)
+activate AG
+AG -> UMS: sendVerificationCode(email)
+activate UMS
+UMS -> UMS: generateCode()
+UMS -> KV: save(code, email)\n[TTL: 1H]
+activate KV
+KV --> UMS: 201 Created
+deactivate KV
+UMS ->> SMTP: enqueueVerificationEmail(email, code)
+activate SMTP
+SMTP ->> User: Deliver verification email
+SMTP --> UMS: 200 OK
+deactivate SMTP
+UMS --> AG: 200 OK
+deactivate UMS
+AG --> AP: 200 OK
+deactivate AG
+AP --> Frontend: 200 OK
+deactivate AP
+Frontend -> User: Show code sent banner
+User -> Frontend: Insert verification code
+Frontend -> AP: verifyCode(email, code)
+activate AP
+AP -> AG: verifyCode(email, code)
+activate AG
+AG -> UMS: verifyCode(email, code)
+activate UMS
+UMS -> KV: getEmail(code)
+activate KV
+KV --> UMS: 200 OK (email)
+deactivate KV
+UMS -> UMS: checkEmail(email1, email2)
+UMS --> Frontend: 200 OK
+deactivate UMS
+UMS --> AG: 200 OK
+deactivate UMS
+AG --> AP: 200 OK
+deactivate AG
+AP --> Frontend: 200 OK
+deactivate AP
+Frontend -> User: Show account signup form
+User ->> Frontend: Insert name, password\naccept consents & privacy
+Frontend -> AP: signup(name, email, password, code)
+activate AP
+AP -> AG: signup(name, email, password, code)
+activate AG
+AG -> UMS: signup(name, email, password, code)
+activate UMS
+UMS -> KV: getEmail(code)
+activate KV
+KV --> UMS: 200 OK (email)
+deactivate KV
+UMS -> UMS: checkEmail(email1, email2)
+UMS -> DB: createAccount(name, email, password)
+activate DB
+DB --> UMS: 201 Created
+deactivate DB
+UMS -> UMS: generateToken()
+UMS --> AG: 201 Created (token)
+deactivate UMS
+AG --> AP: 201 Created (token)
+deactivate AG
+AP --> Frontend: 201 Created (token)
+deactivate AP
+Frontend -> User: Show homepage as logged user
 ```
 #figure(
   accountCreationSequenceDiagram,

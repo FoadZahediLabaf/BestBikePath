@@ -369,29 +369,25 @@ end
 #pagebreak()
 
 *[UC3] Automatic Pause and Resume* \
-This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case. \
-During an active automatic recording session, the mobile application continuously monitors the user’s activity in order to determine whether the user is currently biking or not. This monitoring is performed by the Trip Statistics Manager, which analyzes the preprocessed data provided by the Data Collection Manager (e.g., GPS updates and motion sensor data). \
-When the Trip Statistics Manager detects that the user has stopped biking, it triggers an automatic pause of the recording session by suspending data collection and pausing the trip timer shown in the user interface. \
-When biking activity is detected again, the Trip Statistics Manager triggers the automatic resumption of the recording session by reactivating data collection and restarting the trip timer. \
-This use case causes repeated transitions between the Recording and Paused states until the user explicitly stops the recording session. \
+This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case.
+During an active recording session, the mobile application monitors the ongoing trip to determine whether the user is currently biking. This monitoring is performed by the Trip Statistics Manager, which evaluates the stream of sensor data provided by the Sensor Data Collection Manager.
+When a stop is detected, the Trip Statistics Manager triggers the automatic pause of the session by requesting the Sensor Data Collection Manager to suspend acquisition and by pausing the timer shown in the UI. When activity is detected again, the Trip Statistics Manager triggers the resumption of acquisition and the UI timer.
+This use case causes repeated transitions between Recording and Paused states until the user explicitly stops the session.
+ \
 
 #let AutomaticPauseResumeSequenceDiagram = ```plantuml
 title UC3 - Automatic Pause and Resume
 boundary "Mobile App" as App
 control "Trip Statistics Manager" as TSM
-control "Data Collection Manager" as DCM
-control "Data Preprocessing Manager" as DPM
+control "Sensor Data Collection Manager" as SDCM
 loop While recording session is active
-  DCM -> DPM : provideCollectedData()
-  DPM -> TSM : providePreprocessedData()
-  TSM -> TSM : evaluateUserActivity()
-  alt User stops biking
-    TSM -> DCM : pauseCollection()
-    TSM -> DPM : pauseProcessing()
+  SDCM -> TSM : provideData(stream)
+  TSM -> TSM : evaluateActivity()
+  alt stop detected
+    TSM -> SDCM : pauseCollection()
     TSM -> App : pauseTimerAndUI()
-  else User resumes biking
-    TSM -> DCM : resumeCollection()
-    TSM -> DPM : resumeProcessing()
+  else resume detected
+    TSM -> SDCM : resumeCollection()
     TSM -> App : resumeTimerAndUI()
   end
 end

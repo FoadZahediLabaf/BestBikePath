@@ -326,15 +326,13 @@ control "Application Proxy" as Proxy
 control "API Gateway" as GW
 control "User Management Service" as UMS
 entity "DBMS" as DBMS
-entity "KV Storage" as KV
-entity "SMTP Server" as SMTP
 User -> App : Tap "Sign In"
 User -> App : Enter email
 App -> Proxy : checkEmail(email)
 Proxy -> GW
 GW -> UMS : checkEmail(email)
 UMS -> DBMS : userExists(email)?
-DBMS --> UMS : notExists
+DBMS --> UMS : exists
 UMS --> App : emailStatus
 User -> App : Enter password
 App -> Proxy : signIn(email,password)

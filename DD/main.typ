@@ -259,12 +259,59 @@ The application will also interact with various services hosted externally by th
 This section describes the dynamic behavior of the Best Bike Paths (BBP) system by illustrating the flow of messages exchanged among architectural components for the most relevant use cases defined in the RASD. \
 The runtime view focuses on the main success scenarios and highlights how the system components collaborate to realize the required functionalities. \
 For clarity and consistency with the Software Architecture lectures, the following aspects are intentionally omitted: \
-authorization and access-control checks, \
-error handling and exceptional flows, \
-caching and optimization mechanisms.\ 
+- authorization and access-control checks;
+- error handling and exceptional flows;
+- caching and optimization mechanisms.
 All sequence diagrams represent only the main execution path. \
 The system frontend is represented exclusively by a Mobile Application (iOS/Android), as specified in the RASD. \
 Each runtime scenario corresponds directly to a use case defined in the RASD. Some use cases are included even when they do not introduce new backend components because they involve critical runtime interactions with device sensors, which are architecturally relevant for the system. \
+
+#pagebreak() 
+*UC1 Account Creation* \
+This sequence diagram shows the flow of messages for the Account Creation use case. \
+The user initiates authentication through the mobile application by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS. \
+If the email is not registered, the User Management Service generates a verification code, stores it temporarily in the KV Storage, and sends it to the user via the SMTP Server. After the user enters the received code and provides the registration data, the service validates the code, creates the user in the DBMS, and returns a JWT the user can use to authenticate their subsequent requests. \
+
+#let accountCreationSequenceDiagram = ```plantuml
+actor User
+boundary "Mobile App" as App
+control "Application Proxy" as Proxy
+control "API Gateway" as GW
+control "User Management Service" as UMS
+entity "DBMS" as DBMS
+entity "KV Storage" as KV
+entity "SMTP Server" as SMTP
+User -> App : Tap "Sign In"
+User -> App : Enter email
+App -> Proxy : checkEmail(email)
+Proxy -> GW
+GW -> UMS : checkEmail(email)
+UMS -> DBMS : userExists(email)?
+DBMS --> UMS : exists / notExists
+UMS --> App : emailStatus
+App -> Proxy : requestVerificationCode(email)
+Proxy -> GW
+GW -> UMS : requestVerificationCode(email)
+UMS -> KV : storeOTP(email, code)
+UMS -> SMTP : sendVerificationCode(email, code)
+SMTP --> UMS : sent
+User -> App : Insert verification code
+User -> App : Enter registration data
+App -> Proxy : createAccount(name,email,password,code)
+Proxy -> GW
+GW -> UMS : createAccount(...)
+UMS -> KV : validateOTP(email, code)
+UMS -> DBMS : createUser(...)
+DBMS --> UMS : OK
+UMS --> App : JWT token
+```
+
+#figure(
+  accountCreationSequenceDiagram,
+  kind: image,
+  caption: [Account Creation Sequence Diagram]
+)
+
 
 #pagebreak() 
 *[UC1] Authentication (Sign In / Sign Up)* \
@@ -323,6 +370,7 @@ end
   kind: image,
   caption: [Authentication (Sign In / Sign Up) Sequence Diagram]
 )
+
 #pagebreak()
 *[UC2] Start Automatic Recording* \ 
 This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \

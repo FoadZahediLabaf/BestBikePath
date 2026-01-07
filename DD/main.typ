@@ -745,6 +745,8 @@ SDCM -> GYR: startUpdates
 activate GYR
 SDCM -> ACC: startUpdates
 activate ACC
+Frontend -> TSM: startPerformanceMonitoring
+TSM -> SDCM: startMotionUpdates
 loop Until recording stops
   ...
   ACC ->> SDCM: accelerometerData
@@ -753,14 +755,16 @@ loop Until recording stops
   alt User starts biking
     SDCM ->> TSM: notifyActivityChange('cycling')
     TSM ->> Frontend: notifyActivityChange('cycling')
-    Frontend -> TSM: startPerformanceUpdates
+    Frontend -> TSM: startPerformanceMonitoring
+    TSM -> SDCM: startMotionUpdates
     Frontend -> Frontend: Resume timer
     Frontend -> User: Show updated UI
     ...
   else User stops biking
     SDCM ->> TSM: notifyActivityChange\n('stationary' / 'walking' / ...)
     TSM ->> Frontend: notifyActivityChange\n('stationary' / 'walking' / ...)
-    Frontend -> TSM: stopPerformanceUpdates
+    Frontend -> TSM: stopPerformanceMonitoring
+    TSM -> SDCM: stopMotionUpdates
     Frontend -> Frontend: Pause timer
     Frontend -> User: Show updated UI
     ...

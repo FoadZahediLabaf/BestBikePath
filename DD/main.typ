@@ -388,27 +388,68 @@ The user initiates authentication through the mobile application by entering an 
 Since the email provided is registered, the user provides credentials and the service verifies them. If valid, the service issues a JSON Web Token (JWT), which is returned to the mobile application and used to authenticate subsequent requests. \
 
 #let userSignInSequenceDiagram = ```plantuml
+autonumber
 actor User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
+boundary "BBP App" as Frontend
+control "Application Proxy" as AP
+control "API Gateway" as AG
 control "User Management Service" as UMS
-entity "DBMS" as DBMS
-User -> App : Tap "Sign In"
-User -> App : Enter email
-App -> Proxy : checkEmail(email)
-Proxy -> GW
-GW -> UMS : checkEmail(email)
-UMS -> DBMS : userExists(email)?
-DBMS --> UMS : exists
-UMS --> App : emailStatus
-User -> App : Enter password
-App -> Proxy : signIn(email,password)
-Proxy -> GW
-GW -> UMS : signIn(email,password)
-UMS -> DBMS : verifyCredentials(email,password)
-DBMS --> UMS : valid
-UMS --> App : JWT token
+database "DBMS" as DB
+activate User
+activate Frontend
+User ->> Frontend: Open account pUMSe
+Frontend -> User: Show email textfield
+User ->> Frontend: Insert email
+Frontend -> AP: userExists(email)
+activate AP
+AP -> AG: userExists(email)
+activate AG
+AG -> UMS: userExists(email)
+activate UMS
+UMS -> DB: userExists(email)
+activate DB
+DB --> UMS: 200 OK (true)
+deactivate DB
+UMS --> AG: 200 OK (true)
+deactivate UMS
+AG --> AP: 200 OK (true)
+deactivate AG
+AP --> Frontend: 200 OK (true)
+deactivate AP
+Frontend -> User: Show password textfield
+User ->> Frontend: Insert password
+Frontend -> AP: signin(email, password)
+activate AP
+AP -> AG: signin(email, password)
+activate AG
+AG -> UMS: signin(email, password)
+activate UMS
+UMS -> DB: getAccount(email)
+activate DB
+DB --> UMS: 200 OK (account)
+deactivate DB
+UMS -> UMS: checkCredentials(password1, password2)
+alt Not valid credentials
+    UMS --> AG: 401 Unauthorized
+    deactivate UMS
+    AG --> AP: 401 Unauthorized
+    deactivate AG
+    AP --> Frontend: 401 Unauthorized
+    deactivate AP
+    Frontend -> User: Show error
+else Valid credentials
+    activate AP
+    activate AG
+    activate UMS
+    UMS -> UMS: generateToken()
+    UMS --> AG: 200 OK (account, token)
+    deactivate UMS
+    AG --> AP: 200 OK (account, token)
+    deactivate AG
+    AP --> Frontend: 200 OK (account, token)
+    deactivate AP
+    Frontend -> User: Show homepage as logged user
+end
 ```
 
 #figure(

@@ -514,6 +514,8 @@ actor User
 boundary "BBP App" as Frontend
 activate User
 activate Frontend
+User ->> Frontend: Open account page
+Frontend -> User: Show sign out button
 User ->> Frontend: Press logout account button
 Frontend -> User: Show confirmation dialog
 User ->> Frontend: Press confirm button

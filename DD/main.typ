@@ -667,7 +667,7 @@ deactivate CP
 #pagebreak()
 *UC6 Automatic Recording With Manual Controls* \ 
 This sequence diagram shows the flow of messages for the Manual Pause and Resume use case. \
-During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer. \
+During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend motion sensors acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer. \
 This use case causes explicit transitions between Recording and Paused states. \
 
 #let ManualPauseResumeSequenceDiagram = ```plantuml
@@ -721,6 +721,66 @@ User ->> Frontend: Press "Stop Recording" button
 )
 
 #pagebreak()
+*UC7 Automatic Recording With Activity Detection* \
+This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case. \
+During an active recording session, the mobile application monitors the ongoing trip to determine whether the user is currently biking. This monitoring is performed by the Trip Statistics Manager, which evaluates the stream of sensor data provided by the Sensor Data Collection Manager. \
+When a stop is detected, the Trip Statistics Manager triggers the automatic pause of the session by requesting the Sensor Data Collection Manager to suspend acquisition and by pausing the timer shown in the UI. \ When activity is detected again, the Trip Statistics Manager triggers the resumption of acquisition and the UI timer. \
+This use case causes repeated transitions between Recording and Paused states until the user explicitly stops the session.\
+
+#let automaticRecordingManualActivityDetectionSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "BBP App" as Frontend
+control "Trip Statistics Manager" as TSM
+control "Sensor Data Collection Manager" as SDCM
+entity "Accelerometer" as ACC
+entity "Gyroscope" as GYR
+activate User
+activate Frontend
+User ->> Frontend: Press "start" button
+Frontend -> TSM: startActivityUpdates()
+activate TSM
+TSM -> SDCM: startActivityUpdates()
+activate SDCM
+SDCM -> GYR: startUpdates()
+activate GYR
+SDCM -> ACC: startUpdates() 
+activate ACC
+loop Until recording stops
+  ...
+  ACC ->> SDCM: accData
+  GYR ->> SDCM: gyrData
+  SDCM ->> SDCM: detectActivityChange(accData, gyrData)
+  alt User starts biking
+    SDCM ->> TSM: cycling
+    Frontend -> Frontend: Resume timer
+    Frontend -> User: Show updated UI
+    ...
+  else User stops biking
+    SDCM ->> TSM: stationary / walking / ...
+    Frontend -> Frontend: Pause timer
+    Frontend -> User: Show updated UI
+    ...
+  end
+  ...
+end
+User ->> Frontend: Press "Stop Recording" button
+Frontend -> TSM: stopActivityUpdates(handler)
+TSM -> SDCM: stopActivityUpdates(handler)
+deactivate TSM
+SDCM -> ACC: stopUpdates(handler) 
+deactivate ACC
+SDCM -> GYR: stopUpdates(handler)
+deactivate GYR
+deactivate SDCM
+```
+#figure(
+  automaticRecordingManualActivityDetectionSequenceDiagram,
+  kind: image,
+  caption: [ Automatic Pause and Resume Sequence Diagram]
+)
+
+#pagebreak()
 *[UC6] Start Automatic Recording* \ 
 This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
 An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data. \
@@ -763,36 +823,6 @@ end
   caption: [Start Automatic Recording Sequence Diagram]
 )
 #pagebreak()
-
-*[UC3] Automatic Pause and Resume* \
-This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case. \
-During an active recording session, the mobile application monitors the ongoing trip to determine whether the user is currently biking. This monitoring is performed by the Trip Statistics Manager, which evaluates the stream of sensor data provided by the Sensor Data Collection Manager. \
-When a stop is detected, the Trip Statistics Manager triggers the automatic pause of the session by requesting the Sensor Data Collection Manager to suspend acquisition and by pausing the timer shown in the UI. \ When activity is detected again, the Trip Statistics Manager triggers the resumption of acquisition and the UI timer. \
-This use case causes repeated transitions between Recording and Paused states until the user explicitly stops the session.\
-
-#let AutomaticPauseResumeSequenceDiagram = ```plantuml
-title UC3 - Automatic Pause and Resume
-boundary "Mobile App" as App
-control "Trip Statistics Manager" as TSM
-control "Sensor Data Collection Manager" as SDCM
-loop While recording session is active
-  SDCM -> TSM : provideData(stream)
-  TSM -> TSM : evaluateActivity()
-  alt stop detected
-    TSM -> SDCM : pauseCollection()
-    TSM -> App : pauseTimerAndUI()
-  else resume detected
-    TSM -> SDCM : resumeCollection()
-    TSM -> App : resumeTimerAndUI()
-  end
-end
-```
-
-#figure(
-  AutomaticPauseResumeSequenceDiagram,
-  kind: image,
-  caption: [ Automatic Pause and Resume Sequence Diagram]
-)
 
 #pagebreak()
 *[UC5] Stop Recording and Save Trip* \

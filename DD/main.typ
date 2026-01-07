@@ -190,56 +190,55 @@ The accelerometer is another hardware component of the user's device and is resp
 
 #let FrontendComponentDiagram = ```plantuml
 component "Best Bike Paths Frontend" {
-
-  component "Trip Statistics Manager" as TSM
-  component "Permission Manager" as PM
-  component "Local Storage" as LS
-  component "Sensor Data Collection Manager" as DCM
-  component "Obstacle Detection Manager" as ODM
+component "Trip Statistics Manager" as TSM
+component "Permission Manager" as PM
+component "Local Storage" as LS
+component "Sensor Data Collection Manager" as DCM
+component "Obstacle Detection Manager" as ODM
  
-  interface "SensorData I" as SensorData
-  interface "ObstacleEvents I" as ObstacleEvents
-  interface "PermissionState I" as PermissionState
-  interface "Storage I" as StorageI
-  interface "RawData I" as RawData
+interface "SensorData I" as SensorData
+interface "ObstacleEvents I" as ObstacleEvents
+interface "PermissionState I" as PermissionState
+interface "Storage I" as StorageI
+interface "RawData I" as RawData
 
-  ODM - ObstacleEvents
-  DCM -left- RawData
-  PM  -up- PermissionState
-  LS  -up- StorageI
+ODM - ObstacleEvents
+DCM -left- RawData
+PM  -up- PermissionState
+LS  -up- StorageI
 
-  DCM ..> PermissionState
-  TSM ..> PermissionState
-  ODM ..> PermissionState
+DCM ..> PermissionState: use
+TSM ..> PermissionState: use
+ODM ..> PermissionState: use
 
-  DCM -down..> SensorData
-  ODM ..> RawData
-  TSM ..> RawData
+DCM -down..> SensorData: use
+ODM ..> RawData: use
+TSM ..> RawData: use
 
-    ODM ..> StorageI
-  TSM ..> StorageI
+ODM ..> StorageI: use
+TSM ..> StorageI: use
 
 
 }
 
 package "Device Hardware" {
 
-  component GPS
-  component Gyroscope
-  component Accelerometer
+component GPS
+component Gyroscope
+component Accelerometer
 
-  interface SensorData
+interface SensorData
 
-  GPS -- SensorData
-  Gyroscope - SensorData
-  Accelerometer - SensorData
+GPS -- SensorData
+Gyroscope - SensorData
+Accelerometer - SensorData
 }
 
 top to bottom direction
-  component "BBP Backend" as Backend
-  interface API
-  LS ..> API
-  API -down- Backend
+component "BBP Backend" as Backend
+interface API
+LS ..> API: use
+API -down- Backend
 ```
 #figure(
   FrontendComponentDiagram,
@@ -282,6 +281,81 @@ The DBMS will manage all the user-associated data, including account information
 
 *KV Store* \
 The KV store is used to temporarily persist key–value pairs required for short-lived operations, like generating OTP code for the email verification.
+
+#let BackendComponentDiagram = ```plantuml
+top to bottom direction
+
+' frontend
+component "Mobile App" as app 
+
+
+' external components and interfaces
+component "Weather Service" as ws 
+component "SMTP Service" as smtp 
+component "Maps Service" as ms  
+interface "Weatheri" as wi 
+interface "Mail I" as mi 
+interface "Map I" as mapi
+smtp -right- mi 
+ms -up- mapi 
+ws -left- wi
+
+
+component "Best Bike Paths Backend"{
+component "User Management Service" as ums 
+component "Personal Paths Service" as pps 
+component "Path Recommendation Service" as prs component "Path Recording Service" as recs 
+component "DBMS" as db 
+
+component "API Gateway" as gate 
+
+interface "auth I" as useri 
+interface "DBMS I" as dbi 
+interface "Paths I" as pathsi 
+interface "Recommend I" as ri
+interface "Recording I" as reci 
+interface "API I" as apii
+
+' interface providers
+ums -up- useri 
+db -up- dbi
+pps -up- pathsi
+recs -up- reci 
+prs -up- ri
+
+gate -up- apii
+
+
+' connections with gateway
+gate ..> useri : use
+gate ..> pathsi : use
+gate ..> reci : use
+gate ..> ri : use
+
+'  dbms usage
+ums ..> dbi: use 
+prs ..> dbi: use
+pps ..> dbi: use
+recs ..> dbi: use
+
+' connections with external components
+app -right..> wi: use
+ums -left..> mi: use
+pps -down..> mapi: use 
+prs -down..> mapi: use  
+port p1
+p1 -down..> apii
+app -down.. p1
+app -left..> mi
+}
+```
+#figure(
+  BackendComponentDiagram,
+  kind: image,
+  caption: [Backend Component Diagram]
+)
+
+#pagebreak()
 
 == Deployment view
 The goal of the deployment view is to describe the physical realization of the system’s logical components and the execution environments in which they operate. This view also highlights the physical nodes of the system, the communication links between them, and the protocols used for interaction.

@@ -46,7 +46,7 @@ Additional details regarding the application functions and architectural decisio
 === Definitions
 *User*: Term used to indicate both authenticated and unauthenticated individuals who interact with the application.
 
-*Authenticated User*: User who are authenticated in their BBP account. An authenticated user has full access to the functionalities offered by the application.
+*Authenticated User*: User who is authenticated in their BBP account. An authenticated user has full access to the functionalities offered by the application.
 
 *Unauthenticated User*: Users who do not have a BBP account, or who have an account but aren't currently authenticated within the system. These users have limited access to the application's functionalities.
 
@@ -2466,32 +2466,43 @@ D2 .up. PM
 )
 
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
-
-#let automaticRecordingTestDiagram = ```plantuml
-top to bottom direction
-  folder "Driver"
-  folder "Permission Manager" as PM
-
- 
- driver-down. PM
-
-}
-```
-#figure(
-  permissionManagementTestDiagram,
-  kind: image,
-  caption: [Account Registration Test Diagram]
-)
-#figure(
-  permissionManagementTestDiagram,
-  kind: image,
-  caption: [Account Registration Test Diagram]
-)
-
 *F5: Automatic Recording* \
 Once permission handling is validated, automatic bike path recording is integrated. This feature involves several client-side components, including sensor data collection, statistics computation, obstacle detection, and local storage. \
 testing verifies that recording sessions can be started, paused, resumed, and stopped correctly. During this phase, the correct coordination between client-side components is observed, ensuring that sensor data is collected consistently and that a complete trip representation can be produced at the end of the session. \
 Since interaction with backend services is not yet required, the client-side logic can be validated independently. \
+
+#let automaticRecordingTestDiagram = ```plantuml
+package Backend {
+    folder "User Management Service" as UMS
+}
+package Frontend {
+    folder "Permission Manager" as PM
+    folder "Trip Statistics Manager" as TSM
+    folder "Permission Manager" as PM
+    folder "Sensor Data Collection Manager" as DCM
+    folder "Obstacle Detection Manager" as ODM
+    folder "Local Storage" as LS
+}
+folder Driver as D1 #LightBlue
+folder Driver as D2 #LightBlue
+folder Driver as D3 #LightBlue
+folder Driver as D4 #LightBlue
+DCM -down. PM
+TSM -up. LS
+ODM -up. LS
+TSM -up. DCM
+ODM -up. DCM
+D1 .up. UMS
+D2 .up. PM
+D3 .up. TSM
+D4 .up. ODM
+```
+#figure(
+  automaticRecordingTestDiagram,
+  kind: image,
+  caption: [Account Registration Test Diagram]
+)
+
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
 

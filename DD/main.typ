@@ -270,7 +270,7 @@ Each runtime scenario corresponds directly to a use case defined in the RASD. So
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
 *UC1 Account Creation* \
 This sequence diagram shows the flow of messages for the Account Creation use case . \
-The user initiates authentication through the mobile application by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS. \
+The user initiates authentication through the app by entering an email address. The request is forwarded through the Application Proxy and the API Gateway to the User Management Service, which checks whether the email is already registered in the DBMS. \
 Since the email provided is not registered, the User Management Service generates a verification code, stores it temporarily in the KV Storage, and sends it to the user via the SMTP Server. After the user enters the received code and provides the registration data, the service validates the code, creates the user in the DBMS, and returns a JWT the user can use to authenticate their subsequent requests. \
 
 #let accountCreationSequenceDiagram = ```plantuml
@@ -285,7 +285,7 @@ collections "KV Store" as KV
 queue "SMTP Server" as SMTP
 activate User
 activate Frontend
-User ->> Frontend: Open account pUMSe
+User ->> Frontend: Open account page
 Frontend -> User: Show email text field
 User ->> Frontend: Insert email
 Frontend -> AP: userExists(email)
@@ -397,7 +397,7 @@ control "User Management Service" as UMS
 database "DBMS" as DB
 activate User
 activate Frontend
-User ->> Frontend: Open account pUMSe
+User ->> Frontend: Open account page
 Frontend -> User: Show email textfield
 User ->> Frontend: Insert email
 Frontend -> AP: userExists(email)

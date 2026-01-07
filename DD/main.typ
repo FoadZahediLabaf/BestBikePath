@@ -662,8 +662,66 @@ deactivate CP
   caption: [User Sign-Out Sequence Diagram]
 )
 
+
+
 #pagebreak()
-*[UC2] Start Automatic Recording* \ 
+*UC6 Automatic Recording With Manual Controls* \ 
+This sequence diagram shows the flow of messages for the Manual Pause and Resume use case. \
+During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer. \
+This use case causes explicit transitions between Recording and Paused states. \
+
+#let ManualPauseResumeSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "BBP App" as Frontend
+control "Trip Statistics Manager" as TSM
+control "Sensor Data Collection Manager" as SDCM
+entity "Accelerometer" as ACC
+entity "Gyroscope" as GYR
+activate User
+activate Frontend
+User ->> Frontend: Press "start" button
+loop Until recording stops
+...
+  alt User presses "resume" button
+    User ->> Frontend: Press "resume" button
+    Frontend -> TSM: startMotionUpdates(handler)
+    activate TSM
+    TSM -> SDCM: startMotionUpdates(handler)
+    activate SDCM
+    SDCM -> GYR: startUpdates(handler)
+    activate GYR
+    SDCM -> ACC: startUpdates(handler) 
+    activate ACC
+    Frontend -> Frontend: Resume timer
+    Frontend -> User: Show updated UI
+    ...
+  else User presses "pause" button
+    User ->> Frontend: Press "pause" button
+    Frontend -> TSM: stopMotionUpdates(handler)
+    TSM -> SDCM: stopMotionUpdates(handler)
+    deactivate TSM
+    SDCM -> ACC: stopUpdates(handler) 
+    deactivate ACC
+    SDCM -> GYR: stopUpdates(handler)
+    deactivate GYR
+    deactivate SDCM
+    Frontend -> Frontend: Pause timer
+    Frontend -> User: Show updated UI
+    ...
+  end
+  ...
+end
+User ->> Frontend: Press "Stop Recording" button
+```
+#figure(
+  ManualPauseResumeSequenceDiagram,
+  kind: image,
+  caption: [Manual Pause and Resume Sequence Diagram]
+)
+
+#pagebreak()
+*[UC6] Start Automatic Recording* \ 
 This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
 An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data. \
 During the recording, the Sensor Data Collection Manager samples data periodically and provides it to the Trip Statistics Manager, which computes real-time statistics (e.g., speed and distance) shown in the user interface. The same collected stream is also provided to the Obstacle Detection Manager to support obstacle detection during the trip. Collected trip data is stored locally until the session ends. \
@@ -735,33 +793,7 @@ end
   kind: image,
   caption: [ Automatic Pause and Resume Sequence Diagram]
 )
-#pagebreak()
-*[UC4] Manual Pause and Resume* \ 
-This sequence diagram shows the flow of messages for the Manual Pause and Resume use case. \
-During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer. \
-This use case causes explicit transitions between Recording and Paused states. \
 
-#let ManualPauseResumeSequenceDiagram = ```plantuml
-title UC4 - Manual Pause and Resume
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Sensor Data Collection Manager" as SDCM
-alt User pauses recording
-  User -> App : Tap "Pause"
-  App -> SDCM : pauseCollection()
-  App -> User : show paused state
-else User resumes recording
-  User -> App : Tap "Resume"
-  App -> SDCM : resumeCollection()
-  App -> User : show recording state
-end
-```
-
-#figure(
-  ManualPauseResumeSequenceDiagram,
-  kind: image,
-  caption: [Manual Pause and Resume Sequence Diagram]
-)
 #pagebreak()
 *[UC5] Stop Recording and Save Trip* \
 This sequence diagram shows the flow of messages for the Stop Recording and Save Trip use case. \

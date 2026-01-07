@@ -516,7 +516,7 @@ Frontend -> User: Show homepage as unauthenticated user
 
 #pagebreak()
 *UC4 User Sign Out* \
-This sequence diagram shows the flow of messages for the Sign Out use case. \
+This sequence diagram shows the flow of messages for the User Sign Out use case. \
 The authenticated user signs out by removing the locally stored authentication token. No interaction with Backend services is required. \
 
 #let userSignOutSequenceDiagram = ```plantuml
@@ -538,7 +538,7 @@ Frontend -> User: Show homepage as unauthenticated user
 #figure(
 userSignOutSequenceDiagram,
   kind: image,
-  caption: [Sign Out Sequence Diagram]
+  caption: [User Sign Out Sequence Diagram]
 )
 
 #pagebreak()
@@ -546,20 +546,20 @@ userSignOutSequenceDiagram,
 *UC5 Request Device Capability Permission*
 
 This sequence diagram shows how the system verifies and obtains the permissions required to access a device capability, for example the user’s location access.
-When the user initiates the recording function, the mobile application requests the Permission Manager to check if it has access authorization to the user’s location obtained through the device GPS.
+When the user initiates the recording function, the mobile application requests the Permission Manager to check if it has access authorization to the user’s location obtained through the device's GPS.
 
 If the permission is missing, the mobile application shows a modal to the user.
 Here, the user can see which capability the app needs to access and why.
 
-*Not Determined Permission* \
+_Not Determined Permission_ \
 If the capability is available and the user has never denied the authorization (from the system dialog), and the user decides to give their permission, the system dialog is shown and the user can allow the app to use the capability through the system dialog.
 Otherwise, the user can close the modal and not use the app feature.
 
-*Denied Permission* \
+_Denied Permission_ \
 If the capability is available and the user has denied the authorization (from the system dialog), and the user decides to give their permission, they must open the settings and change the access authorization status manually.
 Otherwise, the user can close the modal and not use the app feature.
 
-*Unavailable Permission* \
+_Unavailable Permission_ \
 If the capability is unavailable, the user can just close the modal and not use the app feature.
 
 #let requestCapabilitySequenceDiagram = ```plantuml
@@ -680,8 +680,8 @@ deactivate CP
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 *UC6 Automatic Recording With Manual Controls* \ 
-This sequence diagram shows the flow of messages for the Manual Pause and Resume use case. \
-During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend motion sensors acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer. \
+This sequence diagram shows the flow of messages for the Automatic Recording With Manual Controls use case. \
+During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Trip Statistics Manager to suspend performance monitoring and updates the UI accordingly. When the user resumes, the application requests performance monitoring to restart and updates the UI timer. \
 This use case causes explicit transitions between Recording and Paused states.
 #let automaticRecordingManualControlsSequenceDiagram = ```plantuml
 autonumber
@@ -741,9 +741,9 @@ deactivate SDCM
 )
 #pagebreak()
 *UC7 Automatic Recording With Activity Detection* \
-This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case. \
-During an active recording session, the mobile application monitors the ongoing trip to determine whether the user is currently biking. This monitoring is performed by the Trip Statistics Manager, which evaluates the stream of sensor data provided by the Sensor Data Collection Manager. \
-When a stop is detected, the Trip Statistics Manager triggers the automatic pause of the session by requesting the Sensor Data Collection Manager to suspend acquisition and by pausing the timer shown in the UI. \ When activity is detected again, the Trip Statistics Manager triggers the resumption of acquisition and the UI timer. \
+This sequence diagram shows the flow of messages for the Automatic Recording With Activity Detection use case. \
+During an active recording session, the mobile application monitors the ongoing trip to determine whether the user is currently biking. This monitoring is performed by the Trip Statistics Manager that reacts to the activity change updates coming from Sendor Data CollectionManager, which evaluates the stream of sensor data provided by the motion sensors. \
+When an activity change is detected, the Trip Statistics Manager notify the UI that updates accordingly.
 This use case causes repeated transitions between Recording and Paused states until the user explicitly stops the session.
 #let automaticRecordingManualActivityDetectionSequenceDiagram = ```plantuml
 autonumber
@@ -804,7 +804,7 @@ deactivate SDCM
 #figure(
   automaticRecordingManualActivityDetectionSequenceDiagram,
   kind: image,
-  caption: [ Automatic Pause and Resume Sequence Diagram]
+  caption: [Automatic Recording With Activity Detection Sequence Diagram]
 )
 
 #pagebreak()
@@ -1012,8 +1012,8 @@ App -> User: Show Homepage
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 *UC11 Manual Path Insertion* \
 This sequence diagram shows the flow of messages for the Manual Path Insertion use case. \
-An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate locations through the mobile application. For each inserted location, the application interacts with the Maps API to translate street names into geographic coordinates and to visualize the path on the map. \
-Once the path definition is completed, the user selects the path status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the path data in the DBMS, making it available in the user’s personal history. \
+An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate locations through the mobile application. For each inserted location, the application interacts with the Maps API to translate street addresses into geographic coordinates and to visualize the path on the map. \
+Once the path definition is completed, the user selects the path status and privacy level. The mobile application then submits the manually created path to the Backend through the Application Proxy and the API Gateway. The Path Recording Service stores the path data in the DBMS, making it available in the user’s personal history. \
 This use case does not involve sensor data acquisition and does not affect the recording state. \
 #let manualPathInserionSequenceDiagram = ```plantuml
 autonumber
@@ -1076,14 +1076,13 @@ UI -> U : Show path added to history
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
-*UC12 Show Detailed view* \
-This sequence diagram shows the flow of messages for the Show Personal History use case. \
+*UC12 Show Detailed View* \
+This sequence diagram shows the flow of messages for the Show Detailed View use case. \
 An authenticated user accesses the personal history section of the application. The mobile application requests the list of paths associated with the user through the Application Proxy and the API Gateway. \
 The Personal Paths Service retrieves the list of stored paths from the DBMS and returns it to the mobile application, which displays the paths to the user. \
-This use case only involves read operations and does not modify stored data.\
-This sequence diagram shows the flow of messages for the Show Path Detailed View use case. \
-After selecting a path from the personal history, the user requests detailed information about the selected path. The mobile application forwards the request to the Personal Paths Service, which retrieves the complete path data from the DBMS, including coordinates, statistics, obstacles, and associated metadata. \
+After selecting a path from the personal history, the user requests detailed information about the selected path. The mobile application forwards the request to the Personal Paths Service, which retrieves the complete path data from the DBMS, including coordinates, statistics and associated metadata. \
 The mobile application then visualizes the retrieved information on the map. \
+This use case only involves read operations and does not modify stored data.\
 #let showUserPathDetailedViewSequenceDiagram = ```plantuml
 autonumber
 actor "User" as User
@@ -1238,7 +1237,7 @@ App -> User: Notify User
 
 #pagebreak()
 *UC14 Delete Bike Path* \
-This sequence diagram shows the flow of messages for the Delete Path use case. \
+This sequence diagram shows the flow of messages for the Delete Bike Path use case. \
 An authenticated user deletes one of their previously stored paths. After user confirmation, the deletion request is forwarded to the Personal Paths Service, which removes the path from the DBMS. \ 
 #let deleteBikePathSequenceDiagram = ```plantuml
 autonumber
@@ -1306,7 +1305,7 @@ App -> User : Show History Page
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 *UC15 Browse Community Paths* \
 This sequence diagram shows the flow of messages for the Browse Community Paths use case. \
-A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves queries public paths from the DBMS using a sorting predicated that ranks paths based on quality and freshness, and returns the ranked paths to the mobile application. \
+A user searches for bike paths between a starting point and a destination. The Path Recommendation Service queries public paths from the DBMS using a sorting predicate that ranks paths based on quality and freshness, and returns the ranked paths to the mobile application. \
 The application visualizes the recommended paths using the Maps API and highlights any incompatible road segments. \
 #let browseCommunityPathSequenceDiagram = ```plantuml
 autonumber
@@ -1386,6 +1385,8 @@ end
 
 #pagebreak()
 == Component interfaces
+
+
 == Selected architectural styles and patterns
 Please explain which styles/patterns you used, why, and how
 == Other design decisions

@@ -309,7 +309,7 @@ component "DBMS" as db
 
 component "API Gateway" as gate 
 
-interface "auth I" as useri 
+interface "Auth I" as useri 
 interface "DBMS I" as dbi 
 interface "Paths I" as pathsi 
 interface "Recommend I" as ri

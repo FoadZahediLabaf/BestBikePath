@@ -1385,119 +1385,133 @@ end
 
 #pagebreak()
 == Component interfaces
+This section describes the interfaces exposed by the main architectural components introduced in the previous sections. The goal is to clarify how components interact with each other and which services they provide, without entering implementation-specific details. \
+In line with the Software Architecture lectures, interfaces are described at a logical level, focusing on the operations offered by each component and on the type of information that is exchanged. As a result, this section does not define concrete APIs, protocols, or data formats, but rather provides an abstract view of the responsibilities of each interface. \
+All the interfaces presented here are consistent with the runtime interactions illustrated in Section 2.4. 
+The Mobile Application represents the only entry point for user interactions and communicates with the back-end exclusively through the interfaces described below. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Frontend")
 
 Mobile App
-- notifyCapabilityAuthorizationChange(authorization)
-- notifyActivityChange(activity)
-- notifyPerformanceUpdate(performance)
-- notifyObstacleDetection to update
+- `notifyCapabilityAuthorizationChange(authorization)`
+- `notifyActivityChange(activity)`
+- `notifyPerformanceUpdate(performance)`
+- `notifyObstacleDetection to update`
 
 Local Storage
-- incrementObstacleCount
-- decrementObstacleCount
+- `incrementObstacleCount`
+- `decrementObstacleCount`
+
+*Capability Authorization I* \
+Permission Manager
+- `getAuthorizationStatus`
+- `notifyCapabilityAuthorizationChange`
+- `askAuthorization`
+
+Capability Providers
+- `getAuthorizationStatus`
+- `askAuthorization`
 
 
-Application Proxy – API Gateway Interface
-- userExists(email)
-- sendVerificationCode(email)
-- verifyCode(email, code)
-- signup(name, email, password, code)
-- signin(email, password)
-- deleteAccount(email)
-- savePath(pathData)
-- getPaths(userId)
-- getUserPathDetails(pathId)
-- setPrivacyStatus(pathId, privacyStatus)
-- deletePath(pathId)
-- fetchPaths(startLocation, endLocation)
-
-Auth I (User Management Service)
-- userExists(email)
-- sendVerificationCode(email)
-- verifyCode(email, code)
-- signup(name, email, password, code)
-- signIn(email, password)
-- deleteAccount(email) (authenticated)
-
-Persistence I
-DBMS
-- userExists(email)
-- createAccount(name, email, password)
-- getAccount(email)
-- deleteAccount(email)
-- savePath(pathData)
-- getPaths(userId)
-- getUserPathDetails(pathId)
-- setPrivacyStatus(pathId, status)
-- deletePath(pathId)
-- queryPaths(startLocaiton, endLocation, sortPredicate)
-
-KV Storage
-- save(code, email, ttl)
-- getEmail(code)
-
-External Services I
-SMTP Server
-- enqueueVerificationEmail(email, code)
-
-Weather API
-- getWeatherData(location, date)
-
-MAPS API
-- reverseGeocode(streetAddress)
-- geocode(location)
-- addLocationToMap(location)
-- addPathToMap(path)
-- hasHighways(path)
-
-
-Capability Authorization I (Permission Manager + Capability Providers)
-for each capability:
-- getAuthorizationStatus
-- notifyCapabilityAuthorizationChange
-- askAuthorization
-
-
-Recording I (Sensor Data Collection Manager + client-side modules)
+*Recording I* \
 Trip Statistics Manager
-- startActivityUpdates
-- stopActivityUpdates
-- startPerformanceMonitoring
-- stopPerformanceMonitoring
-- notifyMotionUpdates(motion)
-- notifyActivityChange(activity)
+- `startActivityUpdates`
+- `stopActivityUpdates`
+- `startPerformanceMonitoring`
+- `stopPerformanceMonitoring`
+- `notifyMotionUpdates(motionData)`
+- `notifyActivityChange(activity)`
 
-ObstacleDetectionManager
-- incrementObstacleCount
-- decrementObstacleCount
-- startObstacleDetection
-- stopObstacleDetection
-- notifyMotionUpdates(motion)
-
+Obstacle Detection Manager
+- `incrementObstacleCount`
+- `decrementObstacleCount`
+- `startObstacleDetection`
+- `stopObstacleDetection`
+- `notifyMotionUpdates(motionData)`
 
 Sensor Data Collection Manager
-- startActivityChangeUpdates 
-- stopActivityChangeUpdates
-- startMotionUpdates
-- stopMotionUpdates
-- notifyAccelleromerUpdates
-- notifyGyroUpdates
+- `startActivityChangeUpdates`
+- `stopActivityChangeUpdates`
+- `startMotionUpdates`
+- `stopMotionUpdates`
+- `notifyAccelleromerUpdates`
+- `notifyGyroUpdates`
 
 Accellerometer/Gyroscope
-- startUpdates
-- stopUpdates
+- `startUpdates`
+- `stopUpdates`
 
 Path Recording Service
-- savePath(pathData)
+- `savePath(pathData)`
 
-Personal History I (Personal Paths Service)
-- getPaths(userId)
-- getUserPathDetails(pathId)
-- setPrivacyStatus(pathId, status)
-- deletePath(pathId)
+#heading(level: 4, numbering: none,  outlined: false,  "Backend")
 
-Community Browsing I (Path Recommendation Service)
-- fetchPaths(startLocation, endLocation)
+*API* \
+Application Proxy – API Gateway Interface
+- `userExists(email)`
+- `sendVerificationCode(email)`
+- `verifyCode(email, code)`
+- `signup(name, email, password, code)`
+- `signin(email, password)`
+- `deleteAccount(email)`
+- `savePath(pathData)`
+- `getPaths(userId)`
+- `getUserPathDetails(pathId)`
+- `setPrivacyStatus(pathId, privacyStatus)`
+- `deletePath(pathId)`
+- `fetchPaths(startLocation, endLocation)`
+
+*Auth I* \
+User Management Service
+- `userExists(email)`
+- `sendVerificationCode(email)`
+- `verifyCode(email, code)`
+- `signup(name, email, password, code)`
+- `signIn(email, password)`
+- `deleteAccount(email) (authenticated)`
+
+*Personal History I* \
+Personal Paths Service
+- `getPaths(userId)`
+- `getUserPathDetails(pathId)`
+- `setPrivacyStatus(pathId, status)`
+- `deletePath(pathId)`
+
+*Community Browsing I* \
+Path Recommendation Service
+- `fetchPaths(startLocation, endLocation)`
+
+*Persistence I* \
+DBMS
+- `userExists(email)`
+- `createAccount(name, email, password)`
+- `getAccount(email)`
+- `deleteAccount(email)`
+- `savePath(pathData)`
+- `getPaths(userId)`
+- `getUserPathDetails(pathId)`
+- `setPrivacyStatus(pathId, status)`
+- `deletePath(pathId)`
+- `queryPaths(startLocaiton, endLocation, sortPredicate)`
+
+KV Storage
+- `save(code, email, ttl)`
+- `getEmail(code)`
+
+*External Services I* \
+SMTP Server
+- `enqueueVerificationEmail(email, code)`
+
+Weather API
+- `getWeatherData(location, date)`
+
+MAPS API
+- `reverseGeocode(streetAddress)`
+- `geocode(location)`
+- `addLocationToMap(location)`
+- `addPathToMap(path)`
+- `hasHighways(path)`
+
 
 
 

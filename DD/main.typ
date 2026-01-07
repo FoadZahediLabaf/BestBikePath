@@ -681,37 +681,43 @@ entity "Gyroscope" as GYR
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
+Frontend -> TSM: startActivityUpdates
+activate TSM
+TSM -> SDCM: startActivityUpdates
+activate SDCM
+SDCM -> GYR: startUpdates
+activate GYR
+SDCM -> ACC: startUpdates
+activate ACC
+Frontend -> TSM: startPerformanceMonitoring
+TSM -> SDCM: startMotionUpdates
 loop Until recording stops
-...
+  ...
   alt User presses "resume" button
     User ->> Frontend: Press "resume" button
-    Frontend -> TSM: startMotionUpdates
-    activate TSM
+    Frontend -> TSM: startPerformanceMonitoring
     TSM -> SDCM: startMotionUpdates
-    activate SDCM
-    SDCM -> GYR: startUpdates
-    activate GYR
-    SDCM -> ACC: startUpdates 
-    activate ACC
     Frontend -> Frontend: Resume timer
     Frontend -> User: Show updated UI
     ...
   else User presses "pause" button
     User ->> Frontend: Press "pause" button
-    Frontend -> TSM: stopMotionUpdates
+    Frontend -> TSM: stopPerformanceMonitoring
     TSM -> SDCM: stopMotionUpdates
-    deactivate TSM
-    SDCM -> ACC: stopUpdates 
-    deactivate ACC
-    SDCM -> GYR: stopUpdates
-    deactivate GYR
-    deactivate SDCM
     Frontend -> Frontend: Pause timer
     Frontend -> User: Show updated UI
     ...
   end
 end
 User ->> Frontend: Press "Stop Recording" button
+Frontend -> TSM: stopActivityUpdates
+TSM -> SDCM: stopActivityUpdates
+deactivate TSM
+SDCM -> ACC: stopUpdates 
+deactivate ACC
+SDCM -> GYR: stopUpdates
+deactivate GYR
+deactivate SDCM
 ```
 #figure(
   automaticRecordingManualControlsSequenceDiagram,

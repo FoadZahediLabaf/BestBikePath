@@ -276,7 +276,10 @@ Since the email provided is not registered, the User Management Service generate
 #let accountCreationSequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
+end box
+box "Backend"
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "User Management Service" as UMS
@@ -1353,18 +1356,18 @@ Since the app relies on motion and location device features, the interface will 
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
-When an unauthenticated user open the app, @ui-account-management-home-unauthenticated is shown. From here the user can start browsing community bike paths, or sign into the app.
+When an unauthenticated user opens the app, @ui-account-management-home-unauthenticated is shown. From here the user can start browsing community bike paths, or sign into the app.
 
-When an authenticated user open the app @ui-account-management-home-authenticated is shown. From here the user can start browsing community bike paths, access their bike path history, add or record a new bike path.
+When an authenticated user opens the app @ui-account-management-home-authenticated is shown. From here the user can start browsing community bike paths, access their bike path history, add or record a new bike path.
 
 The user can access the account page by tapping the account button, located in the trailing section of the navigation bar in both @ui-account-management-home-unauthenticated and @ui-account-management-home-authenticated. The user can also access the account page by tapping the sign in button in @ui-account-management-home-unauthenticated.
 
 *Unauthenticated Account Page* \
 If the unauthenticated user navigates to the account page a new modal replace the _Community Bike Paths_ one as shown in @ui-account-management-home-account-unhauthenticated. The user can now fill the email text field as in @ui-account-management-home-account-unhauthenticated-filled and submit. 
 
-If the email is not registered with an existing user account, the sign up flow starts by showing a text field for verifying the user provided email as in @ui-account-management-account-emailverification. The user fill with the received verification code as in @ui-account-management-account-emailverification-filled and submit. The sign up form in @ui-account-management-account-signup is shown and the user fill it as in @ui-account-management-account-signup-filled. After submitting the form the user is authenticated with their new account and @ui-account-management-home-authenticated is shown.
+If the email is not registered with an existing user account, the sign up flow starts by showing a text field for verifying the user provided email as in @ui-account-management-account-emailverification. The user fills with the received verification code as in @ui-account-management-account-emailverification-filled and submit. The sign up form in @ui-account-management-account-signup is shown and the user fills it as in @ui-account-management-account-signup-filled. After submitting the form the user is authenticated with their new account and @ui-account-management-home-authenticated is shown.
 
-If the email is registered with an existing user account, the sign in flow starts by showing a password secure text field for verifying the user credential as in @ui-account-management-account-signin. The user fill with the account password as in @ui-account-management-account-signin-filled and submit. If the password is wrong @ui-account-management-account-signin-wrongpassword is shown. Otherwise, the user is authenticated with their account and @ui-account-management-home-authenticated is shown.
+If the email is registered with an existing user account, the sign in flow starts by showing a password secure text field for verifying the user credential as in @ui-account-management-account-signin. The user fills with the account password as in @ui-account-management-account-signin-filled and submit. If the password is wrong @ui-account-management-account-signin-wrongpassword is shown. Otherwise, the user is authenticated with their account and @ui-account-management-home-authenticated is shown.
 
 *Authenticated Account Page* \
 If the authenticated user navigates to the account page @ui-account-management-account-authorized modal is shown. From here the user can sign out or cancel their account. Since those actions are disruptive a confirmation dialog is presented before performing them, as shown in @ui-account-management-account-authorized-signoutconfirmation and @ui-account-management-account-authorized-deleteaccountconfirmation
@@ -1499,13 +1502,13 @@ When the system needs a capability permission for a feature, for example the use
 *Not Determined Permission Page* \
 If the capability is available and the user never denied the authorization (from the system dialog), @ui-capability-management-requestcapability-notdetermined is shown.
 Here the user can see what capability the app need to access and why.
-If the user decide to give their permission, the system dialog in @ui-capability-management-requestcapability-notdetermined-systemdialog is shown, and the user can allow the app to user the capability.
+If the user decides to give their permission, the system dialog in @ui-capability-management-requestcapability-notdetermined-systemdialog is shown, and the user can allow the app to user the capability.
 Otherwise the user can close the modal and don't use the app feature.
 
 *Denied Permission Page* \
 If the capability is available and the user denied the authorization (from the system dialog) @ui-capability-management-requestcapability-denied is shown.
 Here the user can see what capability the app need to access and why.
-If the user decide to give their permission, they must open settings and change the access authorization status manually. 
+If the user decides to give their permission, they must open settings and change the access authorization status manually. 
 Otherwise the user can close the modal and don't use the app feature.
 
 *Unavailable Permission Page* \
@@ -1554,7 +1557,7 @@ The user can just close the modal and don't use the app feature.
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
-When the authenticated user open the path record page a full-screen map and a modal sheet are shown.
+When the authenticated user opens the path record page a full-screen map and a modal sheet are shown.
 
 *Idle Recording Page* \
 When the recoding is idle @ui-automatic-path-recording-pathrecording-idle is shown.  \
@@ -1567,14 +1570,14 @@ The recording can be started manually by the user or automatically by the app wh
 When the recording is active @ui-automatic-path-recording-pathrecording-active is shown. \
 The map shows the user marker, start marker, and the followed route (and a suggested route, if it was selected before). \
 The modal shows the running stopwatch, the weather data (if available), the performance data (all of them if motion capability access is available, otherwise only distance), the pause button and the add obstacle button. \
-The recording can be paused manually by the user or automatically by the app when the user stop cycling (if motion capability access is available). \
+The recording can be paused manually by the user or automatically by the app when the user stops cycling (if motion capability access is available). \
 An obstacle can be registered manually by the user or automatically by the app when the device shakes (if motion capability access is available). When an obstacle is registered an alert notification is presented, as in @ui-automatic-path-recording-pathrecording-obstaclealert, to confirm or cancel the obstacle detection, if the notification is ignored the obstacle detection is confirmed.
 
 *Paused Recording Page* \
 When the recording is paused @ui-automatic-path-recording-pathrecording-paused is shown. \
 The map shows the user marker, start location, and the followed route (and a suggested route, if it was selected before). \
 The modal shows the stopwatch, the weather data (if available), the performance data (all of them if motion capability access is available, otherwise only distance), the resume button, the stop button and the add obstacle button. \
-The recording can be resumed manually by the user or automatically by the app when the user start cycling (if motion capability access is available). \
+The recording can be resumed manually by the user or automatically by the app when the user starts cycling (if motion capability access is available). \
 An obstacle can be registered manually by the user. When an obstacle is registered an alert notification is presented to confirm or cancel the obstacle detection, if the notification is ignored the obstacle detection is confirmed.
 
 *Stopped Recording Page* \
@@ -1630,7 +1633,7 @@ The modal shows the stopwatch, the weather data (if available), the performance 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
-When the authenticated user open the path insertion page a full-screen map and a modal sheet are shown.
+When the authenticated user opens the path insertion page a full-screen map and a modal sheet are shown.
 
 The map shows the user marker, the markers of the locations provided by the user, and the route connecting them.
 The modal shows the road status stepper for the path, the path privacy status, a list of the locations composing the route, and a search bar to look up locations.
@@ -1659,9 +1662,9 @@ The modal shows the road status stepper for the path, the path privacy status, a
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
-When the authenticated user open the app and has at least recorded or added one path, the history page is shown has in @ui-personal-path-history-hystory.
+When the authenticated user opens the app and has at least recorded or added one path, the history page is shown has in @ui-personal-path-history-hystory.
 
-When the user select a path a full-screen map and a modal sheet are shown as in @ui-personal-path-history-history-detail and @ui-personal-path-history-history-detail-fullscreen. \
+When the user selects a path a full-screen map and a modal sheet are shown as in @ui-personal-path-history-history-detail and @ui-personal-path-history-history-detail-fullscreen. \
 The map shows the path route, start marker, end marker and, if the path was added manually, all the locations provided by the user to compose it. \
 The modal shows all the available path information, the path route status stepper (if path was manually added), the path privacy status toggle, the record new path button and the delete button. \
 When the user edits the path information (with the toggle or the stepper), the confirm button on the trailing section of the modal navigation bar is enabled, as in @ui-personal-path-history-history-detail-edited. \
@@ -1715,12 +1718,12 @@ The user enters a start location, as in @ui-community-paths-browsing-browsing-st
 The user enters an end location, as in @ui-community-paths-browsing-browsing-endentered. The map shows the start and end markers, and the confirm button on the trailing section of the modal navigation bar is enabled.
 
 *Community Path List Page* \
-After the user tap the confirm button, the app loads their results in a list, ranked by a path quality score, as in @ui-community-paths-browsing-browsing-list. \
+After the user taps the confirm button, the app loads their results in a list, ranked by a path quality score, as in @ui-community-paths-browsing-browsing-list. \
 The list rows display the path route in the map, its quality score and, if the path is not optimal for biking (for example, it contains an highway), an alert is shown.
-When the user select a path row, the full-screen map shows the path and the confirm button on the trailing section of the modal navigation bar is enabled.
+When the user selects a path row, the full-screen map shows the path and the confirm button on the trailing section of the modal navigation bar is enabled.
 
 *Community Path Detail Page* \
-When the user tap the confirm button, a modal sheet is shown as in @ui-community-paths-browsing-browsing-detail-authenticated if the user is authenticated, or in @ui-community-paths-browsing-browsing-detail-authenticated if the user is unauthenticated. \
+When the user taps the confirm button, a modal sheet is shown as in @ui-community-paths-browsing-browsing-detail-authenticated if the user is authenticated, or in @ui-community-paths-browsing-browsing-detail-authenticated if the user is unauthenticated. \
 The map shows the path route, start marker, end marker and, if the path was added manually, all the locations provided by the user to compose it. \
 The modal shows all the publicly available path information and if the user is authenticated the record new path button. \
 When the user starts a new path from here, a bike path recording session begins, with the selected path displayed on the map as a suggested route for the user to follow.
@@ -1784,20 +1787,6 @@ map to the design elements that you have defined in this document.
 Identify here the order in which you plan
 to implement the subcomponents of your system and the order in which you plan to integrate
 such subcomponents and test the integration.
-
-
-
-#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
-
-#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
-
-#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
-
-#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
-
-#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
-
-#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
 
 = Effort Spent

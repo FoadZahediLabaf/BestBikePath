@@ -280,7 +280,7 @@ boundary "BBP App" as Frontend
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "User Management Service" as UMS
-database "Database" as DB
+database "DBMS" as DB
 collections "KV Store" as KV
 queue "SMTP Server" as SMTP
 activate User

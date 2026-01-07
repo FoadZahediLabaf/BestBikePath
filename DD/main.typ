@@ -599,14 +599,14 @@ else Capability access was denied
     else Authorize capability access
       User ->> Settings: Authorize capability access
       activate Settings
-      Settings -> CP: updateCapabilityAuthorization('authorized')
+      Settings -> CP: notifyCapabilityAuthorizationChange('authorized')
       deactivate Settings
       activate CP
       User ->> Frontend: Open application
-      CP -> PM: updateCapabilityAuthorization('authorized')
+      CP -> PM: notifyCapabilityAuthorizationChange('authorized')
       deactivate CP
       activate PM
-      PM -> Frontend: updateCapabilityAuthorization('authorized')
+      PM -> Frontend: notifyCapabilityAuthorizationChange('authorized')
       deactivate PM
       Frontend -> Frontend: Continue with capability
     end
@@ -643,27 +643,27 @@ else Capability access is not determined
     Settings -> User: Show system dialog to give permission
     alt Not allow usage
       User ->> Settings: Press 'Don't allow' button
-      Settings -> CP: updateCapabilityAuthorization('denied')
+      Settings -> CP: notifyCapabilityAuthorizationChange('denied')
       deactivate Settings
       activate CP
       User ->> Frontend: Open application
-      CP -> PM: updateCapabilityAuthorization('denied')
+      CP -> PM: notifyCapabilityAuthorizationChange('denied')
       deactivate CP
       activate PM
-      PM -> Frontend: updateCapabilityAuthorization('denied')
+      PM -> Frontend: notifyCapabilityAuthorizationChange('denied')
       deactivate PM
       Frontend -> Frontend: Continue without capability
     else Allow usage
       activate Settings
       User ->> Settings: Press 'Allow' button
-      Settings -> CP: updateCapabilityAuthorization('authorized')
+      Settings -> CP: notifyCapabilityAuthorizationChange('authorized')
       deactivate Settings
       activate CP
       User ->> Frontend: Open application
-      CP -> PM: updateCapabilityAuthorization('authorized')
+      CP -> PM: notifyCapabilityAuthorizationChange('authorized')
       deactivate CP
       activate PM
-      PM -> Frontend: updateCapabilityAuthorization('authorized')
+      PM -> Frontend: notifyCapabilityAuthorizationChange('authorized')
       deactivate PM
       Frontend -> Frontend: Continue with capability
     end
@@ -696,9 +696,9 @@ end box
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
-Frontend -> TSM: startActivityUpdates
+Frontend -> TSM: StartActivityChangeUpdates
 activate TSM
-TSM -> SDCM: startActivityUpdates
+TSM -> SDCM: startActivityChangeUpdates
 activate SDCM
 SDCM -> GYR: startUpdates
 activate GYR
@@ -725,8 +725,8 @@ loop Until recording stops
   end
 end
 User ->> Frontend: Press "Stop Recording" button
-Frontend -> TSM: stopActivityUpdates
-TSM -> SDCM: stopActivityUpdates
+Frontend -> TSM: stopActivityChangeUpdates
+TSM -> SDCM: stopActivityChangeUpdates
 deactivate TSM
 SDCM -> ACC: stopUpdates 
 deactivate ACC
@@ -758,9 +758,9 @@ end box
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
-Frontend -> TSM: startActivityUpdates
+Frontend -> TSM: startActivityChangeUpdates
 activate TSM
-TSM -> SDCM: startActivityUpdates
+TSM -> SDCM: startActivityChangeUpdates
 activate SDCM
 SDCM -> GYR: startUpdates
 activate GYR
@@ -792,8 +792,8 @@ loop Until recording stops
   end
 end
 User ->> Frontend: Press "Stop Recording" button
-Frontend -> TSM: stopActivityUpdates
-TSM -> SDCM: stopActivityUpdates
+Frontend -> TSM: stopActivityChangeUpdates
+TSM -> SDCM: stopActivityChangeUpdates
 deactivate TSM
 SDCM -> ACC: stopUpdates 
 deactivate ACC
@@ -1341,7 +1341,7 @@ UI -> AP : fetchPaths\n(startLocation, endLocation)
 activate AP
 AP -> AG : fetchPaths\n(startLocation, endLocation)
 activate AG
-AP -> PRS : fetchPaths\n(startLocation, endLocation)
+AG -> PRS : fetchPaths\n(startLocation, endLocation)
 activate PRS
 PRS -> DB : queryPaths\n(startLocation, endLocation,\nsortPredicate)
 activate DB
@@ -1385,6 +1385,120 @@ end
 
 #pagebreak()
 == Component interfaces
+
+Mobile App
+- notifyCapabilityAuthorizationChange(authorization)
+- notifyActivityChange(activity)
+- notifyPerformanceUpdate(performance)
+- notifyObstacleDetection to update
+
+Local Storage
+- incrementObstacleCount
+- decrementObstacleCount
+
+
+Application Proxy – API Gateway Interface
+- userExists(email)
+- sendVerificationCode(email)
+- verifyCode(email, code)
+- signup(name, email, password, code)
+- signin(email, password)
+- deleteAccount(email)
+- savePath(pathData)
+- getPaths(userId)
+- getUserPathDetails(pathId)
+- setPrivacyStatus(pathId, privacyStatus)
+- deletePath(pathId)
+- fetchPaths(startLocation, endLocation)
+
+Auth I (User Management Service)
+- userExists(email)
+- sendVerificationCode(email)
+- verifyCode(email, code)
+- signup(name, email, password, code)
+- signIn(email, password)
+- deleteAccount(email) (authenticated)
+
+Persistence I
+DBMS
+- userExists(email)
+- createAccount(name, email, password)
+- getAccount(email)
+- deleteAccount(email)
+- savePath(pathData)
+- getPaths(userId)
+- getUserPathDetails(pathId)
+- setPrivacyStatus(pathId, status)
+- deletePath(pathId)
+- queryPaths(startLocaiton, endLocation, sortPredicate)
+
+KV Storage
+- save(code, email, ttl)
+- getEmail(code)
+
+External Services I
+SMTP Server
+- enqueueVerificationEmail(email, code)
+
+Weather API
+- getWeatherData(location, date)
+
+MAPS API
+- reverseGeocode(streetAddress)
+- geocode(location)
+- addLocationToMap(location)
+- addPathToMap(path)
+- hasHighways(path)
+
+
+Capability Authorization I (Permission Manager + Capability Providers)
+for each capability:
+- getAuthorizationStatus
+- notifyCapabilityAuthorizationChange
+- askAuthorization
+
+
+Recording I (Sensor Data Collection Manager + client-side modules)
+Trip Statistics Manager
+- startActivityUpdates
+- stopActivityUpdates
+- startPerformanceMonitoring
+- stopPerformanceMonitoring
+- notifyMotionUpdates(motion)
+- notifyActivityChange(activity)
+
+ObstacleDetectionManager
+- incrementObstacleCount
+- decrementObstacleCount
+- startObstacleDetection
+- stopObstacleDetection
+- notifyMotionUpdates(motion)
+
+
+Sensor Data Collection Manager
+- startActivityChangeUpdates 
+- stopActivityChangeUpdates
+- startMotionUpdates
+- stopMotionUpdates
+- notifyAccelleromerUpdates
+- notifyGyroUpdates
+
+Accellerometer/Gyroscope
+- startUpdates
+- stopUpdates
+
+Path Recording Service
+- savePath(pathData)
+
+Personal History I (Personal Paths Service)
+- getPaths(userId)
+- getUserPathDetails(pathId)
+- setPrivacyStatus(pathId, status)
+- deletePath(pathId)
+
+Community Browsing I (Path Recommendation Service)
+- fetchPaths(startLocation, endLocation)
+
 
 
 == Selected architectural styles and patterns

@@ -983,7 +983,7 @@ App -> User: Show Homepage
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
-*UC11 Manual Path Insertion*
+*UC11 Manual Path Insertion* \
 This sequence diagram shows the flow of messages for the Manual Path Insertion use case. \
 An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate locations through the mobile application. For each inserted location, the application interacts with the Maps API to translate street names into geographic coordinates and to visualize the path on the map. \
 Once the path definition is completed, the user selects the path status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the path data in the DBMS, making it available in the user’s personal history. \
@@ -1044,6 +1044,70 @@ UI -> U : Show path added to history
 )
 
 #pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+*UC12 Show Detailed view* \
+#let showUserPathDetailedViewSequenceDiagram = ```plantuml
+autonumber
+actor "User" as User
+boundary "BBP App " as App
+control "Application Proxy" as AP
+control "API Gateway" as AG
+control "Personal Paths Service" as PPS
+database "DBMS" as db
+activate User
+activate App
+User ->> App: Open application
+App -> User: Show History Page 
+App -> AP: getPaths(userId)
+activate AP
+AP -> AG: getPaths(userId)
+activate AG
+AG -> PPS: getPaths(userId)
+activate PPS
+PPS -> db: getPaths(userId)
+activate db
+db --> PPS: userPaths
+deactivate db
+PPS -> AG: userPaths
+deactivate PPS
+AG -> AP: userPaths
+deactivate AG
+AP -> App: userPaths
+deactivate AP
+App -> User: Show user paths 
+User ->> App: Select path
+App -> User: Show Detailed view
+App -> AP: getUserPathDetails(userPathId)
+activate AP
+AP -> AG: getUserPathDetails(userPathId)
+activate AG
+AG -> PPS: getUserPathDetails(userPathId)
+activate PPS
+PPS -> db: getUserPathDetails(userPathId)
+activate db
+db --> PPS: userPathDetail
+deactivate db
+PPS -> AG: userPathDetail
+deactivate PPS
+AG -> AP: userPathDetail
+deactivate AG
+AP -> App: userPathDetail
+deactivate AP
+App -> User: Show Path Details
+opt Performance data available
+    App -> User: Show Performance data
+end
+opt Meteorological data available
+    App -> User: Show Meteorological data
+end
+```
+#figure(
+  showUserPathDetailedViewSequenceDiagram,
+  kind: image,
+  caption: [Show Detailed View Sequence Diagram]
+)
+
+#pagebreak()
 *[UC6] Start Automatic Recording* \ 
 This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
 An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data. \
@@ -1086,44 +1150,6 @@ end
   caption: [Start Automatic Recording Sequence Diagram]
 )
 
-#pagebreak()
-*[UC8] Manual Path Insertion* \
-This sequence diagram shows the flow of messages for the Manual Path Insertion use case. \
-An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate locations through the mobile application. For each inserted location, the application interacts with the Maps API to translate street names into geographic coordinates and to visualize the path on the map. \
-Once the path definition is completed, the user selects the path status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the path data in the DBMS, making it available in the user’s personal history. \
-This use case does not involve sensor data acquisition and does not affect the recording state. \
-
-#let ManualPathInsertionSequenceDiagram = ```plantuml
-title UC8 - Manual Path Insertion
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-entity "Maps API" as MAPI
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
-control "Path Recording Service" as PRS
-entity "DBMS" as DBMS
-User -> App : Open manual path creation
-loop For each location
-  User -> App : Insert street/location
-  App -> MAPI : geocode(address)
-  MAPI --> App : coordinates
-  App -> App : update map
-end
-User -> App : Select status and privacy
-User -> App : Save path
-App -> Proxy : submitManualPath(pathData)
-Proxy -> GW
-GW -> PRS : submitManualPath(pathData)
-PRS -> DBMS : storePath(pathData)
-DBMS --> PRS : OK
-PRS --> App : confirmation
-```
-
-#figure(
-ManualPathInsertionSequenceDiagram,
-  kind: image,
-  caption: [Manual Path Insertion Sequence Diagram]
-)
 #pagebreak()
 *[UC9] Show Personal History* \
 This sequence diagram shows the flow of messages for the Show Personal History use case. \

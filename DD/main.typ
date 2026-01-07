@@ -1019,13 +1019,13 @@ UI -> UI : Store path status
 U ->> UI : Set path privacy
 UI -> UI : Store path privacy
 U ->> UI : Tap "Save"
-UI -> AP : savePath\n(streetLocations, status,\n privacy, date)
+UI -> AP : savePath\n(streetLocations, status,\nprivacy, date)
 activate AP
-AP -> AG : savePath\n(streetLocations, status,\n privacy, date)
+AP -> AG : savePath\n(streetLocations, status,\nprivacy, date)
 activate AG
-AG -> PRS : savePath\n(streetLocations, status,\n privacy, date)
+AG -> PRS : savePath\n(streetLocations, status,\nprivacy, date)
 activate PRS
-PRS -> DB : savePath\n(streetLocations, status,\n privacy, date)
+PRS -> DB : savePath\n(streetLocations, status,\nprivacy, date)
 activate DB
 DB --> PRS : 200 OK
 deactivate DB

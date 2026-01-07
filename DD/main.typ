@@ -710,7 +710,6 @@ loop Until recording stops
     Frontend -> User: Show updated UI
     ...
   end
-  ...
 end
 User ->> Frontend: Press "Stop Recording" button
 ```
@@ -762,7 +761,6 @@ loop Until recording stops
     Frontend -> User: Show updated UI
     ...
   end
-  ...
 end
 User ->> Frontend: Press "Stop Recording" button
 Frontend -> TSM: stopActivityUpdates

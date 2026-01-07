@@ -1809,7 +1809,7 @@ User ->> Frontend: Press confirm button
 Frontend -> Backend: deleteAccount(email)
 activate Backend
 note over Frontend, Backend
-  Request authenticated
+  Authenticated request
 end note
 Backend -> DB: deleteAccount(email)
 activate DB

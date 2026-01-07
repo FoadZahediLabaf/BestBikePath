@@ -464,21 +464,28 @@ This sequence diagram shows the flow of messages for the Account Deletion use ca
 The authenticated user permanently deletes their account. After confirmation, the request is forwarded to the User Management Service, which removes the user account and all related data from the DBMS. The user is then returned to an unauthenticated state. \
 
 #let AccountDeletionSequenceDiagram = ```plantuml
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
-control "User Management Service" as UMS
-entity "DBMS" as DBMS
-User -> App : Request account deletion
-App -> User : Show confirmation
-User -> App : Confirm
-App -> Proxy : deleteAccount(userId)
-Proxy -> GW
-GW -> UMS : deleteAccount(userId)
-UMS -> DBMS : removeUserData(userId)
-DBMS --> UMS : OK
-UMS --> App : deletion confirmed
+autonumber
+actor User
+boundary "BBP App" as Frontend
+control "Backend" as Backend
+database "Database" as DB
+activate User
+activate Frontend
+User ->> Frontend: Press delete account button
+Frontend -> User: Show confirmation
+User ->> Frontend: Press confirm button
+Frontend -> Backend: deleteAccount(email)
+activate Backend
+note over Frontend, Backend
+  Request authenticated
+end note
+Backend -> DB: deleteAccount(email)
+activate DB
+DB --> Backend: 200 OK (true)
+deactivate DB
+Backend --> Frontend: 200 OK (true)
+deactivate Backend
+Frontend -> User: Show homepage as unauthenticated user
 ```
 
 #figure(

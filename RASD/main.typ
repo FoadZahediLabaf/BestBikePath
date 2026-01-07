@@ -1809,7 +1809,7 @@ User ->> Frontend: Press confirm button
 Frontend -> Backend: deleteAccount(email)
 activate Backend
 note over Frontend, Backend
-  Authenticated request
+  Request authenticated
 end note
 Backend -> DB: deleteAccount(email)
 activate DB
@@ -2005,51 +2005,32 @@ User ->> Frontend: Press 'stop' button
 autonumber
 actor User
 boundary "BBP App" as Frontend
-control "Obstacle Detection Manager" as ODM
-control "Sensor Data Collection Manager" as SDCM
-entity "Accelerometer" as ACC
-entity "Gyroscope" as GYR
-entity "Local Storage" as LS
+control "Sensor API" as CP
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
-Frontend -> ODM: startObstacleDetection
-activate ODM
-ODM -> SDCM: startMotionUpdates
-activate SDCM
-SDCM -> GYR: startUpdates
-activate GYR
-SDCM -> ACC: startUpdates
-activate ACC
-
+Frontend -> CP: startAccelerometerUpdates(handler)
+activate CP
+Frontend -> CP: startGyroUpdates(handler)
 loop Until recording stops
-  ...
-  ACC ->> SDCM: accelerometerData
-  GYR ->> SDCM: gyroData
-  SDCM -> ODM: motionData
-  ODM -> ODM: detectObstacle(motionData)
+  CP ->> Frontend: accelerometerData
+  CP ->> Frontend: gyroData
+  Frontend -> Frontend: detectObstacle(accelerometerData, gyroData)
   opt Obstacle is detected
-    ODM -> LS: incrementObstacleCount
-    ODM -> Frontend: notifyDetectedObstacle
+    Frontend -> Frontend: Increment obstacle count
     Frontend -> User: Show obstacle confirmation dialog
     alt User confirms or ignores dialog
       User ->> Frontend: Press "confirm" button
     else User cancels
       User ->> Frontend: Press "cancel" button
-      Frontend -> ODM: decrementObstacleCount
-      ODM -> LS: decrementObstacleCount
+      Frontend -> Frontend: Decrement obstacle count
     end
   end
 end
 User ->> Frontend: Press "stop" button
-Frontend -> ODM: stopObstacleDetection
-ODM -> SDCM: stopMotionUpdates
-deactivate ODM
-SDCM -> ACC: stopUpdates
-deactivate ACC
-SDCM -> GYR: stopUpdates
-deactivate SDCM
-deactivate GYR
+Frontend -> CP: stopAccelerometerUpdates()
+Frontend -> CP: stopGyroUpdates()
+deactivate CP
 ```
 #figure(
   automaticObstacleDetectionSequenceDiagram,

@@ -147,6 +147,7 @@ The third tier implements the data layer, primarily responsible for storing bike
 Communication with external services occurs via REST APIs, while client-server interactions are managed through an API gateway, which routes requests to the appropriate microservices. To prevent bottlenecks, load balancers distribute HTTP/S requests across the replicated servers.
 Security is enforced through an application proxy and a firewall to enforce both application-level and network-level security, respectively. \
 The microservice architectural style is adopted to support independent deployment and scalability of backend functionalities such as path browsing and recommendation. The introduction of an API Gateway enables centralized access control and routing, while component replication improves availability for read-intensive operations. These choices are aligned with the expected usage patterns and quality requirements of the system. \
+
 #figure(
   image("diagrams/architecture.drawio.png"),
   caption: [Architecture Diagram]
@@ -1583,7 +1584,7 @@ Sensor Data Collection Manager
 - `stopActivityChangeUpdates`
 - `startMotionUpdates`
 - `stopMotionUpdates`
-- `notifyAccelleromerUpdates`
+- `notifyAcceleromerUpdates`
 - `notifyGyroUpdates`
 
 Accellerometer/Gyroscope
@@ -2614,6 +2615,45 @@ D7 .up. CPS
   communityPathBrowsingTestDiagram,
   kind: image,
   caption: [Community Path Browsing Test Diagram]
+)
+
+To conclude, the frontend and backend are integrated to ensure that the application operates correctly.
+
+#let finalTestDiagram = ```plantuml
+package Backend {
+    folder "User Management Service" as UMS
+    folder "Path Recording Service" as PRS
+    folder "Personal Path Service" as PPS
+    folder "Path Reccomendation Service" as CPS
+    folder "API Gateway" as AG
+    folder "Application Proxy" as AP
+}
+package Frontend {
+    folder "Permission Manager" as PM
+    folder "Trip Statistics Manager" as TSM
+    folder "Permission Manager" as PM
+    folder "Sensor Data Collection Manager" as DCM
+    folder "Obstacle Detection Manager" as ODM
+    folder "Local Storage" as LS
+}
+folder Driver as D1 #LightBlue
+DCM -down. PM
+TSM -up. LS
+ODM -up. LS
+TSM -up. DCM
+ODM -up. DCM
+D1 -right. Frontend
+Frontend -right. AP
+AP -down. AG
+AG -. UMS
+AG -. PRS
+AG -. PPS
+AG -. CPS
+```
+#figure(
+  finalTestDiagram,
+  kind: image,
+  caption: [Final Test Diagram]
 )
 
 #pagebreak()

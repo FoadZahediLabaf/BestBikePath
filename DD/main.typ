@@ -912,7 +912,7 @@ boundary "Weather API" as API
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "Path Recording Service" as PRS
-database "Database" as DB
+database "DBMS" as DB
 activate User
 activate App
 activate TSM
@@ -996,7 +996,7 @@ boundary "Maps API" as MAP
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "Path Recording Service" as PRS
-database "BBP Database" as DB
+database "DBMS" as DB
 activate U
 activate UI
 U ->> UI : Open "Manual Path Creation"
@@ -1259,7 +1259,44 @@ App -> User : Show History Page
   caption: [Delete Bike Path Sequence Diagram]
 )
 
-
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+*UC15 Browse Community Paths*
+#let browseCommunityPathSequenceDiagram = ```plantuml
+autonumber
+actor "User" as U
+boundary "BBP App " as UI
+boundary "Routing/Map Service" as MAP
+database "BBP Database" as DB
+activate UI
+activate U
+== Open feature ==
+U ->> UI : Open "Find Paths"
+UI -> U : Show search form
+== Submit query ==
+U ->> UI : Enter start + destination
+UI -> DB : fetchPathMetadata(start, destination)
+activate DB
+DB --> UI: paths + metadata
+deactivate DB
+UI -> UI : rankPaths(paths, metadata)
+UI -> MAP : mapPaths(paths)
+activate MAP
+MAP --> UI : map
+deactivate MAP
+UI -> U : Display ranked list and render paths on map
+opt User is authenticated
+  U ->> UI : Select a Path
+  UI -> U : Show “Start Recording” Button
+  U ->> UI : Press “Start Recording” Button
+  UI -> U : Show Automatic Recording Page\nwith selected path displayed on the map
+end
+```
+#figure(
+  browseCommunityPathSequenceDiagram,
+  kind: image,
+  caption: [Browse Community Paths Sequence Diagram]
+)
 
 #pagebreak()
 *[UC13] Browse Community Paths* \

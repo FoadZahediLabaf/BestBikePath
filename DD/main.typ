@@ -781,6 +781,46 @@ deactivate SDCM
 )
 
 #pagebreak()
+*UC8 Manual Obstacle Insertion*
+This sequence diagram shows the flow of messages for the Manual Obstacle Insertion use case. \
+During an active recording session, the authenticated user manually reports an obstacle through the mobile application. The obstacle is associated with the current trip and stored locally together with the trip data. \
+This use case does not interrupt the recording session. \
+#let manualObstacleInsertionSequenceDiagram = ```plantuml
+autonumber
+actor User
+boundary "BBP App" as Frontend
+control "Obstacle Detection Manager" as ODM
+entity "Local Storage" as LS
+activate User
+activate Frontend
+User ->> Frontend: Press 'start' button
+loop Until recording stops
+  ...
+  User ->> Frontend: Press 'add obstacle' button
+  Frontend -> ODM: incrementObastacleCount
+  activate ODM
+  ODM -> LS: incrementObastacleCount
+  deactivate ODM
+  Frontend -> User: Show obstacle confirmation dialog
+  alt User confirms or ignores dialog
+    User ->> Frontend: Press 'confirm' button
+  else User cancels
+    User ->> Frontend: Press 'cancel' button
+    Frontend -> ODM: decrementObastacleCount
+    activate ODM
+    ODM -> LS: decrementObastacleCount
+    deactivate ODM
+  end
+end
+User ->> Frontend: Press 'stop' button
+```
+#figure(
+  manualObstacleInsertionSequenceDiagram,
+  kind: image,
+  caption: [Manual Obstacle Insertion Sequence Diagram]
+)
+
+#pagebreak()
 *[UC6] Start Automatic Recording* \ 
 This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
 An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data. \
@@ -898,23 +938,6 @@ end
   kind: image,
   caption: [Automatic Obstacle Detection Sequence Diagram]
 )
-#pagebreak()
-*[UC7] Manual Obstacle Insertion* \
-This sequence diagram shows the flow of messages for the Manual Obstacle Insertion use case. \
-During an active recording session, the authenticated user manually reports an obstacle through the mobile application. The obstacle is associated with the current trip and stored locally together with the trip data. \
-This use case does not interrupt the recording session. \
-
-#let ManualObstacleInsertionSequenceDiagram = ```plantuml
-title UC7 - Manual Obstacle Insertion
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Obstacle Detection Manager" as ODM
-entity "Local Storage" as LS
-User -> App : Add obstacle
-App -> ODM : registerManualObstacle()
-ODM -> LS : storeObstacle(currentTrip, obstacle)
-ODM --> App : update UI
-```
 
 #figure(
 ManualObstacleInsertionSequenceDiagram,

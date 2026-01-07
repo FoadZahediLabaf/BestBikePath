@@ -1198,62 +1198,67 @@ App -> User: Notify User
 )
 
 #pagebreak()
-*[UC11] Set Bike Path Privacy* \
-This sequence diagram shows the flow of messages for the Set Path Privacy use case. \
-An authenticated user changes the visibility of one of their stored paths by updating its privacy level. The request is forwarded to the Personal Paths Service, which updates the privacy attribute of the selected path in the DBMS. \
-This use case causes a transition of the path visibility state between Public and Private. \
-
-#let SetBikePathPrivacySequenceDiagram = ```plantuml
-title UC11 - Set Bike Path Privacy
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
-control "Personal Paths Service" as PPS
-entity "DBMS" as DBMS
-User -> App : Change privacy setting
-App -> Proxy : updatePrivacy(pathId, visibility)
-Proxy -> GW
-GW -> PPS : updatePrivacy(pathId, visibility)
-PPS -> DBMS : updatePrivacy(pathId, visibility)
-DBMS --> PPS : OK
-PPS --> App : confirmation
-```
-
-#figure(
-SetBikePathPrivacySequenceDiagram,
-  kind: image,
-  caption: [Set Bike Path Privacy Sequence Diagram]
-)
-#pagebreak()
-*[UC12] Delete Bike Path* \
+*UC14 Delete Bike Path* \
 This sequence diagram shows the flow of messages for the Delete Path use case. \
 An authenticated user deletes one of their previously stored paths. After user confirmation, the deletion request is forwarded to the Personal Paths Service, which removes the path from the DBMS. \ 
-
-#let DeleteBikePathSequenceDiagram = ```plantuml
-title UC12 - Delete Bike Path
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
+#let deleteBikePathSequenceDiagram = ```plantuml
+autonumber
+actor "User" as User
+boundary "BBP App " as App
+control "Application Proxy" as AP
+control "API Gateway" as AG
 control "Personal Paths Service" as PPS
-entity "DBMS" as DBMS
-User -> App : Request path deletion
-App -> User : Show confirmation
-User -> App : Confirm
-App -> Proxy : deletePath(pathId)
-Proxy -> GW
-GW -> PPS : deletePath(pathId)
-PPS -> DBMS : deletePath(pathId)
-DBMS --> PPS : OK
-PPS --> App : deletion confirmed
+database "DBMS" as DB
+activate User
+activate App
+User ->> App: Open application
+App -> User: Show History Page 
+App -> AP: getPaths(userId)
+activate AP
+AP -> AG: getPaths(userId)
+activate AG
+AG -> PPS: getPaths(userId)
+activate PPS
+PPS -> DB: getPaths(userId)
+activate DB
+DB --> PPS: 200 OK (userPaths)
+deactivate DB
+PPS -> AG: 200 OK (userPaths)
+deactivate PPS
+AG -> AP: 200 OK (userPaths)
+deactivate AG
+AP -> App: 200 OK (userPaths)
+deactivate AP
+App -> User: Show user paths 
+User ->> App: Select path
+App -> User: Show Detailed view
+User ->> App: Press "delete" button
+App -> User: Show "confirm" button
+User ->> App: Press "confirm" button
+App -> AP: deletePath(pathId)
+activate AP
+AP -> AG: deletePath(pathId)
+activate AG
+AG -> PPS: deletePath(pathId)
+activate PPS
+PPS -> DB: deletePath(pathId)
+activate DB
+DB --> PPS: 200 OK
+deactivate DB
+PPS -> AG: 200 OK
+deactivate PPS
+AG -> AP: 200 OK 
+deactivate AG
+AP -> App: 200 OK
+deactivate AP
+App -> User : Show History Page
 ```
-
 #figure(
-DeleteBikePathSequenceDiagram,
+  deleteBikePathSequenceDiagram,
   kind: image,
   caption: [Delete Bike Path Sequence Diagram]
 )
+
 #pagebreak()
 *[UC13] Browse Community Paths* \
 This sequence diagram shows the flow of messages for the Browse Community Paths use case. \

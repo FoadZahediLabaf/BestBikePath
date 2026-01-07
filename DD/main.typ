@@ -662,14 +662,12 @@ deactivate CP
   caption: [User Sign-Out Sequence Diagram]
 )
 
-
-
 #pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 *UC6 Automatic Recording With Manual Controls* \ 
 This sequence diagram shows the flow of messages for the Manual Pause and Resume use case. \
 During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend motion sensors acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer. \
-This use case causes explicit transitions between Recording and Paused states. \
-
+This use case causes explicit transitions between Recording and Paused states.
 #let automaticRecordingManualControlsSequenceDiagram = ```plantuml
 autonumber
 actor User
@@ -722,16 +720,14 @@ deactivate SDCM
 #figure(
   automaticRecordingManualControlsSequenceDiagram,
   kind: image,
-  caption: [Manual Pause and Resume Sequence Diagram]
+  caption: [Automatic Recording With Manual Controls Sequence Diagram]
 )
-
 #pagebreak()
 *UC7 Automatic Recording With Activity Detection* \
 This sequence diagram shows the flow of messages for the Automatic Pause and Resume use case. \
 During an active recording session, the mobile application monitors the ongoing trip to determine whether the user is currently biking. This monitoring is performed by the Trip Statistics Manager, which evaluates the stream of sensor data provided by the Sensor Data Collection Manager. \
 When a stop is detected, the Trip Statistics Manager triggers the automatic pause of the session by requesting the Sensor Data Collection Manager to suspend acquisition and by pausing the timer shown in the UI. \ When activity is detected again, the Trip Statistics Manager triggers the resumption of acquisition and the UI timer. \
-This use case causes repeated transitions between Recording and Paused states until the user explicitly stops the session.\
-
+This use case causes repeated transitions between Recording and Paused states until the user explicitly stops the session.
 #let automaticRecordingManualActivityDetectionSequenceDiagram = ```plantuml
 autonumber
 actor User
@@ -838,7 +834,6 @@ User ->> Frontend: Press 'stop' button
 This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case. \
 During an active recording session, the Sensor Data Collection Manager samples motion sensor data and forwards it to the Obstacle Detection Manager. The Obstacle Detection Manager analyzes the received sensor stream to detect potential obstacles. \
 When an obstacle is detected, the user is notified through the UI and can confirm or reject it. If the user confirms or does not respond within a timeout, the obstacle is associated with the current trip and stored locally together with the trip data; otherwise it is discarded. The recording continues in any case. \
-
 #let automaticObstacleDetectionSequenceDiagram = ```plantuml
 autonumber
 actor User
@@ -902,7 +897,6 @@ If needed, the service may enrich the stored trip with meteorological informatio
 The path data is then submitted to the Backend through the Application Proxy and the API Gateway. The Path Recording Service stores the trip in the DBMS. 
 The mobile application is notified of success and the path becomes available in the user’s personal history \
 This use case causes the recording state to transition from Recording to Stopped. \
-
 #let stopRecordingSequenceDiagram = ```plantuml
 autonumber
 skinparam SequenceMessageAlign center
@@ -985,6 +979,68 @@ App -> User: Show Homepage
   stopRecordingSequenceDiagram,
   kind: image,
   caption: [Stop Recording Sequence Diagram]
+)
+
+#pagebreak()
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+*UC11 Manual Path Insertion*
+This sequence diagram shows the flow of messages for the Manual Path Insertion use case. \
+An authenticated user manually creates a bike path by specifying a starting point, a destination, and optional intermediate locations through the mobile application. For each inserted location, the application interacts with the Maps API to translate street names into geographic coordinates and to visualize the path on the map. \
+Once the path definition is completed, the user selects the path status and privacy level. The mobile application then submits the manually created path to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the path data in the DBMS, making it available in the user’s personal history. \
+This use case does not involve sensor data acquisition and does not affect the recording state. \
+#let manualPathInserionSequenceDiagram = ```plantuml
+autonumber
+actor "User" as U
+boundary "BBP App " as UI
+boundary "Maps API" as MAP
+control "Application Proxy" as AP
+control "API Gateway" as AG
+control "Path Recording Service" as PRS
+database "BBP Database" as DB
+activate U
+activate UI
+U ->> UI : Open "Manual Path Creation"
+UI -> U : Show form
+loop Until all street segment are inserted
+  U ->> UI : Insert street segment address
+  UI -> MAP : reverseGeocode(streetAddress)
+  activate MAP
+  MAP --> UI : streetLocation
+  deactivate MAP
+  UI -> UI : Store street location
+  UI -> MAP : addLocationToMap(streetLocation)
+  activate MAP
+  MAP -->> UI : updateShownMapArea
+  deactivate MAP
+  UI -> U : Show map with updated area
+end
+U ->> UI : Select path status
+UI -> UI : Store path status
+U ->> UI : Set path privacy
+UI -> UI : Store path privacy
+U ->> UI : Tap "Save"
+UI -> AP : savePath\n(streetLocations, status,\n privacy, date)
+activate AP
+AP -> AG : savePath\n(streetLocations, status,\n privacy, date)
+activate AG
+AG -> PRS : savePath\n(streetLocations, status,\n privacy, date)
+activate PRS
+PRS -> DB : savePath\n(streetLocations, status,\n privacy, date)
+activate DB
+DB --> PRS : 200 OK
+deactivate DB
+PRS --> AG : 200 OK
+deactivate PRS
+AG --> AP : 200 OK
+deactivate AG
+AP --> UI : 200 OK
+deactivate AP
+UI -> U : Show path added to history
+```
+#figure(
+  manualPathInserionSequenceDiagram,
+  kind: image,
+  caption: [Manual Path Insertion Sequence Diagram]
 )
 
 #pagebreak()

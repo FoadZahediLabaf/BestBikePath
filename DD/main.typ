@@ -255,13 +255,14 @@ The KV Server is responsible for managing the KV store and will also be replicat
 *External Servers* \
 The application will also interact with various services hosted externally by third-party providers, such as the Maps Service, the SMTP Server, and the Weather Service.
 
-== Runtime view
+== Runtime view <section-runtime-view>
 This section describes the dynamic behavior of the Best Bike Paths (BBP) system by illustrating the flow of messages exchanged among architectural components for the most relevant use cases defined in the RASD. \
 The runtime view focuses on the main success scenarios and highlights how the system components collaborate to realize the required functionalities. \
 For clarity and consistency with the Software Architecture lectures, the following aspects are intentionally omitted: \
 - authorization and access-control checks;
 - error handling and exceptional flows;
-- caching and optimization mechanisms.
+- caching and optimization mechanisms;
+- firewall-related interactions.
 All sequence diagrams represent only the main execution path. \
 The system frontend is represented exclusively by a Mobile Application (iOS/Android), as specified in the RASD. \
 Each runtime scenario corresponds directly to a use case defined in the RASD. Some use cases are included even when they do not introduce new backend components because they involve critical runtime interactions with device sensors, which are architecturally relevant for the system. \
@@ -1387,8 +1388,8 @@ end
 == Component interfaces
 This section describes the interfaces exposed by the main architectural components introduced in the previous sections. The goal is to clarify how components interact with each other and which services they provide, without entering implementation-specific details. \
 In line with the Software Architecture lectures, interfaces are described at a logical level, focusing on the operations offered by each component and on the type of information that is exchanged. As a result, this section does not define concrete APIs, protocols, or data formats, but rather provides an abstract view of the responsibilities of each interface. \
-All the interfaces presented here are consistent with the runtime interactions illustrated in Section 2.4. 
-The Mobile Application represents the only entry point for user interactions and communicates with the back-end exclusively through the interfaces described below. \
+All the interfaces presented here are consistent with the runtime interactions illustrated in @section-runtime-view. 
+The Mobile App represents the only entry point for user interactions and communicates with the back-end exclusively through the interfaces described below. \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Frontend")
 
@@ -1512,12 +1513,56 @@ MAPS API
 - `addPathToMap(path)`
 - `hasHighways(path)`
 
-
-
-
+#pagebreak()
 == Selected architectural styles and patterns
-Please explain which styles/patterns you used, why, and how
+*Three-Tier Architecture* \
+BBP is deployed using a three-tier architecture that separates the presentation, application, and data layers into distinct tiers, enabling a clear separation of concerns. \
+The presentation tier is handled by the application’s frontend, represented by the mobile BBP application running on the user’s personal device. This tier follows a fat-client model, as it’s responsible not only for rendering the user interface but also for executing supporting operations, such as collecting and preprocessing GPS and sensor data during automatic path recording. \
+The application tier is implemented through a set of backend microservices that encapsulate the system’s core business logic and handle computationally intensive operations, such as path processing, recommendation, and user management.\
+The data tier is responsible exclusively for data persistence and manages the storage of user accounts and bike path information.
+
+*Microservice Architecture* \
+A microservice architecture is adopted for the implementation of the application layer. \
+Compared to a monolithic approach, this architectural style promotes a stronger separation of concerns and improves fault isolation, limiting the propagation of failures that could otherwise impact the entire system if deployed on a monolith. \
+This architecture also enhances scalability, since each microservice can be scaled independently based on its specific workload, improving both reliability and performance.
+A key advantage of this architecture is that the internal implementation of each microservice is hidden during intra-system interactions, since communication occurs exclusively through RESTful APIs, which provide technology-neutral service interfaces.
+
+*Circuit Breakers* \
+A microservice architecture allows for the adoption of circuit breakers to mediate interactions between services and to temporarily block communication when failures are detected. This mechanism improves overall system availability by increasing fault tolerance and preventing cascading failures that could render parts of the application unavailable.
+
+*State Pattern* \
+The State pattern, which is used to model objects that can change behavior based on their internal state, improving code maintainability and readability, will be applied to the obstacle detection and confirmation process, where the state of a detected obstacle determines the system’s behavior and interactions with the user interface.
+
+*Strategy Pattern* \
+The strategy pattern will be used to effectively implement path quality computation, where different strategies are used depending on whether the path is manually inserted, automatically recorded, or aggregated from community data. This allows the system to select the appropriate computation algorithm at runtime without modifying the client code.
+
+
+*Observer Pattern* \
+The observer pattern will be applied on the client side, where components like the Trip Statistics Manager and the Obstacle Detection Manager subscribe to a “Data Recorded” event emitted by the Sensor Data Collection Manager whenever new sensor data is available.
+
+*MVVM* \
+
+The Model–View–ViewModel (MVVM) architectural pattern is adopted on the client side to ensure a clear separation of concerns between the user interface and the application logic. \
+Views are responsible for rendering the UI and forwarding user interactions, while ViewModels expose observable states and commands, handling navigation and presentation logic, and coordinating interactions with the underlying models and backend services. \
+This architecture improves modularity, testability and maintainability. It integrates naturally with reactive and event-driven mechanisms such as the Observer pattern used for sensor data updates.
+
+#pagebreak()
 == Other design decisions
+
+*Cloning* \
+Server instances on the back-end side of the application are appropriately replicated to support scalability as network traffic increases. Each microservice is deployed as multiple independent instances, which can be distributed across different servers to improve availability and fault tolerance. \
+Requests for a specific microservice are routed through a dedicated load balancer, which distributes the incoming traffic among the different service instances according to appropriate load-balancing policies. \
+Infrastructure components such as the API Gateway and the load balancers can also be replicated when required by the system’s load.
+
+*API Gateway* \
+The inclusion of an API Gateway provides several advantages in a microservice-based architecture. It centralizes the handling of incoming network requests, acting as a single entry point that routes traffic to the appropriate microservices.
+It also handles access token validation, reducing duplication of logic across individual services.
+
+*Proxy and Firewall* \
+Backend security is enforced through two components deployed in front of the API Gateway to protect the system from cyberattacks and data leakage. A network firewall mitigates network-level threats, such as Denial-of-Service attacks, while an application proxy provides application-level security by inspecting HTTP/S traffic and blocking malicious requests, including SQL injection attempts and application-layer denial-of-service attacks. This layered security approach can be extended in the future by introducing additional internal security controls, such as firewall between internal components.
+
+*KV Store* \ 
+A KV Store was included to handle short-lived, high-frequency data that does not require relational guarantees such as, in our case, email verification codes. Each entry is associated with a Time-To-Live (TTL), preventing stale or sensitive data from persisting beyond its intended lifetime. Using a KV Store avoids unnecessary loads on the primary relational database.
 
 = User Interface Design
 === User Interfaces

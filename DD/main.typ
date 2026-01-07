@@ -146,7 +146,7 @@ The microservice approach helps mitigate bottlenecks, particularly for computati
 The third tier implements the data layer, primarily responsible for storing bike path information as well as user profiles and account data. To ensure scalability and fault tolerance, both the second and third tiers will be replicated. \
 Communication with external services occurs via REST APIs, while client-server interactions are managed through an API gateway, which routes requests to the appropriate microservices. To prevent bottlenecks, load balancers distribute HTTP/S requests across the replicated servers.
 Security is enforced through an application proxy and a firewall to enforce both application-level and network-level security, respectively. \
-
+The microservice architectural style is adopted to support independent deployment and scalability of backend functionalities such as path browsing and recommendation. The introduction of an API Gateway enables centralized access control and routing, while component replication improves availability for read-intensive operations. These choices are aligned with the expected usage patterns and quality requirements of the system. \
 #figure(
   image("diagrams/architecture.drawio.png"),
   caption: [Architecture Diagram]
@@ -2512,15 +2512,56 @@ D5 .up. PRS
 
 *F6: Manual Insertion* \
 After automatic recording is validated, manual bike path insertion is integrated. This feature allows authenticated users to create paths without relying on sensor data. \
-Testing verifies that users can define a path by specifying locations and metadata, and that the resulting path information is correctly prepared for submission. 
+Testing verifies that users can define a path by specifying locations and metadata, and that the resulting path information is correctly prepared for submission. \
+Since we already tested the needed components the diagram remains unchanged.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 *F7: Personal Path Browsing* \
 Once path creation functionalities are available, personal path browsing is integrated. This feature introduces interaction with the backend services responsible for retrieving stored paths. \
 testing confirms that authenticated users can retrieve their personal path history and that the list of paths is correctly returned and displayed.
+
+#let pathBrowsingTestDiagram = ```plantuml
+package Backend {
+    folder "User Management Service" as UMS
+    folder "Path Recording Service" as PRS
+    folder "Path Reccomendation Service" as CPS
+}
+package Frontend {
+    folder "Permission Manager" as PM
+    folder "Trip Statistics Manager" as TSM
+    folder "Permission Manager" as PM
+    folder "Sensor Data Collection Manager" as DCM
+    folder "Obstacle Detection Manager" as ODM
+    folder "Local Storage" as LS
+}
+folder Driver as D1 #LightBlue
+folder Driver as D2 #LightBlue
+folder Driver as D3 #LightBlue
+folder Driver as D4 #LightBlue
+folder Driver as D5 #LightBlue
+folder Driver as D6 #LightBlue
+DCM -down. PM
+TSM -up. LS
+ODM -up. LS
+TSM -up. DCM
+ODM -up. DCM
+D1 .up. UMS
+D2 .up. PM
+D3 .up. TSM
+D4 .up. ODM
+D5 .up. PRS
+D6 .up. CPS
+```
+#figure(
+  pathBrowsingTestDiagram,
+  kind: image,
+  caption: [Personal Path Browsing Test Diagram]
+)
+
 *F8: Bike Path Deletion* \
 After browsing is validated, bike path deletion is integrated. 
 Testing verifies that deletion requests are correctly handled and that removed paths are no longer available in subsequent retrieval operations.
+
 *F9: Privacy State Toggle* \
 The privacy state toggle feature is integrated next. This functionality allows users to change the visibility of their personal paths. \
 testing verifies that privacy updates are correctly propagated to the backend and persistently stored. Changes in visibility are reflected in subsequent operations, such as personal browsing and community path discovery. \

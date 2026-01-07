@@ -2001,12 +2001,134 @@ If the path is not optimal for biking (e.g., it contains a highway), an alert is
 ]
 
 = Requirements Traceability
-Explain how the requirements you have defined in the RASD
-map to the design elements that you have defined in this document.
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+*R1*: The system shall allow an unauthenticated user to create an account. \
+This requirement is fulfilled by the _Mobile App_, which provides the user with the necessary interface for account credential submission, the _User Management Service_, which communicates with the _DBMS_ for the creation of an account, the _KV Store_ to temporarily store the email verification code, and the _SMTP Server_, which sends the email verification code to confirm the user’s identity. \
+
+
+*R2:* The system shall allow an unauthenticated user to sign into the app. \
+This requirement is fulfilled by the _Mobile App_, which provides the user with the necessary interface for account credential submission, and the _User Management Service_, which communicates with the _DBMS_ to verify account ownership and to create the necessary access tokens for authentication. \
+*R3*: The system shall allow an authenticated user to sign out from the app. \
+This requirement is fulfilled by the _Mobile App_, which provides the user with the necessary interface for signing out of their account. \
+
+*R4*: The system shall allow an authenticated user to delete their account. \
+This requirement is fulfilled by the _Mobile App_, which provides the user with the necessary interface for account credential submission, and the _User Management Service_, which communicates with the _DBMS_ to eliminate all data associated with the account. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+*R5*: The system shall request the user’s permission to use a device capability. \
+This requirement is fulfilled by the _Mobile App_, which provides the user with the interface for granting the application with  the necessary privileges for accessing device capabilities, and the _Permission Manager_, which checks with the _Capability Providers_ which permissions have already been granted by the user. \
+
+*R6*: The system shall properly handle user permission denial. \
+This requirement is fulfilled by the _Mobile App_, which provides the user with the interface for manually granting permissions regarding device capabilities, and the _Permission Manager_, which checks with the _Capability Providers_ which permissions have already been granted by the user. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+*Start Recording* \
+
+*R7*: The system shall allow the authenticated user to start the automatic recording mode of a bike path. \
+This requirement is fulfilled by the _Mobile App_, which provides the user with the interface for starting an automatic recording session. \
+
+*R8*: The system shall use the GPS to track the user’s real-time position during the trip. \
+This requirement is fulfilled by the _Sensor Data Collection Manager_, which interacts with the _GPS API_ for collecting the user’s location data. \
+
+*R9*: The system shall use the device’s sensors to collect information about obstacles along the path and the speed of the user. \
+This requirement is fulfilled by the _Sensor Data Collection Manager_, which interacts with the _Gyroscope_ and _Accelerometer_ APIs for collecting the user’s motion data, the _Obstacle Detection Manager_, which analyzes the incoming data to determine whether an obstacle was encountered, and the _Trip Statistics Manager_, which computes real-time statistics about the trip based on the collected data.
+
+*R10*: The system shall display the current trip data (current duration time, map of the path, average speed, top speed, weather conditions, distance covered) while the user is biking. \
+This requirement is fulfilled by the _Mobile App_, which displays the information about the current trip, the _Map Service_, which geocodes locations and displays the path map to the user, the _Sensor Data Collection Manager_, which collects motion and location data from the device’s sensors, the _Trip Statistics Manager_, which computes real-time statistics about the trip based on the collected data, and  the _Weather Service_, which provides meteorological data about the trip.
+
+*R11*: The system shall prompt the user for confirmation of a detected obstacle while biking. \
+This requirement is fulfilled by the _Mobile App_, which visually notifies the user when an obstacle has been detected, the _Sensor Data Collection Manager_, which collects motion data during the trip, and the _Obstacle Detection Manager_,  which computes real-time statistics about the trip based on the collected data.
+
+*R12*: The system shall allow the authenticated user to insert an obstacle manually.
+This requirement is fulfilled by the _Mobile App_, which allows the user to manually insert an obstacle by interacting with the UI during the recording session.
+
+*Stop Recording* \
+
+*R13*: The system shall allow the authenticated user to manually stop the automatic recording of a bike path. \ 
+This requirement is fulfilled by the _Mobile App_, which allows the user to stop the recording session  by interacting with the UI.
+
+*R14*: The system shall stop collecting GPS data once the authenticated user selects “Stop Recording”. 
+This requirement is fulfilled by the _Mobile App_, which allows the user to stop the recording session  by interacting with the UI, and the _Sensor Data Collection Manager_, which terminates the collection of sensor data once the session ends.
+
+*R15*: The system shall stop collecting sensor data once the authenticated user selects “Stop Recording”. \
+This requirement is fulfilled by the _Mobile App_, which allows the user to stop the recording session  by interacting with the UI, and the _Sensor Data Collection Manager_, which terminates the collection of sensor data once the session ends.
+
+*R16*: The system shall compute the status for the recorded path based on the frequency of obstacles. \
+This requirement is fulfilled by the _Personal Paths Service_, which retrieves the user’s paths aloong with their quality status which, for automatically recorded paths, is computed according to the obstacle frequency, and the _Obstacle Detection Manager_, which detects obstacles during the recording of a trip, the _Trip Statistics Manager_, which calculates the total travelled distance,, the _Sensor Data Collection Manager_, which collects motion data during the trip, and the _Mobile App_, which allows the user to manually insert obstacles.
+
+*R17*: The system shall store the path and its associated status in the authenticated user’s personal history. \
+This requirement is fulfilled by the _Path Recording Service_, which stores the incoming paths in the _DBMS_.
+
+*R18*: The system shall cancel the recording if the accuracy of the GPS data drops under a certain threshold (over 10 meters for more than 15 seconds). \
+This requirement is fulfilled by the _Sensor Data Collection Manager_, which collects motion and location data during the trip and verifies its accuracy .
+
+*Pause and Resume* \
+
+*R19*: The system shall automatically pause recording when the authenticated user stops biking. \
+This requirement is fulfilled by the _Mobile App_, which displays a paused timer when the user opens the application while the session is paused, the _Trip Statistics Manager_, which calculates the speed of the user to determine whether the user has stopped biking, and the _Sensor Data Collection Manager_, which collects motion data during the trip. 
+
+*R20*: The system shall automatically resume recording when the authenticated user starts biking. \
+This requirement is fulfilled by the _Mobile App_, which resumes the paused timer when the user starts biking, and the _Sensor Data Collection Manager_, which collects motion data during the trip and determines whether the user is cycling or not. 
+
+*R21*: The system shall allow the user to manually pause the recording. \
+The requirement is fulfilled by the _Mobile App_, which allows the user to manually pause the recording session.
+
+*R22*: The system shall allow the user to manually resume the recording. \
+The requirement is fulfilled by the _Mobile App_, which allows the user to manually resume the recording session.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+*R23:*The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops and defining privacy and a quality status. \
+This requirement is fulfilled by the _Mobile App_, which allows the user to manually create a path by interacting with the UI, the _Map Service_, which geocodes locations and displays the path map to the user, and the _Path Recording Service_, which collects the incoming path data and stores it in the _DBMS_.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+
+*User Bike Path List* \
+*R24*: The system shall display a list of the user’s previously recorded paths in chronological order when accessing their history page. \
+This requirement is fulfilled by the _Mobile App_, which displays the user’s paths, the _Personal Paths Service_, which retrieves all the path data associated with the user’s account, and the _Map Service_, which geocodes locations and displays the path map to the user.
+
+*User Bike Path Detail* \
+*R25*: The system shall display all the collected data of a personal path when the user visits its dedicated page. \
+This requirement is fulfilled by the _Mobile App_, which displays detailed information of a path after the user navigates to the corresponding page, the _Personal Paths Service_, which retrieves detailed information about one of the user’s paths, and the _Map Service_, which geocodes locations and displays the path map to the user.
+
+*R26*: The system shall allow the user to set the privacy status of the path. \
+This requirement is fulfilled by the _Mobile App_, which displays the option to change the privacy status of a path, and the _Personal Paths Service_, which updates the path’s privacy status in the _DBMS_..
+
+*R27*: The system shall allow the user to delete their personal bike paths. \
+This requirement is fulfilled by the _Mobile App_, which displays the option to delete one of the user’s personal paths, and the _Personal Paths Service_, which removes all data associated with the path from the _DBMS_.
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+*R28*: The system shall allow the user to browse publicly available bike paths by specifying a starting point and a destination. \
+This requirement is satisfied by the _Mobile App_, which displays the community paths on a map along with relevant data about their overall quality, the _Path Recommendation Service_, which creates a list of paths with the same starting point and destination specified by the user,  and the _Map Service_, which geocodes locations and displays the path map to the user.
+
+*R29*: The system shall show the user the matching paths, sorting them by their system-computed average quality score (calculated based on the public user path instances). \
+This requirement is satisfied by the _Mobile App_, which displays the community paths on a map along with relevant data about their overall quality, the _Path Recommendation Service_, which computes the aggregated quality score of a path based on the paths submitted by other users, specifically considering the frequency of obstacles along the paths and the recency of the collected data, and the _Map Service_, which geocodes locations and displays the path map to the user.
+
+*R30*: The system shall display for each path the route map along with the system-computed quality score. \
+This requirement is fulfilled by the _Mobile App_, which displays the paths on a map along with their quality score, the _Map Service_, which geocodes locations and displays the path map to the user, and the _Path Recommendation Service_, which computes the overall quality of each path.
+
+*R31*: The system should display an alert badge if a path contains incompatible roads for biking. \
+This requirement is fulfilled by the _Mobile App_, which displays a badge next to a path containing roads incompatible with biking, and the _Map Service_  which indicates whether a road segment within a path is classified as a highway. \
+
+*R32*: The system shall allow the user to select a path as the suggested route for a new automatic recording session. \
+This requirement is fulfilled by the _Mobile App_, which displays to the authenticated user the option to add a path as the suggested route during an automatic recording session, and the _Map Service_, which geocodes locations and displays the path map to the user. \
+
 = Implementation, Integration And Test Plan
-Identify here the order in which you plan
-to implement the subcomponents of your system and the order in which you plan to integrate
-such subcomponents and test the integration.
+
+== Overview
+This section outlines the implementation and testing strategies that will be adopted to deploy the previously described software architecture and verify the correctness of its main functionalities. \
+For the integration of BBP’s core modules, a bottom-up testing strategy will be employed. This strategy involves progressively integrating software components and executing relevant tests to verify the overall stability of the subsystem, allowing for more precise identification of errors.  \
+
+Initially, the components tested in isolation will be those considered less structurally complex and more straightforward in terms of functionality. Their execution and testing will be supported by corresponding drivers that will simulate the necessary dependencies of the tested component. A more detailed description, accompanied by visual diagrams showcasing the testing sequence, will be provided in the following pages. \
+
+The implementation of the BBP software components is assigned to a development team of appropriate size, organized into subgroups of varying sizes and specialties according to the components they are responsible for. Further details regarding workload distribution will be provided in subsequent sections. \
+
+#pagebreak()
+== Implementation Plan
 
 
 = Effort Spent

@@ -881,6 +881,100 @@ deactivate GYR
 )
 
 #pagebreak()
+*UC10 Stop Recording * \
+This sequence diagram shows the flow of messages for the Stop Recording use case. \
+The user stops the recording session and confirms the action. The mobile application requests the services using Sensor Data Collection Manager to terminate sensor acquisition and finalizes the path data. \
+If needed, the service may enrich the stored trip with meteorological information obtained through the Weather API. \
+The path data is then submitted to the Backend through the Application Proxy and the API Gateway. The Path Recording Service stores the trip in the DBMS. 
+The mobile application is notified of success and the path becomes available in the user’s personal history \
+This use case causes the recording state to transition from Recording to Stopped. \
+
+#let stopRecordingSequenceDiagram = ```plantuml
+autonumber
+skinparam SequenceMessageAlign center
+actor User
+boundary "BBP App" as App
+control "Trip Statistics Manager" as TSM
+control "Obstacle Detection Manager" as ODM
+entity "Local Storage" as LS
+control "Sensor Data Collection Manager" as SDCM
+entity "Accelerometer" as ACC
+entity "Gyroscope" as GYR
+boundary "Weather API" as API
+control "Application Proxy" as AP
+control "API Gateway" as AG
+control "Path Recording Service" as PRS
+database "Database" as DB
+activate User
+activate App
+activate TSM
+activate ODM
+activate SDCM
+activate SDCM
+activate ACC
+activate GYR
+User ->> App: Press "stop" button
+App -> User: Request for confirmation
+User ->> App: Press "confirm" button
+App -> TSM: getPerformanceData
+TSM -> LS: getPerformanceData
+activate LS
+LS --> TSM: performanceData
+deactivate LS
+TSM --> App: performanceData
+App -> TSM: stopPerformanceUpdates
+App -> TSM: stopActivityUpdates
+TSM -> SDCM: stopMotionUpdates
+deactivate TSM
+deactivate SDCM
+App -> ODM: getObstacleCount
+ODM -> LS: getObstacleCount
+activate LS
+LS --> ODM: obstacleCount
+deactivate LS
+ODM --> App: obstacleCount
+App -> ODM: stopObstacleDetection
+ODM -> SDCM: stopMotionUpdates
+deactivate ODM
+SDCM -> ACC: stopUpdates
+deactivate ACC
+SDCM -> GYR: stopUpdates
+deactivate GYR
+deactivate SDCM
+App -> API: getWeatherData(location, date)
+alt Meteorological data available
+    activate API
+    API --> App: 200 OK (weatherData)
+else Meteorological data unavailable
+    API --> App: 404 Not Found
+    deactivate API
+end
+App -> App: Compute pathData
+App -> AP: savePath(pathData) 
+activate AP
+AP -> AG: savePath(pathData) 
+activate AG
+AG -> PRS: savePath(pathData) 
+activate PRS
+PRS -> DB: savePath(pathData) 
+activate DB
+DB --> PRS: 200 OK
+deactivate DB
+PRS --> AG: 200 OK
+deactivate PRS
+AG --> AP: 200 OK
+deactivate AG
+AP --> App: 200 OK
+deactivate AP
+App -> User: Show Homepage
+```
+#figure(
+  stopRecordingSequenceDiagram,
+  kind: image,
+  caption: [Stop Recording Sequence Diagram]
+)
+
+#pagebreak()
 *[UC6] Start Automatic Recording* \ 
 This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
 An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data. \
@@ -921,49 +1015,6 @@ end
   StartAutomaticRecordingSequenceDiagram,
   kind: image,
   caption: [Start Automatic Recording Sequence Diagram]
-)
-#pagebreak()
-
-#pagebreak()
-*[UC5] Stop Recording and Save Trip* \
-This sequence diagram shows the flow of messages for the Stop Recording and Save Trip use case. \
-The user stops the recording session and confirms the action. The mobile application requests the Sensor Data Collection Manager to terminate sensor acquisition and finalizes the trip package stored in local storage. \
-The trip package is then submitted to the backend through the Application Proxy and the API Gateway. The Path Recording Service stores the trip in the DBMS. If needed, the service may enrich the stored trip with meteorological information obtained through the Weather API. The mobile application is notified of success and the path becomes available in the user’s personal history \
-This use case causes the recording state to transition from Recording to Stopped. \
-
-#let StopRecordingSaveTripSequenceDiagram = ```plantuml
-title UC5 - Stop Recording and Save Trip
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Sensor Data Collection Manager" as SDCM
-entity "Local Storage" as LS
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
-control "Path Recording Service" as PRS
-entity "DBMS" as DBMS
-entity "Weather API" as WAPI
-User -> App : Tap "Stop Recording"
-App -> User : show confirmation dialog
-User -> App : confirm
-App -> SDCM : stopCollection()
-SDCM --> App : stopped
-App -> LS : finalizeTripPackage()
-App -> Proxy : submitRecordedTrip(tripPackage)
-Proxy -> GW
-GW -> PRS : submitRecordedTrip(tripPackage)
-opt meteorological enrichment if needed
-  PRS -> WAPI : getWeather(tripContext)
-  WAPI --> PRS : weather data
-end
-PRS -> DBMS : storeTrip(userId, tripData)
-DBMS --> PRS : OK
-PRS --> App : confirmation
-```
-
-#figure(
-  StopRecordingSaveTripSequenceDiagram,
-  kind: image,
-  caption: [ Stop Recording and Save Trip Sequence Diagram]
 )
 
 #pagebreak()

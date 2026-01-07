@@ -2255,6 +2255,13 @@ System testing is considered successful when all behaviors defined in the RASD a
 
 
 == Additional Specifications on Testing 
+This section provides additional remarks related to system testing activities. These considerations do not introduce new requirements, but clarify how testing supports the validation of the behaviors defined in the RASD. \
+
+System testing is conducted using representative test data, including valid and invalid credentials, realistic bike path data, and different device permission configurations. This allows the verification of both normal execution scenarios and boundary conditions that may occur during typical usage. \
+Testing also verifies that the system correctly handles incomplete or invalid situations, such as interrupted recording sessions or denied permissions, and that such conditions do not lead to the persistence of inconsistent data. \
+Basic security aspects implied by the requirements are considered during testing, in particular to ensure that protected functionalities are accessible only to authenticated users. \
+
+All testing activities are performed at system level, treating the system as a black box and without making assumptions on internal implementation details. \
 
 = Effort Spent
 

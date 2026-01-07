@@ -1263,7 +1263,7 @@ App -> User : Show History Page
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 *UC15 Browse Community Paths* \
 This sequence diagram shows the flow of messages for the Browse Community Paths use case. \
-A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves public paths from the DBMS, computes a ranking based on quality and freshness, and returns the ranked paths to the mobile application. \
+A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves queries public paths from the DBMS using a sorting predicated that ranks paths based on quality and freshness, and returns the ranked paths to the mobile application. \
 The application visualizes the recommended paths using the Maps API and highlights any incompatible road segments. \
 #let browseCommunityPathSequenceDiagram = ```plantuml
 autonumber
@@ -1307,6 +1307,16 @@ AG --> AP: 200 OK (rankedPaths)
 deactivate AG
 AP --> UI: 200 OK (rankedPaths)
 deactivate AP
+loop
+UI -> MAP : hasHighways(path)
+activate MAP
+MAP -->> UI : true/false
+note over UI, MAP
+  If true the path will display a warning alert
+end note
+deactivate MAP
+end
+deactivate MAP
 UI -> U : Show ranked path list
 U ->> UI : Select a Path
 UI -> MAP : addPathToMap(path)

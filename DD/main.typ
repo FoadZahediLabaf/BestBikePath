@@ -2238,6 +2238,20 @@ Both authenticated and unauthenticated users can access the browsing functionali
 == Component Integration and Testing 
 
 == System Testing 
+System testing is performed to validate that the BBP system, considered as a whole, satisfies the requirements defined in the RASD. \
+
+At this level, the system is treated as a black box, and testing focuses on the externally observable behavior resulting from user interactions with the Mobile App. \
+System tests are derived from the use cases described in the RASD and verify the correct execution of complete end-to-end scenarios, from the mobile client to the back-end services and back. The objective is to ensure that the system behaves as expected under normal operating conditions. \
+In particular, system testing verifies that: \
+- users can correctly register, authenticate, sign out, and delete their accounts; \
+- required device permissions are properly requested and enforced; \
+- automatic bike path recording can be started, paused, resumed, and stopped, and that recordings are cancelled when sensor reliability constraints are violated; \
+- manually inserted paths are correctly submitted and stored; \
+- users can retrieve, manage, and delete their personal bike paths; \
+- community bike paths can be searched, visualized, and are reported as incompatible when necessary. \
+In addition to functional behavior, system testing also verifies constraints implicitly defined by the requirements, such as correct authorization handling, safe management of invalid or incomplete data, and consistent system behavior during common user interactions. \
+System testing is considered successful when all behaviors defined in the RASD are correctly supported at system level and no critical failures are observed during end-to-end execution. \
+
 
 
 == Additional Specifications on Testing 

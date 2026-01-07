@@ -376,6 +376,7 @@ All HTTPS requests attempting to access the BBP infrastructure are first process
 
 *Application Proxy* \
 An application proxy, situated immediately after the firewall, is primarily responsible for applying application-level filtering techniques to incoming HTTPS traffic. By performing deep inspection of requests and responses (after decryption), it can detect and block malicious content, such as SQL injections or malware, and mitigate application-layer DoS attacks through rate-limiting strategies.
+TLS termination occurs at the application proxy, while internal communication uses trusted internal channels.
 
 *API Gateway* \
 The API Gateway is another back-end component that is responsible for receiving HTTP requests and routing them to the corresponding microservices.
@@ -2617,14 +2618,16 @@ D7 .up. CPS
   caption: [Community Path Browsing Test Diagram]
 )
 
-To conclude, the frontend and backend are integrated to ensure that the application operates correctly.
+#heading(level: 4, numbering: none,  outlined: false,  "Final test")
+
+To conclude, the Frontend and Backend are integrated to ensure that the application operates correctly.
 
 #let finalTestDiagram = ```plantuml
 package Backend {
     folder "User Management Service" as UMS
     folder "Path Recording Service" as PRS
     folder "Personal Path Service" as PPS
-    folder "Path Reccomendation Service" as CPS
+    folder "Path Recommendation Service" as CPS
     folder "API Gateway" as AG
     folder "Application Proxy" as AP
 }
@@ -2689,11 +2692,11 @@ All testing activities are performed at system level, treating the system as a b
   table(
     columns: 4,
     table.header([], [*Foad Zahedi Labaf*], [*Lorenzo Fiamingo*], [*Alexander Gabriel Fox*]),
-    [*Section 1*], [], [], [],
-    [*Section 2*], [], [], [],
-    [*Section 3*], [], [], [],
-    [*Section 4*], [], [], [],
-    [*Section 5*], [], [], [],
+    [*Section 1*], [], [4], [6],
+    [*Section 2*], [], [16], [12],
+    [*Section 3*], [], [14], [4],
+    [*Section 4*], [], [4], [],
+    [*Section 5*], [], [5], [],
   ),
   caption: [The number of hours each group member has worked for this document]
 )
@@ -2709,7 +2712,4 @@ All testing activities are performed at system level, treating the system as a b
 - *Xcode* and *SwiftUI* were used to create UI mockups.
 - *ChatGPT* and *Grammarly* were used for grammatical corrections.
 
-
 #show: backmatter.with()
-
-

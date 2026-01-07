@@ -391,11 +391,15 @@ Since the email provided is registered, the user provides credentials and the se
 #let userSignInSequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
+end box
+box "Backend"
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "User Management Service" as UMS
 database "DBMS" as DB
+end box
 activate User
 activate Frontend
 User ->> Frontend: Open account page
@@ -467,11 +471,15 @@ The authenticated user permanently deletes their account. After confirmation, th
 #let accountDeletionSequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
+end box
+box "Backend"
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "User Management Service" as UMS
 database "DBMS" as DB
+end box
 activate User
 activate Frontend
 User ->> Frontend: Open account page
@@ -514,7 +522,9 @@ The authenticated user signs out by removing the locally stored authentication t
 #let userSignOutSequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
+end box
 activate User
 activate Frontend
 User ->> Frontend: Open account page
@@ -555,10 +565,12 @@ If the capability is unavailable, the user can just close the modal and not use 
 #let requestCapabilitySequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
 control "Permission Manager" as PM
 entity "Capability Provider" as CP
 boundary "System Settings" as Settings
+end box
 activate User
 activate Frontend
 Frontend -> Frontend: Needs device capability
@@ -674,11 +686,13 @@ This use case causes explicit transitions between Recording and Paused states.
 #let automaticRecordingManualControlsSequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
 control "Trip Statistics Manager" as TSM
 control "Sensor Data Collection Manager" as SDCM
 entity "Accelerometer" as ACC
 entity "Gyroscope" as GYR
+end box
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
@@ -734,11 +748,13 @@ This use case causes repeated transitions between Recording and Paused states un
 #let automaticRecordingManualActivityDetectionSequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
 control "Trip Statistics Manager" as TSM
 control "Sensor Data Collection Manager" as SDCM
 entity "Accelerometer" as ACC
 entity "Gyroscope" as GYR
+end box
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
@@ -799,9 +815,11 @@ This use case does not interrupt the recording session. \
 #let manualObstacleInsertionSequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
 control "Obstacle Detection Manager" as ODM
 entity "Local Storage" as LS
+end box
 activate User
 activate Frontend
 User ->> Frontend: Press 'start' button
@@ -840,12 +858,14 @@ When an obstacle is detected, the user is notified through the UI and can confir
 #let automaticObstacleDetectionSequenceDiagram = ```plantuml
 autonumber
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as Frontend
 control "Obstacle Detection Manager" as ODM
 control "Sensor Data Collection Manager" as SDCM
 entity "Accelerometer" as ACC
 entity "Gyroscope" as GYR
 entity "Local Storage" as LS
+end box
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
@@ -904,6 +924,7 @@ This use case causes the recording state to transition from Recording to Stopped
 autonumber
 skinparam SequenceMessageAlign center
 actor User
+box "Frontend" #LightBlue
 boundary "BBP App" as App
 control "Trip Statistics Manager" as TSM
 control "Obstacle Detection Manager" as ODM
@@ -911,11 +932,14 @@ entity "Local Storage" as LS
 control "Sensor Data Collection Manager" as SDCM
 entity "Accelerometer" as ACC
 entity "Gyroscope" as GYR
+end box
+box "Backend"
 boundary "Weather API" as API
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "Path Recording Service" as PRS
 database "DBMS" as DB
+end box
 activate User
 activate App
 activate TSM
@@ -994,12 +1018,16 @@ This use case does not involve sensor data acquisition and does not affect the r
 #let manualPathInserionSequenceDiagram = ```plantuml
 autonumber
 actor "User" as U
+box "Frontend" #LightBlue
 boundary "BBP App " as UI
+end box
+box "Backend"
 boundary "Maps API" as MAP
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "Path Recording Service" as PRS
 database "DBMS" as DB
+end box
 activate U
 activate UI
 U ->> UI : Open "Manual Path Creation"
@@ -1059,11 +1087,15 @@ The mobile application then visualizes the retrieved information on the map. \
 #let showUserPathDetailedViewSequenceDiagram = ```plantuml
 autonumber
 actor "User" as User
+box "Frontend" #LightBlue
 boundary "BBP App " as App
+end box
+box "Backend"
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "Personal Paths Service" as PPS
 database "DBMS" as db
+end box
 activate User
 activate App
 User ->> App: Open application
@@ -1125,11 +1157,15 @@ This use case causes a transition of the path visibility state between Public an
 #let setPrivacySequenceDiagram = ```plantuml
 autonumber
 actor "User" as User
+box "Frontend" #LightBlue
 boundary "BBP App " as App
+end box
+box "Backend"
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "Personal Paths Service" as PPS
 database "DBMS" as db
+end box
 activate User
 activate App
 User ->> App: Open application
@@ -1207,11 +1243,15 @@ An authenticated user deletes one of their previously stored paths. After user c
 #let deleteBikePathSequenceDiagram = ```plantuml
 autonumber
 actor "User" as User
+box "Frontend" #LightBlue
 boundary "BBP App " as App
+end box
+box "Backend"
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "Personal Paths Service" as PPS
 database "DBMS" as DB
+end box
 activate User
 activate App
 User ->> App: Open application
@@ -1271,12 +1311,16 @@ The application visualizes the recommended paths using the Maps API and highligh
 #let browseCommunityPathSequenceDiagram = ```plantuml
 autonumber
 actor "User" as U
+box "Frontend" #LightBlue
 boundary "BBP App " as UI
+end box
+box "Backend"
 boundary "Maps API" as MAP
 control "Application Proxy" as AP
 control "API Gateway" as AG
 control "Path Recommendation Service" as PRS
 database "DBMS" as DB
+end box
 activate UI
 activate U
 U ->> UI : Open "Community Bike Paths" browser

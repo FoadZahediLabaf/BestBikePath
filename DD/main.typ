@@ -828,25 +828,53 @@ During an active recording session, the Sensor Data Collection Manager samples m
 When an obstacle is detected, the user is notified through the UI and can confirm or reject it. If the user confirms or does not respond within a timeout, the obstacle is associated with the current trip and stored locally together with the trip data; otherwise it is discarded. The recording continues in any case. \
 
 #let automaticObstacleDetectionSequenceDiagram = ```plantuml
-title UC6 - Automatic Obstacle Detection
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Sensor Data Collection Manager" as SDCM
+autonumber
+actor User
+boundary "BBP App" as Frontend
 control "Obstacle Detection Manager" as ODM
+control "Sensor Data Collection Manager" as SDCM
+entity "Accelerometer" as ACC
+entity "Gyroscope" as GYR
 entity "Local Storage" as LS
-loop While recording session is active
-  SDCM -> ODM : provideData(stream)
-  ODM -> ODM : detectObstacle()
-  alt obstacle detected
-    ODM -> App : showConfirmationAlert()
-    alt confirmed or timeout
-      ODM -> LS : storeObstacle(currentTrip, obstacle)
-      ODM -> App : updateObstacleCountUI()
-    else rejected
-      ODM -> App : discardObstacle()
+activate User
+activate Frontend
+User ->> Frontend: Press "start" button
+Frontend -> ODM: startObstacleDetection
+activate ODM
+ODM -> SDCM: startMotionUpdates
+activate SDCM
+SDCM -> GYR: startUpdates
+activate GYR
+SDCM -> ACC: startUpdates
+activate ACC
+loop Until recording stops
+  ...
+  ACC ->> SDCM: accelerometerData
+  GYR ->> SDCM: gyroData
+  SDCM -> ODM: motionData
+  ODM -> ODM: detectObstacle(motionData)
+  opt Obstacle is detected
+    ODM -> LS: incrementObstacleCount
+    ODM -> Frontend: notifyDetectedObstacle
+    Frontend -> User: Show obstacle confirmation dialog
+    alt User confirms or ignores dialog
+      User ->> Frontend: Press "confirm" button
+    else User cancels
+      User ->> Frontend: Press "cancel" button
+      Frontend -> ODM: decrementObstacleCount
+      ODM -> LS: decrementObstacleCount
     end
   end
 end
+User ->> Frontend: Press "stop" button
+Frontend -> ODM: stopObstacleDetection
+ODM -> SDCM: stopMotionUpdates
+deactivate ODM
+SDCM -> ACC: stopUpdates
+deactivate ACC
+SDCM -> GYR: stopUpdates
+deactivate SDCM
+deactivate GYR
 ```
 #figure(
   automaticObstacleDetectionSequenceDiagram,

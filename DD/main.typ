@@ -2130,6 +2130,18 @@ The implementation of the BBP software components is assigned to a development t
 #pagebreak()
 == Implementation Plan
 
+The implementation of the BBP system is based on the ISO/IEC/IEEE 24748-8 standard, which establishes the requirements for the application of Agile principles within a formal life cycle management framework.
+
+In accordance with ISO/IEC/IEEE 24748-8, the BBP development follows an iterative and incremental life cycle, where the system is realized through a sequence of short development cycles. Each cycle produces a potentially usable increment of the system. This enables continuous verification of requirements, early stakeholder feedback, and progressive refinement.
+
+The implementation strategy combines a thread-based approach, aligned with Agile feature delivery, and a bottom-up integration strategy, as recommended by the standard for managing technical complexity. Feature threads are defined based on the system’s core capabilities (Account Management, Permission Management, Automatic Bike Path Recording, Manual Bike Path Insertion, Personal Hystory Management, Community Bike Path Browsing), each spanning multiple architectural components such as the mobile frontend, sensor management layer, backend services, and data persistence. This ensures that each increment delivers complete functionality rather than isolated components.
+
+At the same time, a bottom-up approach is employed for the realization and integration of shared and low-level components, for example data models, sensor abstractions, persistence mechanisms, shared UI elements.
+These components are implemented and validated early, providing a stable foundation for higher-level feature threads and facilitating integration and testing.
+
+This hybrid strategy is consistent with ISO/IEC/IEEE 24748-8 and supports parallel development activities. Shared components are identified at the beginning of the life cycle to prevent duplication, while iterative integration and continuous testing ensure early detection of defects and controlled system evolution.
+
+
 #let implementationGanttDiagram = ```plantuml
 @startgantt
 Project starts 2025-12-3
@@ -2182,7 +2194,7 @@ Project starts 2025-12-3
 == System Testing 
 
 
-==  Additional Specifications on Testing 
+== Additional Specifications on Testing 
 
 = Effort Spent
 

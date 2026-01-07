@@ -1115,10 +1115,10 @@ end
 )
 
 #pagebreak()
+*UC13 Set Bike Path Privacy* \
 This sequence diagram shows the flow of messages for the Set Path Privacy use case. \
 An authenticated user changes the visibility of one of their stored paths by updating its privacy level. The request is forwarded to the Personal Paths Service, which updates the privacy attribute of the selected path in the DBMS. \
-This use case causes a transition of the path visibility state between Public and Private. \
-*UC13 Set Bike Path Privacy*
+This use case causes a transition of the path visibility state between Public and Private.
 #let setPrivacySequenceDiagram = ```plantuml
 autonumber
 actor "User" as User
@@ -1261,32 +1261,61 @@ App -> User : Show History Page
 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
-*UC15 Browse Community Paths*
+*UC15 Browse Community Paths* \
+This sequence diagram shows the flow of messages for the Browse Community Paths use case. \
+A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves public paths from the DBMS, computes a ranking based on quality and freshness, and returns the ranked paths to the mobile application. \
+The application visualizes the recommended paths using the Maps API and highlights any incompatible road segments. \
 #let browseCommunityPathSequenceDiagram = ```plantuml
 autonumber
 actor "User" as U
 boundary "BBP App " as UI
-boundary "Routing/Map Service" as MAP
-database "BBP Database" as DB
+boundary "Maps API" as MAP
+control "Application Proxy" as AP
+control "API Gateway" as AG
+control "Path Recommendation Service" as PRS
+database "DBMS" as DB
 activate UI
 activate U
-== Open feature ==
-U ->> UI : Open "Find Paths"
+U ->> UI : Open "Community Bike Paths" browser
 UI -> U : Show search form
-== Submit query ==
-U ->> UI : Enter start + destination
-UI -> DB : fetchPathMetadata(start, destination)
+loop Until start and end location are inserted
+  U ->> UI : Insert location address
+  UI -> MAP : reverseGeocode(streetAddress)
+  activate MAP
+  MAP --> UI : streetLocation
+  deactivate MAP
+  UI -> UI : Store street location
+  UI -> MAP : addLocationToMap(streetLocation)
+  activate MAP
+  MAP -->> UI : updateShownMapArea
+  deactivate MAP
+  UI -> U : Show map with updated area
+end
+UI -> AP : fetchPaths\n(startLocation, endLocation)
+activate AP
+AP -> AG : fetchPaths\n(startLocation, endLocation)
+activate AG
+AP -> PRS : fetchPaths\n(startLocation, endLocation)
+activate PRS
+PRS -> DB : queryPaths\n(startLocation, endLocation,\nsortPredicate)
 activate DB
-DB --> UI: paths + metadata
+DB --> PRS: 200 OK (sortedPaths)
 deactivate DB
-UI -> UI : rankPaths(paths, metadata)
-UI -> MAP : mapPaths(paths)
+PRS --> AG: 200 OK (rankedPaths)
+deactivate PRS
+AG --> AP: 200 OK (rankedPaths)
+deactivate AG
+AP --> UI: 200 OK (rankedPaths)
+deactivate AP
+UI -> U : Show ranked path list
+U ->> UI : Select a Path
+UI -> MAP : addPathToMap(path)
 activate MAP
-MAP --> UI : map
+MAP -->> UI : updateShownMapArea
 deactivate MAP
-UI -> U : Display ranked list and render paths on map
+U ->> UI : Confirm Path selection
+UI -> U : Show Path detail
 opt User is authenticated
-  U ->> UI : Select a Path
   UI -> U : Show “Start Recording” Button
   U ->> UI : Press “Start Recording” Button
   UI -> U : Show Automatic Recording Page\nwith selected path displayed on the map
@@ -1299,40 +1328,6 @@ end
 )
 
 #pagebreak()
-*[UC13] Browse Community Paths* \
-This sequence diagram shows the flow of messages for the Browse Community Paths use case. \
-A user searches for bike paths between a starting point and a destination. The Path Recommendation Service retrieves public paths from the DBMS, computes a ranking based on quality and freshness, and returns the ranked paths to the mobile application. \
-The application visualizes the recommended paths using the Maps API and highlights any incompatible road segments. \
-
-#let BrowseCommunityPathsSequenceDiagram = ```plantuml
-title UC13 - Browse Community Paths
-actor User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
-control "Path Recommendation Service" as PRS
-entity "DBMS" as DBMS
-entity "Maps API" as MAPI
-User -> App : Search paths
-App -> Proxy : searchPaths(origin, destination)
-Proxy -> GW
-GW -> PRS : searchPaths(origin, destination)
-PRS -> DBMS : fetchPublicPaths(origin, destination)
-DBMS --> PRS : candidatePaths
-PRS -> PRS : rankPaths()
-PRS --> App : rankedPaths
-App -> MAPI : renderPaths(rankedPaths)
-```
-
-#figure(
-BrowseCommunityPathsSequenceDiagram,
-  kind: image,
-  caption: [Browse Community Paths Sequence Diagram]
-)
-#pagebreak()
-
-
-
 == Component interfaces
 == Selected architectural styles and patterns
 Please explain which styles/patterns you used, why, and how

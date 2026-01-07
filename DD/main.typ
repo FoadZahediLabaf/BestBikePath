@@ -2692,11 +2692,11 @@ All testing activities are performed at system level, treating the system as a b
   table(
     columns: 4,
     table.header([], [*Foad Zahedi Labaf*], [*Lorenzo Fiamingo*], [*Alexander Gabriel Fox*]),
-    [*Section 1*], [], [4], [6],
-    [*Section 2*], [], [16], [12],
-    [*Section 3*], [], [14], [4],
-    [*Section 4*], [], [4], [],
-    [*Section 5*], [], [5], [],
+    [*Section 1*], [2], [2], [6],
+    [*Section 2*], [19], [16], [15],
+    [*Section 3*], [1], [14], [3],
+    [*Section 4*], [1], [2], [3],
+    [*Section 5*], [6], [5], [5],
   ),
   caption: [The number of hours each group member has worked for this document]
 )

@@ -114,7 +114,7 @@ Obstacles can be automatically detected through the device’s motion sensors or
 The following reference materials were used for the preparation of this document:
 - The specification for the 2025/26 Requirement Engineering and Design Project for the Software Engineering II course.
 - The WeBeep slides of the Software Engineering II course.
-- Requirements and Specification Documents from previous years
+- Design Documents from previous years
 - European Union, *General Data Protection Regulation (EU) 2016/679*, 2016.
 - #link("https://www.iso.org/standard/75405.html")[ISO/IEC, *ISO/IEC/IEEE 24748-8:2019 Systems and software engineering -- Life cycle management*, 2019].
 - #link("https://developer.apple.com/design/human-interface-guidelines")[Apple Inc., *Apple Human Interface Guidelines*, online documentation].
@@ -394,6 +394,13 @@ The KV Server is responsible for managing the KV store and will also be replicat
 
 *External Servers* \
 The application will also interact with various services hosted externally by third-party providers, such as the Maps Service, the SMTP Server, and the Weather Service.
+
+#figure(
+  image("diagrams/deployment.drawio.png"),
+  caption: [Deployment Diagram]
+)
+
+#pagebreak()
 
 == Runtime view <section-runtime-view>
 This section describes the dynamic behavior of the Best Bike Paths (BBP) system by illustrating the flow of messages exchanged among architectural components for the most relevant use cases defined in the RASD. \
@@ -2142,6 +2149,31 @@ If the path is not optimal for biking (e.g., it contains a highway), an alert is
 
 = Requirements Traceability
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+This section describes how the requirements defined in the Requirements and Specifications Document are realized by the components presented in Section 2.2. The following table provides a clear mapping between system components and the requirements they contribute to fulfilling.
+
+#figure(
+  table(
+    columns: 2,
+    table.header([*Component*], [*Requirements*]),
+    [Mobile App], [R1 R2 R3 R4 R5 R6 R7 R10 R11 R12 R13 R14 R15 R16 R19 R20 R21 R22 R23 R24 R25 R26 R27 R28 R29 R30 R31 R32],
+    [Permission Manager], [R5 R6],
+    [Sensor Data Collection Manager], [R8 R9 R10 R11 R14 R15 R16 R18 R19 R20],
+    [Trip Statistics Manager], [R9 R10 R16 R19],
+    [Obstacle Detection Manager], [R9 R11 R16],
+    [User Management Service], [R1 R2 R4],
+    [Path Recording Service], [R17 R23],
+    [Personal Paths Service], [R16 R24 R25 R26 R27],
+    [Path Recommendation Service], [R28 R29 R30],
+    [DBMS], [R1 R2 R4 R17 R23 R24 R25 R26 R27 R29 R30],
+    [KV Store], [R1],
+    [Weather Service], [R10],
+    [Map Service], [R10 R23 R24 R25 R28 R29 R30 R31 R32] ,
+    [SMTP Service], [R1],
+  ),
+  caption: [Component-Requirement Mapping]
+)
+#pagebreak()
+The remainder of this section explains how each requirement is fulfilled by the system components: \
 
 *R1*: The system shall allow an unauthenticated user to create an account. \
 This requirement is fulfilled by the _Mobile App_, which provides the user with the necessary interface for account credential submission, the _User Management Service_, which communicates with the _DBMS_ for the creation of an account, the _KV Store_ to temporarily store the email verification code, and the _SMTP Server_, which sends the email verification code to confirm the user’s identity. \
@@ -2149,6 +2181,7 @@ This requirement is fulfilled by the _Mobile App_, which provides the user with 
 
 *R2:* The system shall allow an unauthenticated user to sign into the app. \
 This requirement is fulfilled by the _Mobile App_, which provides the user with the necessary interface for account credential submission, and the _User Management Service_, which communicates with the _DBMS_ to verify account ownership and to create the necessary access tokens for authentication. \
+
 *R3*: The system shall allow an authenticated user to sign out from the app. \
 This requirement is fulfilled by the _Mobile App_, which provides the user with the necessary interface for signing out of their account. \
 
@@ -2158,7 +2191,7 @@ This requirement is fulfilled by the _Mobile App_, which provides the user with 
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
 *R5*: The system shall request the user’s permission to use a device capability. \
-This requirement is fulfilled by the _Mobile App_, which provides the user with the interface for granting the application with  the necessary privileges for accessing device capabilities, and the _Permission Manager_, which checks with the _Capability Providers_ which permissions have already been granted by the user. \
+This requirement is fulfilled by the _Mobile App_, which provides the user with the interface for granting the application the necessary privileges for accessing device capabilities, and the _Permission Manager_, which checks with the _Capability Providers_ which permissions have already been granted by the user. \
 
 *R6*: The system shall properly handle user permission denial. \
 This requirement is fulfilled by the _Mobile App_, which provides the user with the interface for manually granting permissions regarding device capabilities, and the _Permission Manager_, which checks with the _Capability Providers_ which permissions have already been granted by the user. \
@@ -2197,13 +2230,13 @@ This requirement is fulfilled by the _Mobile App_, which allows the user to stop
 This requirement is fulfilled by the _Mobile App_, which allows the user to stop the recording session  by interacting with the UI, and the _Sensor Data Collection Manager_, which terminates the collection of sensor data once the session ends.
 
 *R16*: The system shall compute the status for the recorded path based on the frequency of obstacles. \
-This requirement is fulfilled by the _Personal Paths Service_, which retrieves the user’s paths aloong with their quality status which, for automatically recorded paths, is computed according to the obstacle frequency, and the _Obstacle Detection Manager_, which detects obstacles during the recording of a trip, the _Trip Statistics Manager_, which calculates the total travelled distance,, the _Sensor Data Collection Manager_, which collects motion data during the trip, and the _Mobile App_, which allows the user to manually insert obstacles.
+This requirement is fulfilled by the _Personal Paths Service_, which retrieves the user’s paths along with their quality status which, for automatically recorded paths, is computed according to the obstacle frequency, and the _Obstacle Detection Manager_, which detects obstacles during the recording of a trip, the _Trip Statistics Manager_, which calculates the total travelled distance,, the _Sensor Data Collection Manager_, which collects motion data during the trip, and the _Mobile App_, which allows the user to manually insert obstacles.
 
 *R17*: The system shall store the path and its associated status in the authenticated user’s personal history. \
 This requirement is fulfilled by the _Path Recording Service_, which stores the incoming paths in the _DBMS_.
 
 *R18*: The system shall cancel the recording if the accuracy of the GPS data drops under a certain threshold (over 10 meters for more than 15 seconds). \
-This requirement is fulfilled by the _Sensor Data Collection Manager_, which collects motion and location data during the trip and verifies its accuracy .
+This requirement is fulfilled by the _Sensor Data Collection Manager_, which collects motion and location data during the trip and verifies its accuracy.
 
 *Pause and Resume* \
 
@@ -2221,21 +2254,21 @@ The requirement is fulfilled by the _Mobile App_, which allows the user to manua
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
-*R23:*The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops and defining privacy and a quality status. \
+*R23:*The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops, and defining privacy and a quality status. \
 This requirement is fulfilled by the _Mobile App_, which allows the user to manually create a path by interacting with the UI, the _Map Service_, which geocodes locations and displays the path map to the user, and the _Path Recording Service_, which collects the incoming path data and stores it in the _DBMS_.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
 *User Bike Path List* \
 *R24*: The system shall display a list of the user’s previously recorded paths in chronological order when accessing their history page. \
-This requirement is fulfilled by the _Mobile App_, which displays the user’s paths, the _Personal Paths Service_, which retrieves all the path data associated with the user’s account, and the _Map Service_, which geocodes locations and displays the path map to the user.
+This requirement is fulfilled by the _Mobile App_, which displays the user’s paths, the _Personal Paths Service_, which retrieves all the path data associated with the user’s account from the _DBMS_, and the _Map Service_, which geocodes locations and displays the path map to the user.
 
 *User Bike Path Detail* \
 *R25*: The system shall display all the collected data of a personal path when the user visits its dedicated page. \
-This requirement is fulfilled by the _Mobile App_, which displays detailed information of a path after the user navigates to the corresponding page, the _Personal Paths Service_, which retrieves detailed information about one of the user’s paths, and the _Map Service_, which geocodes locations and displays the path map to the user.
+This requirement is fulfilled by the _Mobile App_, which displays detailed information of a path after the user navigates to the corresponding page, the _Personal Paths Service_, which retrieves detailed information about one of the user’s paths from the _DBMS_, and the _Map Service_, which geocodes locations and displays the path map to the user.
 
 *R26*: The system shall allow the user to set the privacy status of the path. \
-This requirement is fulfilled by the _Mobile App_, which displays the option to change the privacy status of a path, and the _Personal Paths Service_, which updates the path’s privacy status in the _DBMS_..
+This requirement is fulfilled by the _Mobile App_, which displays the option to change the privacy status of a path, and the _Personal Paths Service_, which updates the path’s privacy status in the _DBMS_.
 
 *R27*: The system shall allow the user to delete their personal bike paths. \
 This requirement is fulfilled by the _Mobile App_, which displays the option to delete one of the user’s personal paths, and the _Personal Paths Service_, which removes all data associated with the path from the _DBMS_.
@@ -2246,18 +2279,18 @@ This requirement is fulfilled by the _Mobile App_, which displays the option to 
 This requirement is satisfied by the _Mobile App_, which displays the community paths on a map along with relevant data about their overall quality, the _Path Recommendation Service_, which creates a list of paths with the same starting point and destination specified by the user,  and the _Map Service_, which geocodes locations and displays the path map to the user.
 
 *R29*: The system shall show the user the matching paths, sorting them by their system-computed average quality score (calculated based on the public user path instances). \
-This requirement is satisfied by the _Mobile App_, which displays the community paths on a map along with relevant data about their overall quality, the _Path Recommendation Service_, which computes the aggregated quality score of a path based on the paths submitted by other users, specifically considering the frequency of obstacles along the paths and the recency of the collected data, and the _Map Service_, which geocodes locations and displays the path map to the user.
+This requirement is satisfied by the _Mobile App_, which displays the community paths on a map along with relevant data about their overall quality, the _Path Recommendation Service_, which computes the aggregated quality score of a path based on the paths submitted by other users, specifically considering the frequency of obstacles along the paths and the recency of the collected data, the _DBMS_, which contains the relevant data for reconstructing the paths and computing the quality score, and the _Map Service_, which geocodes locations and displays the path map to the user.
 
 *R30*: The system shall display for each path the route map along with the system-computed quality score. \
-This requirement is fulfilled by the _Mobile App_, which displays the paths on a map along with their quality score, the _Map Service_, which geocodes locations and displays the path map to the user, and the _Path Recommendation Service_, which computes the overall quality of each path.
+This requirement is fulfilled by the _Mobile App_, which displays the paths on a map along with their quality score, the _DBMS_, which contains the relevant data for reconstructing the paths and computing the quality score, the _Map Service_, which geocodes locations and displays the path map to the user, and the _Path Recommendation Service_, which computes the overall quality of each path.
 
 *R31*: The system should display an alert badge if a path contains incompatible roads for biking. \
-This requirement is fulfilled by the _Mobile App_, which displays a badge next to a path containing roads incompatible with biking, and the _Map Service_  which indicates whether a road segment within a path is classified as a highway. \
+This requirement is fulfilled by the _Mobile App_, which displays a badge next to a path containing roads incompatible with biking, and the _Map Service_, which indicates whether a road segment within a path is classified as a highway. \
 
 *R32*: The system shall allow the user to select a path as the suggested route for a new automatic recording session. \
 This requirement is fulfilled by the _Mobile App_, which displays to the authenticated user the option to add a path as the suggested route during an automatic recording session, and the _Map Service_, which geocodes locations and displays the path map to the user. \
 
-= Implementation, Integration And Test Plan
+= Implementation, Integration, And Test Plan
 
 == Overview
 This section outlines the implementation and testing strategies that will be adopted to deploy the previously described software architecture and verify the correctness of its main functionalities. \
@@ -2280,7 +2313,6 @@ At the same time, a bottom-up approach is employed for the realization and integ
 These components are implemented and validated early, providing a stable foundation for higher-level feature threads and facilitating integration and testing.
 
 This hybrid strategy is consistent with ISO/IEC/IEEE 24748-8 and supports parallel development activities. Shared components are identified at the beginning of the life cycle to prevent duplication, while iterative integration and continuous testing ensure early detection of defects and controlled system evolution.
-
 
 #let implementationGanttDiagram = ```plantuml
 @startgantt
@@ -2332,51 +2364,197 @@ The following section provides a brief overview of the main features offered by 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
 
-*Account Registration* \
+*F1: Account Registration* \
 When users first download the BBP application, they will be greeted with a Sign-up/Sign-in page since they don’t currently have an active authenticated session with the backend.
 The Sign-up feature allows users to register a personal account within BBP by inputting a valid username, password, and email. The latter will be used to verify the authenticity of the user by sending a one-time verification code that must be inserted by the user to complete the account creation process. \
 
-*Sign-in* \
+*F2: Sign-in* \
 If the user already possesses an account but doesn't have a valid session, they may select the Sign-in option, allowing the user to insert their credentials, specifically username and password, and to obtain a new access token, thereby authenticating the users within BBP’s backend servers. \
 
-*Account Deletion* \
+*F3: Account Deletion* \
 The application also allows users to delete their account and all associated data by navigating to their profile page and selecting the corresponding “Delete Account” option. Once the user gives manual confirmation, all personal data, as well as bike path information, both public and private, will be permanently deleted from the BBP database. \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
-*Permission Management* \
+*F4: Permission Management* \
 BBP will prompt the user to obtain the required permissions to access the device’s full capabilities, specifically GPS, motion sensors, and notifications. When confirmation is given, the app will be able to read the necessary information for recording bike paths during an automatic session and also send notifications about paused or cancelled recordings, as well as the detection of obstacles along the followed path. \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
-*Automatic Recording* \
+*F5: Automatic Recording* \
 This feature allows users to initiate automatic recording sessions during which the application collects relevant motion and location data related to their bike trips. During a session, the application may transition between different states based on the interpretation of the collected data. For example, a session is automatically cancelled if the GPS data is deemed too inaccurate to reliably reconstruct the route, or it may be temporarily paused when the user’s velocity falls below a predefined threshold or when manually paused by the user. \
 Throughout the trip, the device detects obstacles along the path by analyzing data collected from the accelerometer and gyroscope. This information is essential for assessing the quality of the bike path. \
 Once the recording session ends, the collected data is processed and stored in the database, and all relevant performance statistics are made available in the corresponding section of the application. \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
-*Manual Insertion* \
+*F6: Manual Insertion* \
 This feature allows users to manually add paths after selecting the corresponding option inside their personal history page. Users can specify a start and destination, a series of intermediary points, and a quality status (e.g., Impassable, Bad, Fair, Good, Optimal). Once all the required data is inserted, the path will be saved in the database and can then be viewed by the user in the corresponding section. \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
-*Personal Path Browsing* \
+*F7: Personal Path Browsing* \
 The application allows authenticated users to access a dedicated history page where their recorded bike paths are displayed. This page presents a chronological list of paths that have been either manually inserted or automatically recorded by the device. Each entry is visualized on a map and accompanied by essential information such as the recording date, total distance, and trip duration.
 When a path is selected, the application displays a detailed view containing additional metrics (if available), including average speed, maximum speed, total active time, meteorological data, and overall path quality. From this view, users may also choose to set the visibility of the bike path to public or private, as well as delete the path from the database. \
 
-*Bike Path Deletion* \
+*F8: Bike Path Deletion* \
 The app allows its users to delete their own personal bike paths at their discretion. In order to delete a personal bike path, the user must navigate to their history page and select the path they wish to delete. When selected, a detailed view of the path will be displayed, as well as the option to delete it.  Once deleted, the path is permanently eliminated from the database. \
 
-*Privacy State Toggle* \
+*F9: Privacy State Toggle* \
 This feature allows users to control the privacy status of their personal bike paths. This option can be accessed within the detailed view of a specific bike path. When switched to public, the path can be viewed by other users when browsing for paths with the same origin and destination, and the collected data will be used to compute the overall quality of the path itself. \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
-*Browsing* \
+*F10: Browsing* \
 Both authenticated and unauthenticated users can access the browsing functionality offered by the BBP application by navigating to the browsing page, where they can input a starting point and destination to view the best possible paths that connect the two points, along with their rank and score. \
 
+#pagebreak()
 == Component Integration and Testing 
+This section describes how the main components of the BBP system are progressively integrated and tested. Integration follows a feature-driven approach, where each functionality is validated by combining the components required for its realization. Already integrated components are reused when introducing new features, ensuring that the system evolves in a controlled and consistent manner. \
+In accordance with the Software Architecture lectures and the reference Design Document provided by the professor, a bottom-up integration strategy is adopted. Basic infrastructure components and shared services are assumed to be available, while external services are treated as black boxes and are not explicitly tested. \
 
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+*F1: Account Registration* \
+The first functionality integrated and tested is account registration. \ This feature involves the interaction between the Mobile Application and the User Management Service. \
+testing at this stage verifies that a new user can successfully create an account by providing valid information, that registration requests are correctly forwarded through the backend infrastructure, and that user data is persistently stored. The correct handling of invalid registration attempts is also observed.\ 
+
+#let accountRegistrationTestDiagram = ```plantuml
+left to right direction
+' external components and interfaces
+'component "Weather Service" as ws 
+component "SMTP Service" as smtp <<driver>>
+'component "Maps Service" as ms  
+'interface "Weatheri" as wi 
+interface "Mail I" as mi 
+'interface "Map I" as mapi
+smtp -left- mi 
+'ms -- mapi 
+'ws -- wi
+component "Frontend" {
+    'component "Trip Statistics Manager" as TSM
+    'component "Permission Manager" as PM
+    'component "Local Storage" as LS
+    'component "Sensor Data Collection Manager" as DCM
+    'component "Obstacle Detection Manager" as ODM
+    'interface "SensorData I" as SensorData
+    'interface "ObstacleEvents I" as ObstacleEvents
+    'interface "PermissionState I" as PermissionState
+    'interface "Storage I" as StorageI
+    'interface "RawData I" as RawData
+    'ODM - ObstacleEvents
+    'DCM -- RawData
+    'PM  -- PermissionState
+    'LS  -- StorageI
+    'DCM ..> PermissionState: use
+    'TSM ..> PermissionState: use
+    'ODM ..> PermissionState: use
+    'DCM -..> SensorData: use
+    'ODM ..> RawData: use
+    'TSM ..> RawData: use
+    'ODM ..> StorageI: use
+    'TSM ..> StorageI: use
+}
+'package "Device Hardware" {
+    'component GPS
+    'component Gyroscope
+    'component Accelerometer
+    'interface SensorData
+    'GPS -- SensorData
+    'Gyroscope - SensorData
+    'Accelerometer - SensorData
+'}
+component "Backend" {
+    component "User Management Service" as ums 
+    'component "Personal Paths Service" as pps 
+    'component "Path Recommendation Service" as prs 
+    'component "Path Recording Service" as recs 
+    component "DBMS" as db 
+    component "KV Store" as kv
+    component "API Gateway" as gate 
+    interface "auth I" as useri 
+    interface "DBMS I" as dbi 
+    'interface "Paths I" as pathsi 
+    'interface "Recommend I" as ri
+    'interface "Recording I" as reci 
+    interface "API I" as apii
+    interface "KV I" as kvi
+    ' interface providers
+    ums -up- useri 
+    db -up- dbi
+    'pps -- pathsi
+    'recs -- reci 
+    'prs -- ri
+    gate -up- apii
+    kv -up- kvi
+    ' connections with gateway
+    gate ..> useri : use
+    'gate ..> pathsi : use
+    'gate ..> reci : use
+    'gate ..> ri : use
+    '  dbms usage
+    ums ..> dbi: use 
+    'prs ..> dbi: use
+    'pps ..> dbi: use
+    'recs ..> dbi: use
+    'kv usage
+    ums ..> kvi: use
+    ' connections with external components
+    'Frontend -..> wi: use
+    ums -..> mi: use
+    'pps -..> mapi: use 
+    'prs -..> mapi: use 
+    port p1
+    p1 -..> apii
+}
+Frontend -..> p1: use
+```
+#figure(
+  accountRegistrationTestDiagram,
+  kind: image,
+  caption: [Account Registration Test Diagram]
+)
+
+*F2: Sign-in* \
+For this function we verify that a new user can successfully create an account by providing valid information and that user data is persistently stored.
+
+*F3: Account Deletion* \
+The account deletion feature is integrated after authentication mechanisms are available. This functionality verifies that an authenticated user can permanently remove their account and all associated data. \
+testing confirms that deletion requests are correctly propagated to the User Management Service and that user-related data is removed from the database.
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+*F4: Permission Management* \
+Permission management is integrated next, as it is a prerequisite for accessing device capabilities required by recording functionalities. \
+Testing focuses on verifying that the Mobile Application correctly checks the availability of required permissions and reacts appropriately to different authorization states. Scenarios where permissions are granted, denied, or unavailable are observed.
+This step ensures that subsequent features relying on device sensors can be safely integrated. \
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+*F5: Automatic Recording* \
+Once permission handling is validated, automatic bike path recording is integrated. This feature involves several client-side components, including sensor data collection, statistics computation, obstacle detection, and local storage. \
+testing verifies that recording sessions can be started, paused, resumed, and stopped correctly. During this phase, the correct coordination between client-side components is observed, ensuring that sensor data is collected consistently and that a complete trip representation can be produced at the end of the session. \
+Since interaction with backend services is not yet required, the client-side logic can be validated independently. \
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+*F6: Manual Insertion* \
+After automatic recording is validated, manual bike path insertion is integrated. This feature allows authenticated users to create paths without relying on sensor data. \
+Testing verifies that users can define a path by specifying locations and metadata, and that the resulting path information is correctly prepared for submission. 
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+*F7: Personal Path Browsing* \
+Once path creation functionalities are available, personal path browsing is integrated. This feature introduces interaction with the backend services responsible for retrieving stored paths. \
+testing confirms that authenticated users can retrieve their personal path history and that the list of paths is correctly returned and displayed.
+*F8: Bike Path Deletion* \
+After browsing is validated, bike path deletion is integrated. 
+Testing verifies that deletion requests are correctly handled and that removed paths are no longer available in subsequent retrieval operations.
+*F9: Privacy State Toggle* \
+The privacy state toggle feature is integrated next. This functionality allows users to change the visibility of their personal paths. \
+testing verifies that privacy updates are correctly propagated to the backend and persistently stored. Changes in visibility are reflected in subsequent operations, such as personal browsing and community path discovery. \
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+*F10: Browsing* \
+The final feature integrated is community bike path browsing. This step introduces the Path Recommendation Service.
+Integration testing verifies that users can search for paths between two locations and receive a ranked list of public paths. This feature reuses several previously integrated components.
+At the end of this step, all core functionalities of the system are integrated and verified, providing a solid foundation for the system-level testing activities described in the following section. \
+#pagebreak()
 == System Testing 
 System testing is performed to validate that the BBP system, considered as a whole, satisfies the requirements defined in the RASD. \
 
@@ -2393,7 +2571,7 @@ In addition to functional behavior, system testing also verifies constraints imp
 System testing is considered successful when all behaviors defined in the RASD are correctly supported at system level and no critical failures are observed during end-to-end execution. \
 
 
-
+#pagebreak()
 == Additional Specifications on Testing 
 This section provides additional remarks related to system testing activities. These considerations do not introduce new requirements, but clarify how testing supports the validation of the behaviors defined in the RASD. \
 
@@ -2422,6 +2600,7 @@ All testing activities are performed at system level, treating the system as a b
 
 - *Typst* language and its online editor were used to build this document.
 - *PlantUML* was used to define and create diagrams.
+- *Draw.io* was used for the realization of architecture and deployment diagrams
 - *Alloy* was used for formal modeling and analysis.
 - *GitHub* was used for version control and to automate diagram generation.
 - *Google Docs* was used for collaborative writing.

@@ -407,7 +407,7 @@ The application will also interact with various services hosted externally by th
 This section describes the dynamic behavior of the Best Bike Paths (BBP) system by illustrating the flow of messages exchanged among architectural components for the most relevant use cases defined in the RASD. \
 The runtime view focuses on the main success scenarios and highlights how the system components collaborate to realize the required functionalities. \
 For clarity and consistency with the Software Architecture lectures, the following aspects are intentionally omitted: \
-- authorization and access-control checks;
+- detailed token validation and access-control checks;
 - error handling and exceptional flows;
 - caching and optimization mechanisms;
 - firewall-related interactions.
@@ -823,7 +823,7 @@ deactivate CP
 #figure(
   requestCapabilitySequenceDiagram,
   kind: image,
-  caption: [User Sign-Out Sequence Diagram]
+  caption: [Request Device Capability Permission Sequence Diagram]
 )
 
 #pagebreak()
@@ -2517,14 +2517,14 @@ Since we already tested the needed components the diagram remains unchanged.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 *F7: Personal Path Browsing* \
-Once path creation functionalities are available, personal path browsing is integrated. This feature introduces interaction with the backend services responsible for retrieving stored paths. \
+Once path creation functionalities are available, personal path browsing is integrated. This feature introduces interaction with the Backend services responsible for retrieving stored paths. \
 testing confirms that authenticated users can retrieve their personal path history and that the list of paths is correctly returned and displayed.
 
 #let pathBrowsingTestDiagram = ```plantuml
 package Backend {
     folder "User Management Service" as UMS
     folder "Path Recording Service" as PRS
-    folder "Path Reccomendation Service" as CPS
+    folder "Personal Path Service" as PPS
 }
 package Frontend {
     folder "Permission Manager" as PM
@@ -2550,7 +2550,7 @@ D2 .up. PM
 D3 .up. TSM
 D4 .up. ODM
 D5 .up. PRS
-D6 .up. CPS
+D6 .up. PPS
 ```
 #figure(
   pathBrowsingTestDiagram,
@@ -2560,17 +2560,62 @@ D6 .up. CPS
 
 *F8: Bike Path Deletion* \
 After browsing is validated, bike path deletion is integrated. 
-Testing verifies that deletion requests are correctly handled and that removed paths are no longer available in subsequent retrieval operations.
+Testing verifies that deletion requests are correctly handled and that removed paths are no longer available in subsequent retrieval operations. \
+Since we already tested the needed components the diagram remains unchanged.
 
 *F9: Privacy State Toggle* \
 The privacy state toggle feature is integrated next. This functionality allows users to change the visibility of their personal paths. \
-testing verifies that privacy updates are correctly propagated to the backend and persistently stored. Changes in visibility are reflected in subsequent operations, such as personal browsing and community path discovery. \
+Testing verifies that privacy updates are correctly propagated to the backend and persistently stored. Changes in visibility are reflected in subsequent operations, such as personal browsing and community path discovery. \
+Since we already tested the needed components the diagram remains unchanged.
+
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
 *F10: Browsing* \
 The final feature integrated is community bike path browsing. This step introduces the Path Recommendation Service.
 Integration testing verifies that users can search for paths between two locations and receive a ranked list of public paths. This feature reuses several previously integrated components.
 At the end of this step, all core functionalities of the system are integrated and verified, providing a solid foundation for the system-level testing activities described in the following section. \
+
+#let communityPathBrowsingTestDiagram = ```plantuml
+package Backend {
+    folder "User Management Service" as UMS
+    folder "Path Recording Service" as PRS
+    folder "Personal Path Service" as PPS
+    folder "Path Reccomendation Service" as CPS
+}
+package Frontend {
+    folder "Permission Manager" as PM
+    folder "Trip Statistics Manager" as TSM
+    folder "Permission Manager" as PM
+    folder "Sensor Data Collection Manager" as DCM
+    folder "Obstacle Detection Manager" as ODM
+    folder "Local Storage" as LS
+}
+folder Driver as D1 #LightBlue
+folder Driver as D2 #LightBlue
+folder Driver as D3 #LightBlue
+folder Driver as D4 #LightBlue
+folder Driver as D5 #LightBlue
+folder Driver as D6 #LightBlue
+folder Driver as D7 #LightBlue
+DCM -down. PM
+TSM -up. LS
+ODM -up. LS
+TSM -up. DCM
+ODM -up. DCM
+D1 .up. UMS
+D2 .up. PM
+D3 .up. TSM
+D4 .up. ODM
+D5 .up. PRS
+D6 .up. PPS
+D7 .up. CPS
+```
+#figure(
+  communityPathBrowsingTestDiagram,
+  kind: image,
+  caption: [Community Path Browsing Test Diagram]
+)
+
 #pagebreak()
 == System Testing 
 System testing is performed to validate that the BBP system, considered as a whole, satisfies the requirements defined in the RASD. \

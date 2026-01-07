@@ -751,12 +751,16 @@ loop Until recording stops
   GYR ->> SDCM: gyroData
   SDCM ->> SDCM: detectActivityChange(accelerometerData, gyrData)
   alt User starts biking
-    SDCM ->> TSM: cycling
+    SDCM ->> TSM: notifyActivityChange('cycling')
+    TSM ->> Frontend: notifyActivityChange('cycling')
+    Frontend -> TSM: startPerformanceUpdates
     Frontend -> Frontend: Resume timer
     Frontend -> User: Show updated UI
     ...
   else User stops biking
-    SDCM ->> TSM: stationary / walking / ...
+    SDCM ->> TSM: notifyActivityChange\n('stationary' / 'walking' / ...)
+    TSM ->> Frontend: notifyActivityChange\n('stationary' / 'walking' / ...)
+    Frontend -> TSM: stopPerformanceUpdates
     Frontend -> Frontend: Pause timer
     Frontend -> User: Show updated UI
     ...
@@ -922,7 +926,6 @@ activate LS
 LS --> TSM: performanceData
 deactivate LS
 TSM --> App: performanceData
-App -> TSM: stopPerformanceUpdates
 App -> TSM: stopActivityUpdates
 TSM -> SDCM: stopMotionUpdates
 deactivate TSM

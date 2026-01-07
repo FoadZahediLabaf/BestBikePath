@@ -112,9 +112,10 @@ Obstacles can be automatically detected through the device’s motion sensors or
 == Reference Documents
 
 The following reference materials were used for the preparation of this document:
+- The Requirement Analysis and Specification Document.
 - The specification for the 2025/26 Requirement Engineering and Design Project for the Software Engineering II course.
 - The WeBeep slides of the Software Engineering II course.
-- Design Documents from previous years
+- Design Document sample provided in WeBeep.
 - European Union, *General Data Protection Regulation (EU) 2016/679*, 2016.
 - #link("https://www.iso.org/standard/75405.html")[ISO/IEC, *ISO/IEC/IEEE 24748-8:2019 Systems and software engineering -- Life cycle management*, 2019].
 - #link("https://developer.apple.com/design/human-interface-guidelines")[Apple Inc., *Apple Human Interface Guidelines*, online documentation].
@@ -2466,6 +2467,7 @@ D2 .up. PM
 )
 
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
 *F5: Automatic Recording* \
 Once permission handling is validated, automatic bike path recording is integrated. This feature involves several client-side components, including sensor data collection, statistics computation, obstacle detection, and local storage. \
 testing verifies that recording sessions can be started, paused, resumed, and stopped correctly. During this phase, the correct coordination between client-side components is observed, ensuring that sensor data is collected consistently and that a complete trip representation can be produced at the end of the session. \
@@ -2474,6 +2476,7 @@ Since interaction with backend services is not yet required, the client-side log
 #let automaticRecordingTestDiagram = ```plantuml
 package Backend {
     folder "User Management Service" as UMS
+    folder "Path Recording Service" as PRS
 }
 package Frontend {
     folder "Permission Manager" as PM
@@ -2487,6 +2490,7 @@ folder Driver as D1 #LightBlue
 folder Driver as D2 #LightBlue
 folder Driver as D3 #LightBlue
 folder Driver as D4 #LightBlue
+folder Driver as D5 #LightBlue
 DCM -down. PM
 TSM -up. LS
 ODM -up. LS
@@ -2496,16 +2500,15 @@ D1 .up. UMS
 D2 .up. PM
 D3 .up. TSM
 D4 .up. ODM
+D5 .up. PRS
 ```
 #figure(
   automaticRecordingTestDiagram,
   kind: image,
-  caption: [Account Registration Test Diagram]
+  caption: [Automatic Recording Test Diagram]
 )
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
-
-
 
 *F6: Manual Insertion* \
 After automatic recording is validated, manual bike path insertion is integrated. This feature allows authenticated users to create paths without relying on sensor data. \

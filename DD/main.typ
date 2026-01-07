@@ -463,33 +463,44 @@ end
 This sequence diagram shows the flow of messages for the Account Deletion use case. \
 The authenticated user permanently deletes their account. After confirmation, the request is forwarded to the User Management Service, which removes the user account and all related data from the DBMS. The user is then returned to an unauthenticated state. \
 
-#let AccountDeletionSequenceDiagram = ```plantuml
+#let accountDeletionSequenceDiagram = ```plantuml
 autonumber
 actor User
 boundary "BBP App" as Frontend
-control "Backend" as Backend
-database "Database" as DB
+control "Application Proxy" as AP
+control "API Gateway" as AG
+control "User Management Service" as UMS
+database "DBMS" as DB
 activate User
 activate Frontend
+User ->> Frontend: Open account page
+Frontend -> User: Show delete account button
 User ->> Frontend: Press delete account button
-Frontend -> User: Show confirmation
+Frontend -> User: Show confirm button
 User ->> Frontend: Press confirm button
-Frontend -> Backend: deleteAccount(email)
-activate Backend
-note over Frontend, Backend
-  Request authenticated
+Frontend -> AP: deleteAccount(email)
+note over Frontend, AP
+  Authenticated request
 end note
-Backend -> DB: deleteAccount(email)
+activate AP
+AP -> AG: deleteAccount(email)
+activate AG
+AG -> UMS: deleteAccount(email)
+activate UMS
+UMS -> DB: deleteAccount(email)
 activate DB
-DB --> Backend: 200 OK (true)
+DB --> UMS: 200 OK (true)
 deactivate DB
-Backend --> Frontend: 200 OK (true)
-deactivate Backend
+UMS --> AG: 200 OK (true)
+deactivate UMS
+AG --> AP: 200 OK (true)
+deactivate AG
+AP --> Frontend: 200 OK (true)
+deactivate AP
 Frontend -> User: Show homepage as unauthenticated user
 ```
-
 #figure(
-AccountDeletionSequenceDiagram,
+  accountDeletionSequenceDiagram,
   kind: image,
   caption: [Account Deletion Sequence Diagram]
 )

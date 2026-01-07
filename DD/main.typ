@@ -509,13 +509,17 @@ This sequence diagram shows the flow of messages for the Sign Out use case. \
 The authenticated user signs out by removing the locally stored authentication token. No interaction with Backend services is required. \
 
 #let userSignOutSequenceDiagram = ```plantuml
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-User -> App : Tap logout
-App -> App : clearLocalToken()
-App -> User : Show unauthenticated state
+autonumber
+actor User
+boundary "BBP App" as Frontend
+activate User
+activate Frontend
+User ->> Frontend: Press logout account button
+Frontend -> User: Show confirmation dialog
+User ->> Frontend: Press confirm button
+Frontend -> Frontend: deleteToken()
+Frontend -> User: Show homepage as unauthenticated user
 ```
-
 #figure(
 userSignOutSequenceDiagram,
   kind: image,

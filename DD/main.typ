@@ -340,8 +340,6 @@ activate KV
 KV --> UMS: 200 OK (email)
 deactivate KV
 UMS -> UMS: checkEmail(email1, email2)
-UMS --> Frontend: 200 OK
-deactivate UMS
 UMS --> AG: 200 OK
 deactivate UMS
 AG --> AP: 200 OK

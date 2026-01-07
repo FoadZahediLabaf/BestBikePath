@@ -2422,8 +2422,8 @@ testing at this stage verifies that a new user can successfully create an accoun
 package Backend {
     folder "User Management Service" as UMS
 }
-folder Driver as D #LightBlue
-D .up. UMS
+folder Driver as D1 #LightBlue
+D1 .up. UMS
 ```
 #figure(
   accountRegistrationTestDiagram,
@@ -2432,31 +2432,56 @@ D .up. UMS
 )
 
 *F2: Sign-in* \
-For this function we verify that a new user can successfully create an account by providing valid information and that user data is persistently stored.
+For this function we verify that a new user can successfully create an account by providing valid information and that user data is persistently stored.\
 Since we already tested the needed components the diagram remains unchanged.
 
 *F3: Account Deletion* \
 The account deletion feature is integrated after authentication mechanisms are available. This functionality verifies that an authenticated user can permanently remove their account and all associated data. \
 testing confirms that deletion requests are correctly propagated to the User Management Service and that user-related data is removed from the database.
+Since we already tested the needed components the diagram remains unchanged.
+
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
 *F4: Permission Management* \
 Permission management is integrated next, as it is a prerequisite for accessing device capabilities required by recording functionalities. \
 Testing focuses on verifying that the Mobile Application correctly checks the availability of required permissions and reacts appropriately to different authorization states. Scenarios where permissions are granted, denied, or unavailable are observed.
 This step ensures that subsequent features relying on device sensors can be safely integrated. \
-#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
 #let permissionManagementTestDiagram = ```plantuml
-component "Best Bike Paths Frontend" {
-top to bottom direction
-  folder "<<driver>>\nTrip Statistics Manager" as TSM
-  component "Permission Manager" as PM
-  folder "<<driver>>\nSensor Data Collection Manager" as DCM
-  folder "<<driver>>\nObstacle Detection Manager" as ODM
- TSM -down. PM
- ODM -down. PM
- DCM -down. PM
+package Backend {
+    folder "User Management Service" as UMS
+}
+package Frontend {
+    folder "Permission Manager" as PM
+}
+folder Driver as D1 #LightBlue
+folder Driver as D2 #LightBlue
+D1 .up. UMS
+D2 .up. PM
 ```
+#figure(
+  permissionManagementTestDiagram,
+  kind: image,
+  caption: [Permission Management Test Diagram]
+)
+
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+#let automaticRecordingTestDiagram = ```plantuml
+top to bottom direction
+  folder "Driver"
+  folder "Permission Manager" as PM
+
+ 
+ driver-down. PM
+
+}
+```
+#figure(
+  permissionManagementTestDiagram,
+  kind: image,
+  caption: [Account Registration Test Diagram]
+)
 #figure(
   permissionManagementTestDiagram,
   kind: image,
@@ -2469,29 +2494,6 @@ testing verifies that recording sessions can be started, paused, resumed, and st
 Since interaction with backend services is not yet required, the client-side logic can be validated independently. \
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
-#let automaticRecordingTestDiagram = ```plantuml
-top to bottom direction
-  folder "Trip Statistics Manager" as TSM
-  component "Permission Manager" as PM
-  folder "Sensor Data Collection Manager" as DCM
-  folder "Obstacle Detection Manager" as ODM
-  folder "Local Storage" as storage
- 
- TSM -down. PM
- ODM -down. PM
- DCM -down. PM
-
- TSM -down. storage
- ODM -down. storage
- DCM -down. storage
-}
- 
-```
-#figure(
-  permissionManagementTestDiagram,
-  kind: image,
-  caption: [Account Registration Test Diagram]
-)
 
 
 *F6: Manual Insertion* \

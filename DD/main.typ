@@ -1046,6 +1046,13 @@ UI -> U : Show path added to history
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 *UC12 Show Detailed view* \
+This sequence diagram shows the flow of messages for the Show Personal History use case. \
+An authenticated user accesses the personal history section of the application. The mobile application requests the list of paths associated with the user through the Application Proxy and the API Gateway. \
+The Personal Paths Service retrieves the list of stored paths from the DBMS and returns it to the mobile application, which displays the paths to the user. \
+This use case only involves read operations and does not modify stored data.\
+This sequence diagram shows the flow of messages for the Show Path Detailed View use case. \
+After selecting a path from the personal history, the user requests detailed information about the selected path. The mobile application forwards the request to the Personal Paths Service, which retrieves the complete path data from the DBMS, including coordinates, statistics, obstacles, and associated metadata. \
+The mobile application then visualizes the retrieved information on the map. \
 #let showUserPathDetailedViewSequenceDiagram = ```plantuml
 autonumber
 actor "User" as User
@@ -1066,13 +1073,13 @@ AG -> PPS: getPaths(userId)
 activate PPS
 PPS -> db: getPaths(userId)
 activate db
-db --> PPS: userPaths
+db --> PPS: 200 OK (userPaths)
 deactivate db
-PPS -> AG: userPaths
+PPS -> AG: 200 OK (userPaths)
 deactivate PPS
-AG -> AP: userPaths
+AG -> AP: 200 OK (userPaths)
 deactivate AG
-AP -> App: userPaths
+AP -> App: 200 OK (userPaths)
 deactivate AP
 App -> User: Show user paths 
 User ->> App: Select path
@@ -1085,13 +1092,13 @@ AG -> PPS: getUserPathDetails(userPathId)
 activate PPS
 PPS -> db: getUserPathDetails(userPathId)
 activate db
-db --> PPS: userPathDetail
+db --> PPS: 200 OK (userPathDetail)
 deactivate db
-PPS -> AG: userPathDetail
+PPS -> AG: 200 OK (userPathDetail)
 deactivate PPS
-AG -> AP: userPathDetail
+AG -> AP: 200 OK (userPathDetail)
 deactivate AG
-AP -> App: userPathDetail
+AP -> App: 200 OK (userPathDetail)
 deactivate AP
 App -> User: Show Path Details
 opt Performance data available
@@ -1108,108 +1115,89 @@ end
 )
 
 #pagebreak()
-*[UC6] Start Automatic Recording* \ 
-This sequence diagram shows the flow of messages for the Start Automatic Recording use case. \
-An authenticated user starts a new recording session through the mobile application. The Permission Manager verifies that access to GPS, gyroscope, and accelerometer has been granted. Once permissions are available, the Sensor Data Collection Manager starts the acquisition of raw sensor data. \
-During the recording, the Sensor Data Collection Manager samples data periodically and provides it to the Trip Statistics Manager, which computes real-time statistics (e.g., speed and distance) shown in the user interface. The same collected stream is also provided to the Obstacle Detection Manager to support obstacle detection during the trip. Collected trip data is stored locally until the session ends. \
-This use case causes the recording state to transition from Stopped to Recording. \
-
-#let StartAutomaticRecordingSequenceDiagram = ```plantuml
-title UC2 - Start Automatic Recording
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Permission Manager" as PM
-control "Sensor Data Collection Manager" as SDCM
-control "Trip Statistics Manager" as TSM
-control "Obstacle Detection Manager" as ODM
-entity "Local Storage" as LS
-entity "GPS" as GPS
-entity "Gyroscope" as GYR
-entity "Accelerometer" as ACC
-User -> App : Tap "Start Recording"
-App -> PM : checkPermissions()
-PM --> App : granted
-App -> SDCM : startCollection()
-SDCM -> GPS : startUpdates()
-SDCM -> GYR : startUpdates()
-SDCM -> ACC : startUpdates()
-loop While recording
-  GPS --> SDCM : location sample
-  GYR --> SDCM : angular velocity sample
-  ACC --> SDCM : acceleration sample
-  SDCM -> LS : appendTripData(sample)
-  SDCM -> TSM : provideData(sample)
-  SDCM -> ODM : provideData(sample)
-  TSM --> App : updateUI(stats)
+This sequence diagram shows the flow of messages for the Set Path Privacy use case. \
+An authenticated user changes the visibility of one of their stored paths by updating its privacy level. The request is forwarded to the Personal Paths Service, which updates the privacy attribute of the selected path in the DBMS. \
+This use case causes a transition of the path visibility state between Public and Private. \
+*UC13 Set Bike Path Privacy*
+#let setPrivacySequenceDiagram = ```plantuml
+autonumber
+actor "User" as User
+boundary "BBP App " as App
+control "Application Proxy" as AP
+control "API Gateway" as AG
+control "Personal Paths Service" as PPS
+database "DBMS" as db
+activate User
+activate App
+User ->> App: Open application
+App -> User: Show History Page 
+App -> AP: getPaths(userId)
+activate AP
+AP -> AG: getPaths(userId)
+activate AG
+AG -> PPS: getPaths(userId)
+activate PPS
+PPS -> db: getPaths(userId)
+activate db
+db --> PPS: 200 OK (userPaths)
+deactivate db
+PPS -> AG: 200 OK (userPaths)
+deactivate PPS
+AG -> AP: 200 OK (userPaths)
+deactivate AG
+AP -> App: 200 OK (userPaths)
+deactivate AP
+App -> User: Show user paths 
+User ->> App: Select path
+App -> User: Show Detailed view
+alt Publish bike path
+    User ->> App: Set privacy toggle to "On"
+    User ->> App: Press save button
+    App -> AP: setPrivacyStatus(userPath, "Public")
+    activate AP
+    AP -> AG: setPrivacyStatus(userPath, "Public")
+    activate AG
+    AG -> PPS: setPrivacyStatus(userPath, "Public")
+    activate PPS
+    PPS -> db: setPrivacyStatus(userPath, "Public")
+    activate db
+    db --> PPS: 200 OK
+    deactivate db
+    PPS -> AG: 200 OK
+    deactivate PPS
+    AG -> AP: 200 OK
+    deactivate AG
+    AP -> App: 200 OK
+    deactivate AP
+else Unpublish bike path
+    User ->> App: Set privacy toggle to "Off"
+    User ->> App: Press save button
+    App -> AP: setPrivacyStatus(userPath, "Private")
+    activate AP
+    AP -> AG: setPrivacyStatus(userPath, "Private")
+    activate AG
+    AG -> PPS: setPrivacyStatus(userPath, "Private")
+    activate PPS
+    PPS -> db: setPrivacyStatus(userPath, "Private")
+    activate db
+    db --> PPS: 200 OK
+    deactivate db
+    PPS -> AG: 200 OK
+    deactivate PPS
+    AG -> AP: 200 OK
+    deactivate AG
+    AP -> App: 200 OK
+    deactivate AP
 end
+App -> User: Notify User
 ```
-
 #figure(
-  StartAutomaticRecordingSequenceDiagram,
+  setPrivacySequenceDiagram,
   kind: image,
-  caption: [Start Automatic Recording Sequence Diagram]
+  caption: [Set Bike Path Privacy Sequence Diagram]
 )
 
 #pagebreak()
-*[UC9] Show Personal History* \
-This sequence diagram shows the flow of messages for the Show Personal History use case. \
-An authenticated user accesses the personal history section of the application. The mobile application requests the list of paths associated with the user through the Application Proxy and the API Gateway. \
-The Personal Paths Service retrieves the list of stored paths from the DBMS and returns it to the mobile application, which displays the paths to the user. \
-This use case only involves read operations and does not modify stored data.\
-
-#let ShowDetailedViewSequenceDiagram = ```plantuml
-title UC9 - Show Personal History
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
-control "Personal Paths Service" as PPS
-entity "DBMS" as DBMS
-User -> App : Open history
-App -> Proxy : getUserPaths(userId)
-Proxy -> GW
-GW -> PPS : getUserPaths(userId)
-PPS -> DBMS : fetchPathsByUser(userId)
-DBMS --> PPS : pathsList
-PPS --> App : pathsList
-```
-
-#figure(
-ShowDetailedViewSequenceDiagram,
-  kind: image,
-  caption: [Show Detailed View Sequence Diagram]
-)
-#pagebreak()
-*[UC10] Show Path Detailed View* \
-This sequence diagram shows the flow of messages for the Show Path Detailed View use case. \
-After selecting a path from the personal history, the user requests detailed information about the selected path. The mobile application forwards the request to the Personal Paths Service, which retrieves the complete path data from the DBMS, including coordinates, statistics, obstacles, and associated metadata. \
-The mobile application then visualizes the retrieved information on the map. \
-#let ShowPathDetailedViewSequenceDiagram = ```plantuml
-title UC10 - Show Path Detailed View
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Application Proxy" as Proxy
-control "API Gateway" as GW
-control "Personal Paths Service" as PPS
-entity "DBMS" as DBMS
-entity "Maps API" as MAPI
-User -> App : Select path
-App -> Proxy : getPathDetails(pathId)
-Proxy -> GW
-GW -> PPS : getPathDetails(pathId)
-PPS -> DBMS : fetchPathDetails(pathId)
-DBMS --> PPS : pathDetails
-PPS --> App : pathDetails
-App -> MAPI : renderPath(pathDetails)
-```
-
-#figure(
-ShowPathDetailedViewSequenceDiagram,
-  kind: image,
-  caption: [Show Path Detailed View Sequence Diagram]
-)
-#pagebreak()
-
 *[UC11] Set Bike Path Privacy* \
 This sequence diagram shows the flow of messages for the Set Path Privacy use case. \
 An authenticated user changes the visibility of one of their stored paths by updating its privacy level. The request is forwarded to the Personal Paths Service, which updates the privacy attribute of the selected path in the DBMS. \

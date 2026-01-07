@@ -1583,8 +1583,10 @@ The user can access the account page by tapping the account button, located in t
 *Unauthenticated Account Page* \
 If the unauthenticated user navigates to the account page a new modal replace the _Community Bike Paths_ one as shown in @ui-account-management-home-account-unhauthenticated. The user can now fill the email text field as in @ui-account-management-home-account-unhauthenticated-filled and submit. 
 
+_Sign Up Flow_ \
 If the email is not registered with an existing user account, the sign up flow starts by showing a text field for verifying the user provided email as in @ui-account-management-account-emailverification. The user fills with the received verification code as in @ui-account-management-account-emailverification-filled and submit. The sign up form in @ui-account-management-account-signup is shown and the user fills it as in @ui-account-management-account-signup-filled. After submitting the form the user is authenticated with their new account and @ui-account-management-home-authenticated is shown.
 
+_Sign In Flow_ \
 If the email is registered with an existing user account, the sign in flow starts by showing a password secure text field for verifying the user credential as in @ui-account-management-account-signin. The user fills with the account password as in @ui-account-management-account-signin-filled and submit. If the password is wrong @ui-account-management-account-signin-wrongpassword is shown. Otherwise, the user is authenticated with their account and @ui-account-management-home-authenticated is shown.
 
 *Authenticated Account Page* \
@@ -1718,21 +1720,21 @@ If the authenticated user navigates to the account page @ui-account-management-a
 When the system needs a capability permission for a feature, for example the user location to record bike path, a sheet modal is shown.
 
 *Not Determined Permission Page* \
-If the capability is available and the user never denied the authorization (from the system dialog), @ui-capability-management-requestcapability-notdetermined is shown.
-Here the user can see what capability the app need to access and why.
-If the user decides to give their permission, the system dialog in @ui-capability-management-requestcapability-notdetermined-systemdialog is shown, and the user can allow the app to user the capability.
-Otherwise the user can close the modal and don't use the app feature.
+If the capability is available and the user never denied the authorization (from the system dialog) @ui-capability-management-requestcapability-notdetermined is shown.
+Here the user can see what capability the app needs to access and why.
+If the user decides to give their permission, the system dialog in @ui-capability-management-requestcapability-notdetermined-systemdialog is shown, and the user can allow the app to use the capability.
+Otherwise the user can close the modal and not use the app feature.
 
 *Denied Permission Page* \
 If the capability is available and the user denied the authorization (from the system dialog) @ui-capability-management-requestcapability-denied is shown.
-Here the user can see what capability the app need to access and why.
+Here the user can see what capability the app needs to access and why.
 If the user decides to give their permission, they must open settings and change the access authorization status manually. 
-Otherwise the user can close the modal and don't use the app feature.
+Otherwise the user can close the modal and not use the app feature.
 
 *Unavailable Permission Page* \
-If the capability is unavailable @ui-capability-management-requestcapability-unavailable is shown. 
-Here the user can see what capability the app need to access and why.
-The user can just close the modal and don't use the app feature.
+If the capability is unavailable, @ui-capability-management-requestcapability-unavailable is shown. 
+Here the user can see what capability the app needs to access and why.
+The user can just close the modal and not use the app feature.
 
 #pagebreak()
 #align(center)[
@@ -1778,30 +1780,29 @@ The user can just close the modal and don't use the app feature.
 When the authenticated user opens the path record page a full-screen map and a modal sheet are shown.
 
 *Idle Recording Page* \
-When the recoding is idle @ui-automatic-path-recording-pathrecording-idle is shown.  \
+When the recoding is idle, @ui-automatic-path-recording-pathrecording-idle is shown.  \
 The map shows the user marker (and a suggested route, if it was selected before).\
-The modal shows a stopwatch, the weather data (if available) and the start button. \
-distance), the pause button and the add obstacle button. \
-The recording can be started manually by the user or automatically by the app when the user start cycling (if motion capability access is available). \
+The modal displays a stopwatch, the weather data (if available), and the start button. \
+The recording can be started manually by the user or automatically by the app when the user starts cycling (if motion capability access is available). \
 
 *Active Recording Page* \
-When the recording is active @ui-automatic-path-recording-pathrecording-active is shown. \
-The map shows the user marker, start marker, and the followed route (and a suggested route, if it was selected before). \
-The modal shows the running stopwatch, the weather data (if available), the performance data (all of them if motion capability access is available, otherwise only distance), the pause button and the add obstacle button. \
+When the recording is active, @ui-automatic-path-recording-pathrecording-active is shown. \
+The map shows the user marker, the start marker, and the followed route (and a suggested route, if it was selected before). \
+The modal shows the running stopwatch, the weather data (if available), the performance data (all of them if motion capability access is available, otherwise only distance), the pause button, and the add obstacle button. \
 The recording can be paused manually by the user or automatically by the app when the user stops cycling (if motion capability access is available). \
-An obstacle can be registered manually by the user or automatically by the app when the device shakes (if motion capability access is available). When an obstacle is registered an alert notification is presented, as in @ui-automatic-path-recording-pathrecording-obstaclealert, to confirm or cancel the obstacle detection, if the notification is ignored the obstacle detection is confirmed.
+An obstacle can be registered manually by the user or automatically by the app when the device shakes (if motion capability access is available). When an obstacle is registered, an alert notification is presented, as in @ui-automatic-path-recording-pathrecording-obstaclealert, to confirm or cancel the obstacle detection. If the notification is ignored, the obstacle detection is confirmed.
 
 *Paused Recording Page* \
-When the recording is paused @ui-automatic-path-recording-pathrecording-paused is shown. \
-The map shows the user marker, start location, and the followed route (and a suggested route, if it was selected before). \
-The modal shows the stopwatch, the weather data (if available), the performance data (all of them if motion capability access is available, otherwise only distance), the resume button, the stop button and the add obstacle button. \
+When the recording is paused, @ui-automatic-path-recording-pathrecording-paused is shown. \
+The map shows the user marker, the start marker, and the followed route (and a suggested route, if it was selected before). \
+The modal shows the stopwatch, the weather data (if available), the performance data (all of them if motion capability access is available, otherwise only distance), the resume button, the stop button, and the add obstacle button. \
 The recording can be resumed manually by the user or automatically by the app when the user starts cycling (if motion capability access is available). \
-An obstacle can be registered manually by the user. When an obstacle is registered an alert notification is presented to confirm or cancel the obstacle detection, if the notification is ignored the obstacle detection is confirmed.
+An obstacle can be registered manually by the user. When an obstacle is registered, an alert notification is presented to confirm or cancel the obstacle detection. If the notification is ignored, the obstacle detection is confirmed.
 
 *Stopped Recording Page* \
-When the recording is paused @ui-automatic-path-recording-pathrecording-paused is shown. \
-The map shows the user marker, start marker, the followed route and end marker. \
-The modal shows the stopwatch, the weather data (if available), the performance data (all of them if motion capability access is available, otherwise only distance), the calculated path road status, the path privacy status toggle and the save button. \
+When the recording is paused, @ui-automatic-path-recording-pathrecording-paused is shown. \
+The map shows the user marker, the start marker, the followed route and the end marker. 
+The modal shows the stopwatch, the weather data (if available), the performance data (all of them if motion capability access is available, otherwise only distance), the calculated path road status, the path privacy status toggle, and the save button.
 
 
 #pagebreak()
@@ -1851,7 +1852,7 @@ The modal shows the stopwatch, the weather data (if available), the performance 
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
-When the authenticated user opens the path insertion page a full-screen map and a modal sheet are shown.
+When the authenticated user opens the path insertion page, a full-screen map and a modal sheet are shown.
 
 The map shows the user marker, the markers of the locations provided by the user, and the route connecting them.
 The modal shows the road status stepper for the path, the path privacy status, a list of the locations composing the route, and a search bar to look up locations.
@@ -1880,14 +1881,14 @@ The modal shows the road status stepper for the path, the path privacy status, a
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
 
-When the authenticated user opens the app and has at least recorded or added one path, the history page is shown has in @ui-personal-path-history-hystory.
+When the authenticated user opens the app and has at least recorded or added one path, the history page is shown as in @ui-personal-path-history-hystory.
 
-When the user selects a path a full-screen map and a modal sheet are shown as in @ui-personal-path-history-history-detail and @ui-personal-path-history-history-detail-fullscreen. \
-The map shows the path route, start marker, end marker and, if the path was added manually, all the locations provided by the user to compose it. \
-The modal shows all the available path information, the path route status stepper (if path was manually added), the path privacy status toggle, the record new path button and the delete button. \
+When the user selects a path, a full-screen map and a modal sheet are shown as in @ui-personal-path-history-history-detail and @ui-personal-path-history-history-detail-fullscreen. \
+The map shows the path route, the start marker, the end marker, and, if the path was added manually, all the markers of the locations provided by the user composing the route. \
+The modal shows all the available path information, the path route status stepper (if the path was manually added), the path privacy status toggle, the "Record New Path" button, and the delete button. \
 When the user edits the path information (with the toggle or the stepper), the confirm button on the trailing section of the modal navigation bar is enabled, as in @ui-personal-path-history-history-detail-edited. \
-When the user starts a new path from here, a bike path recording session begins, with the selected path displayed on the map as a suggested route for the user to follow.
-If the path is not optimal for biking (for example, it contains an highway) an alert is shown.
+When the user starts a new path from here, a bike path recording session begins, with the selected path displayed on the map as a suggested route for the user to follow. \
+If the path is not optimal for biking (e.g., it contains a highway), an alert is displayed.
 
 #pagebreak()
 #align(center)[
@@ -1930,22 +1931,23 @@ If the path is not optimal for biking (for example, it contains an highway) an a
 #pagebreak()
 #heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
 
-When the user is in the home page and tap on the search bar of the _Community Bike Paths_ modal a full-screen map is shown, as in @ui-community-paths-browsing-browsing-focused.
+When the user is on the home page and presses on the search bar of the _Community Bike Paths_ modal, a full-screen map is shown, as in @ui-community-paths-browsing-browsing-focused.
 
 The user enters a start location, as in @ui-community-paths-browsing-browsing-startentered. The map shows the start marker. \
+
 The user enters an end location, as in @ui-community-paths-browsing-browsing-endentered. The map shows the start and end markers, and the confirm button on the trailing section of the modal navigation bar is enabled.
 
 *Community Path List Page* \
 After the user taps the confirm button, the app loads their results in a list, ranked by a path quality score, as in @ui-community-paths-browsing-browsing-list. \
-The list rows display the path route in the map, its quality score and, if the path is not optimal for biking (for example, it contains an highway), an alert is shown.
-When the user selects a path row, the full-screen map shows the path and the confirm button on the trailing section of the modal navigation bar is enabled.
+The list rows display the path route in the map, its quality score, and, if the path is not optimal for biking (e.g., it contains a highway), an alert is shown.
+When the user selects a path row, the full-screen map shows the path, and the confirm button on the trailing section of the modal navigation bar is enabled.
 
 *Community Path Detail Page* \
-When the user taps the confirm button, a modal sheet is shown as in @ui-community-paths-browsing-browsing-detail-authenticated if the user is authenticated, or in @ui-community-paths-browsing-browsing-detail-authenticated if the user is unauthenticated. \
-The map shows the path route, start marker, end marker and, if the path was added manually, all the locations provided by the user to compose it. \
-The modal shows all the publicly available path information and if the user is authenticated the record new path button. \
+When the user taps the confirm button, a modal sheet is shown as in @ui-community-paths-browsing-browsing-detail-authenticated if the user is authenticated, or in @ui-community-paths-browsing-browsing-detail-unauthenticated if the user is unauthenticated. \
+The map shows the path route, the start marker, the end marker, and, if the path was added manually, all the markers of the locations provided by the user composing it. \
+The modal shows all the publicly available path information, and, if the user is authenticated, the "Record New Path" button. \
 When the user starts a new path from here, a bike path recording session begins, with the selected path displayed on the map as a suggested route for the user to follow.
-If the path is not optimal for biking (for example, it contains an highway) an alert is shown.
+If the path is not optimal for biking (e.g., it contains a highway), an alert is shown.
 
 
 #pagebreak()

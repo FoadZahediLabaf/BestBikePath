@@ -284,10 +284,8 @@ The KV store is used to temporarily persist key–value pairs required for short
 
 #let BackendComponentDiagram = ```plantuml
 top to bottom direction
-
 ' frontend
 component "Mobile App" as app 
-
 
 ' external components and interfaces
 component "Weather Service" as ws 
@@ -304,17 +302,20 @@ ws -left- wi
 component "Best Bike Paths Backend"{
 component "User Management Service" as ums 
 component "Personal Paths Service" as pps 
-component "Path Recommendation Service" as prs component "Path Recording Service" as recs 
+component "Path Recommendation Service" as prs 
+component "Path Recording Service" as recs 
 component "DBMS" as db 
+component "KV Store" as kv
 
 component "API Gateway" as gate 
 
-interface "Auth I" as useri 
+interface "auth I" as useri 
 interface "DBMS I" as dbi 
 interface "Paths I" as pathsi 
 interface "Recommend I" as ri
 interface "Recording I" as reci 
 interface "API I" as apii
+interface "KV I" as kvi
 
 ' interface providers
 ums -up- useri 
@@ -322,8 +323,8 @@ db -up- dbi
 pps -up- pathsi
 recs -up- reci 
 prs -up- ri
-
 gate -up- apii
+kv -up- kvi
 
 
 ' connections with gateway
@@ -338,16 +339,20 @@ prs ..> dbi: use
 pps ..> dbi: use
 recs ..> dbi: use
 
+'kv usage
+ums -down-kvi
+
 ' connections with external components
 app -right..> wi: use
 ums -left..> mi: use
 pps -down..> mapi: use 
-prs -down..> mapi: use  
+prs -down..> mapi: use
+
+    
 port p1
 p1 -down..> apii
 app -down.. p1
 app -left..> mi
-}
 ```
 #figure(
   BackendComponentDiagram,

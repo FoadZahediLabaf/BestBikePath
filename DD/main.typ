@@ -670,7 +670,7 @@ This sequence diagram shows the flow of messages for the Manual Pause and Resume
 During an active recording session, the authenticated user may explicitly pause or resume the recording through the UI. When the user pauses, the mobile application requests the Sensor Data Collection Manager to suspend motion sensors acquisition and updates the UI accordingly. When the user resumes, the application requests acquisition to restart and updates the UI timer. \
 This use case causes explicit transitions between Recording and Paused states. \
 
-#let ManualPauseResumeSequenceDiagram = ```plantuml
+#let automaticRecordingManualControlsSequenceDiagram = ```plantuml
 autonumber
 actor User
 boundary "BBP App" as Frontend
@@ -685,25 +685,25 @@ loop Until recording stops
 ...
   alt User presses "resume" button
     User ->> Frontend: Press "resume" button
-    Frontend -> TSM: startMotionUpdates(handler)
+    Frontend -> TSM: startMotionUpdates
     activate TSM
-    TSM -> SDCM: startMotionUpdates(handler)
+    TSM -> SDCM: startMotionUpdates
     activate SDCM
-    SDCM -> GYR: startUpdates(handler)
+    SDCM -> GYR: startUpdates
     activate GYR
-    SDCM -> ACC: startUpdates(handler) 
+    SDCM -> ACC: startUpdates 
     activate ACC
     Frontend -> Frontend: Resume timer
     Frontend -> User: Show updated UI
     ...
   else User presses "pause" button
     User ->> Frontend: Press "pause" button
-    Frontend -> TSM: stopMotionUpdates(handler)
-    TSM -> SDCM: stopMotionUpdates(handler)
+    Frontend -> TSM: stopMotionUpdates
+    TSM -> SDCM: stopMotionUpdates
     deactivate TSM
-    SDCM -> ACC: stopUpdates(handler) 
+    SDCM -> ACC: stopUpdates 
     deactivate ACC
-    SDCM -> GYR: stopUpdates(handler)
+    SDCM -> GYR: stopUpdates
     deactivate GYR
     deactivate SDCM
     Frontend -> Frontend: Pause timer
@@ -715,7 +715,7 @@ end
 User ->> Frontend: Press "Stop Recording" button
 ```
 #figure(
-  ManualPauseResumeSequenceDiagram,
+  automaticRecordingManualControlsSequenceDiagram,
   kind: image,
   caption: [Manual Pause and Resume Sequence Diagram]
 )
@@ -738,19 +738,19 @@ entity "Gyroscope" as GYR
 activate User
 activate Frontend
 User ->> Frontend: Press "start" button
-Frontend -> TSM: startActivityUpdates()
+Frontend -> TSM: startActivityUpdates
 activate TSM
-TSM -> SDCM: startActivityUpdates()
+TSM -> SDCM: startActivityUpdates
 activate SDCM
-SDCM -> GYR: startUpdates()
+SDCM -> GYR: startUpdates
 activate GYR
-SDCM -> ACC: startUpdates() 
+SDCM -> ACC: startUpdates
 activate ACC
 loop Until recording stops
   ...
-  ACC ->> SDCM: accData
-  GYR ->> SDCM: gyrData
-  SDCM ->> SDCM: detectActivityChange(accData, gyrData)
+  ACC ->> SDCM: accelerometerData
+  GYR ->> SDCM: gyroData
+  SDCM ->> SDCM: detectActivityChange(accelerometerData, gyrData)
   alt User starts biking
     SDCM ->> TSM: cycling
     Frontend -> Frontend: Resume timer
@@ -765,12 +765,12 @@ loop Until recording stops
   ...
 end
 User ->> Frontend: Press "Stop Recording" button
-Frontend -> TSM: stopActivityUpdates(handler)
-TSM -> SDCM: stopActivityUpdates(handler)
+Frontend -> TSM: stopActivityUpdates
+TSM -> SDCM: stopActivityUpdates
 deactivate TSM
-SDCM -> ACC: stopUpdates(handler) 
+SDCM -> ACC: stopUpdates 
 deactivate ACC
-SDCM -> GYR: stopUpdates(handler)
+SDCM -> GYR: stopUpdates
 deactivate GYR
 deactivate SDCM
 ```
@@ -781,7 +781,7 @@ deactivate SDCM
 )
 
 #pagebreak()
-*UC8 Manual Obstacle Insertion*
+*UC8 Manual Obstacle Insertion* \
 This sequence diagram shows the flow of messages for the Manual Obstacle Insertion use case. \
 During an active recording session, the authenticated user manually reports an obstacle through the mobile application. The obstacle is associated with the current trip and stored locally together with the trip data. \
 This use case does not interrupt the recording session. \
@@ -818,6 +818,40 @@ User ->> Frontend: Press 'stop' button
   manualObstacleInsertionSequenceDiagram,
   kind: image,
   caption: [Manual Obstacle Insertion Sequence Diagram]
+)
+
+
+#pagebreak()
+*UC9 Automatic Obstacle Detection* \
+This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case. \
+During an active recording session, the Sensor Data Collection Manager samples motion sensor data and forwards it to the Obstacle Detection Manager. The Obstacle Detection Manager analyzes the received sensor stream to detect potential obstacles. \
+When an obstacle is detected, the user is notified through the UI and can confirm or reject it. If the user confirms or does not respond within a timeout, the obstacle is associated with the current trip and stored locally together with the trip data; otherwise it is discarded. The recording continues in any case. \
+
+#let automaticObstacleDetectionSequenceDiagram = ```plantuml
+title UC6 - Automatic Obstacle Detection
+actor "Authenticated User" as User
+boundary "Mobile App" as App
+control "Sensor Data Collection Manager" as SDCM
+control "Obstacle Detection Manager" as ODM
+entity "Local Storage" as LS
+loop While recording session is active
+  SDCM -> ODM : provideData(stream)
+  ODM -> ODM : detectObstacle()
+  alt obstacle detected
+    ODM -> App : showConfirmationAlert()
+    alt confirmed or timeout
+      ODM -> LS : storeObstacle(currentTrip, obstacle)
+      ODM -> App : updateObstacleCountUI()
+    else rejected
+      ODM -> App : discardObstacle()
+    end
+  end
+end
+```
+#figure(
+  automaticObstacleDetectionSequenceDiagram,
+  kind: image,
+  caption: [Automatic Obstacle Detection Sequence Diagram]
 )
 
 #pagebreak()
@@ -905,45 +939,7 @@ PRS --> App : confirmation
   kind: image,
   caption: [ Stop Recording and Save Trip Sequence Diagram]
 )
-#pagebreak()
-*[UC6] Automatic Obstacle Detection* \
-This sequence diagram shows the flow of messages for the Automatic Obstacle Detection use case. \
-During an active recording session, the Sensor Data Collection Manager samples motion sensor data and forwards it to the Obstacle Detection Manager. The Obstacle Detection Manager analyzes the received sensor stream to detect potential obstacles. \
-When an obstacle is detected, the user is notified through the UI and can confirm or reject it. If the user confirms or does not respond within a timeout, the obstacle is associated with the current trip and stored locally together with the trip data; otherwise it is discarded. The recording continues in any case. \
 
-#let AutomaticObstacleDetectionSequenceDiagram = ```plantuml
-title UC6 - Automatic Obstacle Detection
-actor "Authenticated User" as User
-boundary "Mobile App" as App
-control "Sensor Data Collection Manager" as SDCM
-control "Obstacle Detection Manager" as ODM
-entity "Local Storage" as LS
-loop While recording session is active
-  SDCM -> ODM : provideData(stream)
-  ODM -> ODM : detectObstacle()
-  alt obstacle detected
-    ODM -> App : showConfirmationAlert()
-    alt confirmed or timeout
-      ODM -> LS : storeObstacle(currentTrip, obstacle)
-      ODM -> App : updateObstacleCountUI()
-    else rejected
-      ODM -> App : discardObstacle()
-    end
-  end
-end
-```
-
-#figure(
-  AutomaticObstacleDetectionSequenceDiagram,
-  kind: image,
-  caption: [Automatic Obstacle Detection Sequence Diagram]
-)
-
-#figure(
-ManualObstacleInsertionSequenceDiagram,
-  kind: image,
-  caption: [Manual Obstacle Insertion Sequence Diagram]
-)
 #pagebreak()
 *[UC8] Manual Path Insertion* \
 This sequence diagram shows the flow of messages for the Manual Path Insertion use case. \

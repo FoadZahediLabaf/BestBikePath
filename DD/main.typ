@@ -286,7 +286,7 @@ queue "SMTP Server" as SMTP
 activate User
 activate Frontend
 User ->> Frontend: Open account pUMSe
-Frontend -> User: Show email textfield
+Frontend -> User: Show email text field
 User ->> Frontend: Insert email
 Frontend -> AP: userExists(email)
 activate AP

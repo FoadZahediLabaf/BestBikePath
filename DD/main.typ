@@ -2188,6 +2188,52 @@ Project starts 2025-12-3
 )
 
 === Features identification
+The following section provides a brief overview of the main features offered by the BBP application, which will be properly implemented and tested. These functionalities are essential for achieving the objectives previously defined and for translating the requirements outlined in the associated Requirements and Specifications Document into a concrete, functional system. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Account Management")
+
+*Account Registration* \
+When users first download the BBP application, they will be greeted with a Sign-up/Sign-in page since they don’t currently have an active authenticated session with the backend.
+The Sign-up feature allows users to register a personal account within BBP by inputting a valid username, password, and email. The latter will be used to verify the authenticity of the user by sending a one-time verification code that must be inserted by the user to complete the account creation process. \
+
+*Sign-in* \
+If the user already possesses an account but doesn't have a valid session, they may select the Sign-in option, allowing the user to insert their credentials, specifically username and password, and to obtain a new access token, thereby authenticating the users within BBP’s backend servers. \
+
+*Account Deletion* \
+The application also allows users to delete their account and all associated data by navigating to their profile page and selecting the corresponding “Delete Account” option. Once the user gives manual confirmation, all personal data, as well as bike path information, both public and private, will be permanently deleted from the BBP database. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
+
+*Permission Management* \
+BBP will prompt the user to obtain the required permissions to access the device’s full capabilities, specifically GPS, motion sensors, and notifications. When confirmation is given, the app will be able to read the necessary information for recording bike paths during an automatic session and also send notifications about paused or cancelled recordings, as well as the detection of obstacles along the followed path. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
+
+*Automatic Recording* \
+This feature allows users to initiate automatic recording sessions during which the application collects relevant motion and location data related to their bike trips. During a session, the application may transition between different states based on the interpretation of the collected data. For example, a session is automatically cancelled if the GPS data is deemed too inaccurate to reliably reconstruct the route, or it may be temporarily paused when the user’s velocity falls below a predefined threshold or when manually paused by the user. \
+Throughout the trip, the device detects obstacles along the path by analyzing data collected from the accelerometer and gyroscope. This information is essential for assessing the quality of the bike path. \
+Once the recording session ends, the collected data is processed and stored in the database, and all relevant performance statistics are made available in the corresponding section of the application. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+*Manual Insertion* \
+This feature allows users to manually add paths after selecting the corresponding option inside their personal history page. Users can specify a start and destination, a series of intermediary points, and a quality status (e.g., Impassable, Bad, Fair, Good, Optimal). Once all the required data is inserted, the path will be saved in the database and can then be viewed by the user in the corresponding section. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
+*Personal Path Browsing* \
+The application allows authenticated users to access a dedicated history page where their recorded bike paths are displayed. This page presents a chronological list of paths that have been either manually inserted or automatically recorded by the device. Each entry is visualized on a map and accompanied by essential information such as the recording date, total distance, and trip duration.
+When a path is selected, the application displays a detailed view containing additional metrics (if available), including average speed, maximum speed, total active time, meteorological data, and overall path quality. From this view, users may also choose to set the visibility of the bike path to public or private, as well as delete the path from the database. \
+
+*Bike Path Deletion* \
+The app allows its users to delete their own personal bike paths at their discretion. In order to delete a personal bike path, the user must navigate to their history page and select the path they wish to delete. When selected, a detailed view of the path will be displayed, as well as the option to delete it.  Once deleted, the path is permanently eliminated from the database. \
+
+*Privacy State Toggle* \
+This feature allows users to control the privacy status of their personal bike paths. This option can be accessed within the detailed view of a specific bike path. When switched to public, the path can be viewed by other users when browsing for paths with the same origin and destination, and the collected data will be used to compute the overall quality of the path itself. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Community Bike Path Browsing")
+
+*Browsing* \
+Both authenticated and unauthenticated users can access the browsing functionality offered by the BBP application by navigating to the browsing page, where they can input a starting point and destination to view the best possible paths that connect the two points, along with their rank and score. \
 
 == Component Integration and Testing 
 

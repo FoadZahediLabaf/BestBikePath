@@ -188,6 +188,67 @@ The gyroscope is a built-in component of the mobile device on which the app resi
 *Accelerometer* \
 The accelerometer is another hardware component of the user's device and is responsible for providing measurements of the user's acceleration along the three axes in order to determine the speed at which the user is moving and to detect obstacles. The raw acceleration data is sent to the Sensor Data Collection Manager.
 
+#let FrontendComponentDiagram = ```plantuml
+component "Best Bike Paths Frontend" {
+
+  component "Trip Statistics Manager" as TSM
+  component "Permission Manager" as PM
+  component "Local Storage" as LS
+  component "Sensor Data Collection Manager" as DCM
+  component "Obstacle Detection Manager" as ODM
+ 
+  interface "SensorData I" as SensorData
+  interface "ObstacleEvents I" as ObstacleEvents
+  interface "PermissionState I" as PermissionState
+  interface "Storage I" as StorageI
+  interface "RawData I" as RawData
+
+  ODM - ObstacleEvents
+  DCM -left- RawData
+  PM  -up- PermissionState
+  LS  -up- StorageI
+
+  DCM ..> PermissionState
+  TSM ..> PermissionState
+  ODM ..> PermissionState
+
+  DCM -down..> SensorData
+  ODM ..> RawData
+  TSM ..> RawData
+
+    ODM ..> StorageI
+  TSM ..> StorageI
+
+
+}
+
+package "Device Hardware" {
+
+  component GPS
+  component Gyroscope
+  component Accelerometer
+
+  interface SensorData
+
+  GPS -- SensorData
+  Gyroscope - SensorData
+  Accelerometer - SensorData
+}
+
+top to bottom direction
+  component "BBP Backend" as Backend
+  interface API
+  LS ..> API
+  API -down- Backend
+```
+#figure(
+  FrontendComponentDiagram,
+  kind: image,
+  caption: [Frontend Component Diagram]
+)
+
+#pagebreak()
+
 #heading(level: 4, numbering: none,  outlined: false,  "Backend Components")
 
 *User Management Service* \

@@ -1084,13 +1084,13 @@ deactivate AP
 App -> User: Show user paths 
 User ->> App: Select path
 App -> User: Show Detailed view
-App -> AP: getUserPathDetails(userPathId)
+App -> AP: getUserPathDetails(pathId)
 activate AP
-AP -> AG: getUserPathDetails(userPathId)
+AP -> AG: getUserPathDetails(pathId)
 activate AG
-AG -> PPS: getUserPathDetails(userPathId)
+AG -> PPS: getUserPathDetails(pathId)
 activate PPS
-PPS -> db: getUserPathDetails(userPathId)
+PPS -> db: getUserPathDetails(pathId)
 activate db
 db --> PPS: 200 OK (userPathDetail)
 deactivate db
@@ -1153,13 +1153,13 @@ App -> User: Show Detailed view
 alt Publish bike path
     User ->> App: Set privacy toggle to "On"
     User ->> App: Press save button
-    App -> AP: setPrivacyStatus(userPath, "Public")
+    App -> AP: setPrivacyStatus(pathId, "Public")
     activate AP
-    AP -> AG: setPrivacyStatus(userPath, "Public")
+    AP -> AG: setPrivacyStatus(pathId, "Public")
     activate AG
-    AG -> PPS: setPrivacyStatus(userPath, "Public")
+    AG -> PPS: setPrivacyStatus(pathId, "Public")
     activate PPS
-    PPS -> db: setPrivacyStatus(userPath, "Public")
+    PPS -> db: setPrivacyStatus(pathId, "Public")
     activate db
     db --> PPS: 200 OK
     deactivate db
@@ -1172,13 +1172,13 @@ alt Publish bike path
 else Unpublish bike path
     User ->> App: Set privacy toggle to "Off"
     User ->> App: Press save button
-    App -> AP: setPrivacyStatus(userPath, "Private")
+    App -> AP: setPrivacyStatus(pathId, "Private")
     activate AP
-    AP -> AG: setPrivacyStatus(userPath, "Private")
+    AP -> AG: setPrivacyStatus(pathId, "Private")
     activate AG
-    AG -> PPS: setPrivacyStatus(userPath, "Private")
+    AG -> PPS: setPrivacyStatus(pathId, "Private")
     activate PPS
-    PPS -> db: setPrivacyStatus(userPath, "Private")
+    PPS -> db: setPrivacyStatus(pathId, "Private")
     activate db
     db --> PPS: 200 OK
     deactivate db
@@ -1258,6 +1258,8 @@ App -> User : Show History Page
   kind: image,
   caption: [Delete Bike Path Sequence Diagram]
 )
+
+
 
 #pagebreak()
 *[UC13] Browse Community Paths* \

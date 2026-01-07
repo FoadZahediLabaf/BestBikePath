@@ -2419,94 +2419,11 @@ The first functionality integrated and tested is account registration. \ This fe
 testing at this stage verifies that a new user can successfully create an account by providing valid information, that registration requests are correctly forwarded through the backend infrastructure, and that user data is persistently stored. The correct handling of invalid registration attempts is also observed.\ 
 
 #let accountRegistrationTestDiagram = ```plantuml
-left to right direction
-' external components and interfaces
-'component "Weather Service" as ws 
-component "SMTP Service" as smtp <<driver>>
-'component "Maps Service" as ms  
-'interface "Weatheri" as wi 
-interface "Mail I" as mi 
-'interface "Map I" as mapi
-smtp -left- mi 
-'ms -- mapi 
-'ws -- wi
-component "Frontend" {
-    'component "Trip Statistics Manager" as TSM
-    'component "Permission Manager" as PM
-    'component "Local Storage" as LS
-    'component "Sensor Data Collection Manager" as DCM
-    'component "Obstacle Detection Manager" as ODM
-    'interface "SensorData I" as SensorData
-    'interface "ObstacleEvents I" as ObstacleEvents
-    'interface "PermissionState I" as PermissionState
-    'interface "Storage I" as StorageI
-    'interface "RawData I" as RawData
-    'ODM - ObstacleEvents
-    'DCM -- RawData
-    'PM  -- PermissionState
-    'LS  -- StorageI
-    'DCM ..> PermissionState: use
-    'TSM ..> PermissionState: use
-    'ODM ..> PermissionState: use
-    'DCM -..> SensorData: use
-    'ODM ..> RawData: use
-    'TSM ..> RawData: use
-    'ODM ..> StorageI: use
-    'TSM ..> StorageI: use
+package Backend {
+    folder "User Management Service" as UMS
 }
-'package "Device Hardware" {
-    'component GPS
-    'component Gyroscope
-    'component Accelerometer
-    'interface SensorData
-    'GPS -- SensorData
-    'Gyroscope - SensorData
-    'Accelerometer - SensorData
-'}
-component "Backend" {
-    component "User Management Service" as ums 
-    'component "Personal Paths Service" as pps 
-    'component "Path Recommendation Service" as prs 
-    'component "Path Recording Service" as recs 
-    component "DBMS" as db 
-    component "KV Store" as kv
-    component "API Gateway" as gate 
-    interface "auth I" as useri 
-    interface "DBMS I" as dbi 
-    'interface "Paths I" as pathsi 
-    'interface "Recommend I" as ri
-    'interface "Recording I" as reci 
-    interface "API I" as apii
-    interface "KV I" as kvi
-    ' interface providers
-    ums -up- useri 
-    db -up- dbi
-    'pps -- pathsi
-    'recs -- reci 
-    'prs -- ri
-    gate -up- apii
-    kv -up- kvi
-    ' connections with gateway
-    gate ..> useri : use
-    'gate ..> pathsi : use
-    'gate ..> reci : use
-    'gate ..> ri : use
-    '  dbms usage
-    ums ..> dbi: use 
-    'prs ..> dbi: use
-    'pps ..> dbi: use
-    'recs ..> dbi: use
-    'kv usage
-    ums ..> kvi: use
-    ' connections with external components
-    'Frontend -..> wi: use
-    ums -..> mi: use
-    'pps -..> mapi: use 
-    'prs -..> mapi: use 
-    port p1
-    p1 -..> apii
-}
-Frontend -..> p1: use
+folder Driver as D #LightBlue
+D .up. UMS
 ```
 #figure(
   accountRegistrationTestDiagram,
@@ -2516,6 +2433,7 @@ Frontend -..> p1: use
 
 *F2: Sign-in* \
 For this function we verify that a new user can successfully create an account by providing valid information and that user data is persistently stored.
+Since we already tested the needed components the diagram remains unchanged.
 
 *F3: Account Deletion* \
 The account deletion feature is integrated after authentication mechanisms are available. This functionality verifies that an authenticated user can permanently remove their account and all associated data. \
@@ -2528,11 +2446,53 @@ Testing focuses on verifying that the Mobile Application correctly checks the av
 This step ensures that subsequent features relying on device sensors can be safely integrated. \
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
+#let permissionManagementTestDiagram = ```plantuml
+component "Best Bike Paths Frontend" {
+top to bottom direction
+  folder "<<driver>>\nTrip Statistics Manager" as TSM
+  component "Permission Manager" as PM
+  folder "<<driver>>\nSensor Data Collection Manager" as DCM
+  folder "<<driver>>\nObstacle Detection Manager" as ODM
+ TSM -down. PM
+ ODM -down. PM
+ DCM -down. PM
+```
+#figure(
+  permissionManagementTestDiagram,
+  kind: image,
+  caption: [Account Registration Test Diagram]
+)
+
 *F5: Automatic Recording* \
 Once permission handling is validated, automatic bike path recording is integrated. This feature involves several client-side components, including sensor data collection, statistics computation, obstacle detection, and local storage. \
 testing verifies that recording sessions can be started, paused, resumed, and stopped correctly. During this phase, the correct coordination between client-side components is observed, ensuring that sensor data is collected consistently and that a complete trip representation can be produced at the end of the session. \
 Since interaction with backend services is not yet required, the client-side logic can be validated independently. \
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
+
+#let automaticRecordingTestDiagram = ```plantuml
+top to bottom direction
+  folder "Trip Statistics Manager" as TSM
+  component "Permission Manager" as PM
+  folder "Sensor Data Collection Manager" as DCM
+  folder "Obstacle Detection Manager" as ODM
+  folder "Local Storage" as storage
+ 
+ TSM -down. PM
+ ODM -down. PM
+ DCM -down. PM
+
+ TSM -down. storage
+ ODM -down. storage
+ DCM -down. storage
+}
+ 
+```
+#figure(
+  permissionManagementTestDiagram,
+  kind: image,
+  caption: [Account Registration Test Diagram]
+)
+
 
 *F6: Manual Insertion* \
 After automatic recording is validated, manual bike path insertion is integrated. This feature allows authenticated users to create paths without relying on sensor data. \

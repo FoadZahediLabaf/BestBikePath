@@ -30,7 +30,8 @@ export const deleteUser = onCall(async (request) => {
     }
     const { email } = request.data;
     if (email !== request.auth.token.email) {
-        throw new HttpsError("permission-denied", "The email does not match the authenticated user.");
+        throw new HttpsError("permission-denied",
+            "The email does not match the authenticated user.");
     }
 
     return await userManager.deleteUser(email);

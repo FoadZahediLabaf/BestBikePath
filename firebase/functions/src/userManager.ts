@@ -79,3 +79,20 @@ export async function signIn(email: string, password: string): Promise<string> {
 
   return customToken;
 }
+
+/**
+ * Checks if a user exists in Firebase Auth.
+ * @param {string} email - User email
+ * @return {Promise<boolean>} True if user exists, false otherwise
+ */
+export async function checkUserExists(email: string): Promise<boolean> {
+  try {
+    await admin.auth().getUserByEmail(email);
+    return true;
+  } catch (error: any) {
+    if (error.code === 'auth/user-not-found') {
+      return false;
+    }
+    throw error;
+  }
+}

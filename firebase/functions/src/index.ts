@@ -41,3 +41,8 @@ export const signIn = onCall(async (request) => {
     const { email, password } = request.data;
     return await userManager.signIn(email, password);
 });
+
+export const checkUserExists = onCall(async (request) => {
+    const { email } = request.data;
+    return await userManager.checkUserExists(email);
+});

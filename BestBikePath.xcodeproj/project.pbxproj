@@ -27,11 +27,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		A60C06602F28C8AC00C5FA7B /* Extension */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Extension;
-			sourceTree = "<group>";
-		};
 		A6E28BBC2EBBD62F000EECF0 /* BestBikePath */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -59,7 +54,6 @@
 		A6E28BB12EBBD62F000EECF0 = {
 			isa = PBXGroup;
 			children = (
-				A60C06602F28C8AC00C5FA7B /* Extension */,
 				A6E28BBC2EBBD62F000EECF0 /* BestBikePath */,
 				A6E28BBB2EBBD62F000EECF0 /* Products */,
 			);
@@ -89,7 +83,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				A60C06602F28C8AC00C5FA7B /* Extension */,
 				A6E28BBC2EBBD62F000EECF0 /* BestBikePath */,
 			);
 			name = BestBikePath;

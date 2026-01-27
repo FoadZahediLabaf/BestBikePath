@@ -56,3 +56,24 @@ export async function deleteUserPath(pathId: string, userId: string) {
 
   await docRef.delete();
 }
+
+export async function togglePrivacy(pathId: string, userId: string, isPublic: boolean) {
+      const pathRef = admin.firestore().collection("paths").doc(pathId);
+      const pathSnap = await pathRef.get();
+  
+      if (!pathSnap.exists) {
+       throw new Error("Path not found");
+      }
+  
+      const pathData = pathSnap.data();
+      if (pathData?.userId !== userId) {
+        throw new Error("Can't update path");
+      }
+  
+      await pathRef.update({
+        isPublic
+      });
+  
+}
+
+

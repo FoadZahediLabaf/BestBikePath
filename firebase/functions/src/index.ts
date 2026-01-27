@@ -7,7 +7,7 @@ if (!admin.apps.length) {
 
 
 import { registerUser, deleteUserAccount } from "./userManager";
-import { savePath, getUserPaths, deleteUserPath } from "./pathManager";
+import { savePath, getUserPaths, deleteUserPath, togglePrivacy } from "./pathManager";
 
 export const signup = functions.https.onRequest(async (req, res) => {
  
@@ -197,5 +197,33 @@ export const deletePath = functions.https.onRequest(async (req, res) => {
   } catch (error: any) {
     res.status(500).json({ error: error.message });
     return;
+  }
+});
+
+export const togglePathPrivacy = functions.https.onRequest(async (req, res) => {
+
+  try {
+    const idToken = req.headers.authorization?.split("Bearer ")[1];
+    if (!idToken){
+      res.status(400).json({ error: "Missing ID token" });
+      return;
+    }
+
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const userId = decodedToken.uid;
+
+    const { pathId, isPublic } = req.body;
+    if (!pathId || typeof isPublic !== "boolean") {
+      res.status(400).json({ error: "missing or invalid data" });
+      return;
+    }
+    
+    togglePrivacy(pathId, userId, isPublic);
+    res.status(200).json();
+    return;
+
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+    return 
   }
 });

@@ -8,30 +8,33 @@
 import SwiftUI
 import SwiftData
 
-struct UserSignView: View {
+struct AuthenticationView: View {
 
     @Environment(BestBikePathModel.self) private var appModel
 
     @State private var username: String = ""
+    @State private var verificationCode: String = ""
     @State private var password: String = ""
     @State private var passwordConfirmation: String = ""
+    @State private var name: String = ""
+    @State private var areTermsAccepted = false
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     @State private var mode: Mode = .idle
     @FocusState private var focusedField: Field?
 
     enum Field {
-        case username, password, passwordConfirmation
+        case username, verificationCode, password, passwordConfirmation, name, termsAcceptance
     }
 
     enum Mode {
-        case idle, signin, signup
+        case idle, emailVerify, signIn, signUp
     }
 
     var body: some View {
         ScrollView {
             VStack {
-                TextField("Username", text: $username)
+                TextField("Email", text: $username)
                     .textContentType(.username)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
@@ -49,18 +52,32 @@ struct UserSignView: View {
                         }
                     }
 
-                if [.signin, .signup].contains(mode) {
+                if [.emailVerify].contains(mode) {
+                    TextField("Verification Code", text: $verificationCode)
+                        .textContentType(.oneTimeCode)
+                        .keyboardType(.default)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .focused($focusedField, equals: .verificationCode)
+                        .submitLabel(.next)
+                        .onSubmit(buttonAction)
+                        .padding()
+                        .background(.background.secondary, in: .rect)
+                        .cornerRadius(12)
+                }
+
+                if [.signIn, .signUp].contains(mode) {
                     SecureField("Password", text: $password)
                         .textContentType(.password)
                         .focused($focusedField, equals: .password)
                         .submitLabel(.go)
                         .onSubmit {
                             switch mode {
-                            case .idle:
+                            case .idle, .emailVerify:
                                 break
-                            case .signin:
+                            case .signIn:
                                 buttonAction()
-                            case .signup:
+                            case .signUp:
                                 focusedField = .passwordConfirmation
                             }
                         }
@@ -69,7 +86,7 @@ struct UserSignView: View {
                         .cornerRadius(12)
                 }
 
-                if [.signup].contains(mode) {
+                if [.signUp].contains(mode) {
                     SecureField("Password Confirmation", text: $passwordConfirmation)
                         .textContentType(.password)
                         .focused($focusedField, equals: .passwordConfirmation)
@@ -80,6 +97,32 @@ struct UserSignView: View {
                         .cornerRadius(12)
                 }
 
+                if [.signUp].contains(mode) {
+                    TextField("Name", text: $name)
+                        .textContentType(.name)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .focused($focusedField, equals: .name)
+                        .submitLabel(.next)
+                        .onSubmit(buttonAction)
+                        .padding()
+                        .background(.background.secondary, in: .rect)
+                        .cornerRadius(12)
+                        .padding(.top)
+
+                    Toggle(isOn: $areTermsAccepted) {
+                        HStack(spacing: 4) {
+                            Text("Accept")
+                            Link("Terms", destination: URL(string: "https://bbp.com/terms)")!)
+                            Text("and")
+                            Link("Conditions", destination: URL(string: "https://bbp.com/conditions)")!)
+                        }
+                    }
+                        .padding()
+                        .background(.background.secondary, in: .rect)
+                        .cornerRadius(12)
+                        .padding(.top)
+                }
 
                 if let errorMessage {
                     Label(errorMessage, systemImage: "exclamationmark.circle")
@@ -92,6 +135,9 @@ struct UserSignView: View {
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .onTapGesture {
+                            focusedField = .none
+                        }
                 }
             }
             .animation(.default, value: errorMessage)
@@ -107,7 +153,7 @@ struct UserSignView: View {
                             .controlSize(.regular)
                     }
 
-                    Text(buttonTitle)
+                    buttonTitle
 
                     if isLoading {
                         ProgressView()
@@ -129,14 +175,16 @@ struct UserSignView: View {
         .navigationTitle("Account")
     }
 
-    private var buttonTitle: String {
+    private var buttonTitle: Text {
         switch mode {
         case .idle:
-            "Continue"
-        case .signin:
-            "Sign In"
-        case .signup:
-            "Sign Up"
+            Text("Continue")
+        case .signIn:
+            Text("Sign In")
+        case .emailVerify:
+            Text("Verify")
+        case .signUp:
+            Text("Sign Up")
         }
     }
 
@@ -144,11 +192,13 @@ struct UserSignView: View {
     private var infoMessage: String? {
         switch mode {
         case .idle:
-            "Insert your username in order to login or create an account"
-        case .signin:
-            "Insert your password in order to login toyour account"
-        case .signup:
-            "Insert your password in order to create an account"
+            "Enter your email to login or create an account."
+        case .signIn:
+            "Enter your password to login to your account."
+        case .emailVerify:
+            "Check your email inbox and enter the verification code to create an account."
+        case .signUp:
+            "Fill out the form to create an account."
         }
     }
 
@@ -158,10 +208,12 @@ struct UserSignView: View {
         switch mode {
         case .idle:
             !username.isEmpty && !isLoading
-        case .signin:
+        case .signIn:
             !username.isEmpty && !password.isEmpty && !isLoading
-        case .signup:
-            !username.isEmpty && !password.isEmpty && password == passwordConfirmation && !isLoading
+        case .emailVerify:
+            !username.isEmpty && !verificationCode.isEmpty && !isLoading
+        case .signUp:
+            !username.isEmpty && !password.isEmpty && password == passwordConfirmation && !name.isEmpty && areTermsAccepted && !isLoading
         }
     }
 
@@ -182,21 +234,23 @@ struct UserSignView: View {
 
             switch mode {
             case .idle:
-                if appModel.checkUser(username: username) {
-                    mode = .signin
+                if try await appModel.authenticationSource.userExists(email: username) {
+                    mode = .signIn
                     focusedField = .password
                 } else {
-                    mode = .signup
-                    focusedField = .password
+                    mode = .emailVerify
+                    focusedField = .verificationCode
                 }
-            case .signin:
-                if appModel.loginUser(username: username, password: password) {
-
-                } else {
-                    errorMessage = "Wrong password for this username."
+            case .emailVerify:
+                mode = .signUp
+            case .signIn:
+                do {
+                    try await appModel.authenticationSource.signIn(email: username, password: password)
+                } catch {
+                    errorMessage = "Wrong password for this email."
                 }
-            case .signup:
-                appModel.registerUser(username: username, password: password)
+            case .signUp:
+                try await appModel.authenticationSource.createUser(email: username, password: password)
             }
         }
     }
@@ -208,7 +262,7 @@ struct UserSignView: View {
     @Previewable @State var appModel = BestBikePathModel()
 
     NavigationStack {
-        UserSignView()
+        AuthenticationView()
     }
     .modelContainer(for: User.self, inMemory: true)
     .environment(appModel)

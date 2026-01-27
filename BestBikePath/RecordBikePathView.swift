@@ -15,7 +15,7 @@ struct RecordBikePathView: View {
 
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    @State private var duration: Duration = .seconds(0)
+    @State private var duration: Duration = .seconds(60*5)
 
     @State private var isStarted: Bool = false
 
@@ -27,11 +27,11 @@ struct RecordBikePathView: View {
 
     @State private var isPublic = true
 
-    let distance = Measurement<UnitLength>(value: 16342, unit: .meters)
+    @State var distance = Measurement<UnitLength>(value: 0, unit: .meters)
 
-    let averageSpeed = Measurement<UnitSpeed>(value: 68, unit: .kilometersPerHour)
+    @State var averageSpeed = Measurement<UnitSpeed>(value: 0, unit: .kilometersPerHour)
 
-    let peakSpeed = Measurement<UnitSpeed>(value: 103, unit: .kilometersPerHour)
+    @State var peakSpeed = Measurement<UnitSpeed>(value: 0, unit: .kilometersPerHour)
 
     let temperature = Measurement<UnitTemperature>(value: 38, unit: .celsius)
 
@@ -64,7 +64,14 @@ struct RecordBikePathView: View {
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal)
                         .onTapGesture {
-                            confirmingObstacles.append(UUID())
+                            let d = appModel.routes.map(\.route.distance).reduce(0, +)
+                            distance = Measurement<UnitLength>(value: d, unit: .meters)
+                            averageSpeed = Measurement<UnitSpeed>(value: 68, unit: .kilometersPerHour)
+                            peakSpeed = Measurement<UnitSpeed>(value: 103, unit: .kilometersPerHour)
+                            appModel.addCurrentLocation()
+                        }
+                        .onAppear {
+                            BestBikePathModel.locationManager.startUpdatingLocation()
                         }
 
                     if confirmingObstacles.isEmpty {
@@ -78,14 +85,14 @@ struct RecordBikePathView: View {
                                     LabeledContent("Peak Speed", value: peakSpeed.formatted())
                                 }
                             }
-//
-//                            VStack {
-//                                LabeledContent("Temperature", value: temperature.formatted())
-//                                Divider()
-//                                LabeledContent("Humidity", value: humidity.formatted())
-//                                Divider()
-//                                LabeledContent("Wind Speed", value: windSpeed.formatted())
-//                            }
+
+                            VStack {
+                                LabeledContent("Temperature", value: temperature.formatted())
+                                Divider()
+                                LabeledContent("Humidity", value: humidity.formatted())
+                                Divider()
+                                LabeledContent("Wind Speed", value: windSpeed.formatted())
+                            }
 
                             if isCompleted {
                                 VStack {
@@ -129,17 +136,28 @@ struct RecordBikePathView: View {
                         .background(.background.secondary, in: .containerRelative)
                         .transition(.blurReplace)
                     }
+
+                    if isStarted && !isCompleted {
+                        Button("Add obstacle") {
+                            confirmingObstacles.append(UUID())
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.extraLarge)
+                        .buttonSizing(.flexible)
+                        .fontWeight(.semibold)
+                    }
                 }
                 .scenePadding()
             }
             .defaultScrollAnchor(.center)
             .scrollBounceBehavior(.basedOnSize)
+            .customOpacityVisualEffect()
             .safeAreaInset(edge: .bottom) {
                 VStack {
                     if isCompleted {
                         Button {
                             // Save to disk the trip
-                            appModel.presentedRootModal = .searchCommunityPaths
+                            appModel.presentedSheetItem = .pathBrowsing
                         } label: {
                             Label {
                                 Text("Save")
@@ -211,9 +229,26 @@ struct RecordBikePathView: View {
             .animation(.default, value: confirmingObstacles)
             .toolbar {
                 Button(role: .cancel) {
-                    appModel.presentedRootModal = .searchCommunityPaths
+                    appModel.presentedSheetItem = .pathBrowsing
                 }
             }
+    }
+}
+
+private extension View {
+    func customOpacityVisualEffect(isEnabled: Bool = true) -> some View {
+        visualEffect { content, geometry in
+            let height = geometry.size.height + geometry.safeAreaInsets.bottom
+            let opacity: CGFloat = if height < 250 {
+                0
+            } else if height < 300 {
+                (height-250)/50
+            } else {
+                1
+            }
+            return content
+                .opacity(isEnabled ? opacity : 1)
+        }
     }
 }
 

@@ -15,9 +15,11 @@ struct BestBikePathApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NavigationStack {
+                ContentView()
+            }
         }
-        .modelContainer(appModel.sharedModelContainer)
+        .modelContainer(appModel.modelSource.container)
         .environment(appModel)
     }
 }

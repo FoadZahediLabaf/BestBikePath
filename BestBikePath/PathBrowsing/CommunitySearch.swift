@@ -8,85 +8,7 @@
 import SwiftUI
 import MapKit
 
-struct PathRow: View {
 
-    let path: BikePathEntry
-
-    var statusValue: Double {
-        switch path.status {
-        case .excellent:
-            5
-        case .good:
-            4
-        case .fair:
-            3
-        case .poor:
-            2
-        case .impassable:
-            1
-        }
-    }
-
-    var statusPercentage: String {
-        switch path.status {
-        case .excellent:
-            "100%"
-        case .good:
-            "80%"
-        case .fair:
-            "60%"
-        case .poor:
-            "40%"
-        case .impassable:
-            "20%"
-        }
-    }
-
-    var body: some View {
-        Label {
-            VStack {
-
-
-                Gauge(value: statusValue, in: 0...5) {
-                    Label("Status", systemImage: "road.lanes.curved.right")
-                } currentValueLabel: {
-                    Text(statusPercentage)
-                }
-                .gaugeStyle(.accessoryCircular)
-                .tint(.red.mix(with: .green, by: statusValue/5))
-                .frame(maxWidth: .infinity)
-
-                Group {
-                    switch path.status {
-                    case .excellent:
-                        Text("Excellent")
-                    case .good:
-                        Text("Good")
-                    case .fair:
-                        Text("Fair")
-                    case .poor:
-                        Text("Poor")
-                    case .impassable:
-                        Text("Impassable")
-                    }
-                }
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            }
-        } icon: {
-            PathMap(path, margin: 1.2)
-                .cornerRadius(16)
-                .allowsHitTesting(false)
-        }
-        .onAppear(perform: makeTitle)
-    }
-
-    func makeTitle() {
-        Task { @MainActor in
-
-        }
-    }
-}
 
 struct CommunitySearch: View {
 
@@ -115,7 +37,7 @@ struct CommunitySearch: View {
                         } else {
                             ForEach(paths, id: \.self) { path in
                                 Section {
-                                    PathRow(path: path)
+                                    CommunityPathRow(path: path)
                                         .labelReservedIconWidth(192)
                                         .frame(height: 96)
                                 }
@@ -165,12 +87,12 @@ struct CommunitySearch: View {
 
                         Section {
                             if appModel.mapItems.isEmpty {
-                                Label("Type your start location", systemImage: "bicycle")
+                                Label("Type your start location", systemImage: "mappin.and.ellipse")
                                     .foregroundStyle(.secondary)
                                     .frame(maxWidth: .infinity)
                                     .listRowBackground(Color.clear)
                             } else {
-                                Label("Type your end location", systemImage: "bicycle")
+                                Label("Type your end location", systemImage: "mappin.and.ellipse")
                                     .foregroundStyle(.secondary)
                                     .frame(maxWidth: .infinity)
                                     .listRowBackground(Color.clear)
@@ -216,7 +138,7 @@ struct CommunitySearch: View {
                             guard let selectedPath = appModel.selectedPath else { return }
                             appModel.userSelectedPath = selectedPath
                             appModel.displayUserPath(selectedPath)
-                            appModel.presentedRootModal = .userPath
+                            //appModel.presentedRootModal = .userPath
                         }
                         .fontWeight(.semibold)
                         .buttonStyle(.glassProminent)
@@ -234,7 +156,7 @@ struct CommunitySearch: View {
             }
             .animation(.default, value: appModel.communityResultPaths)
         }
-        .presentationDetents([.medium, .large], selection: $selectedDetent)
+        .presentationDetents([.medium, .large])
         .onChange(of: appModel.selectedPath) {
             selectedDetent = .medium
             appModel.routes = appModel.routes

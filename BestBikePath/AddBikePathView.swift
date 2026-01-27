@@ -153,7 +153,7 @@ struct AddBikePathView: View {
                     Task { @MainActor in
                         appModel.addManualPath(isPublic: sharePublicly)
                         appModel.cleanMap()
-                        appModel.presentedRootModal = .searchCommunityPaths
+                        appModel.presentedSheetItem = .pathBrowsing
                     }
                 }
                 .fontWeight(.semibold)
@@ -164,7 +164,7 @@ struct AddBikePathView: View {
                 Button(role: .cancel) {
                     Task { @MainActor in
                         appModel.cleanMap()
-                        appModel.presentedRootModal = .searchCommunityPaths
+                        appModel.presentedSheetItem = .pathBrowsing
                     }
                 }
             }

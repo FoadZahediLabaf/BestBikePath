@@ -12,43 +12,11 @@ import SwiftData
 @Observable
 final class BestBikePathModel {
 
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            User.self, BikePathEntry.self, BikePath.self, StreetLocation.self
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+    let modelSource: SwiftDataModelSource = .swiftData
 
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    let authenticationSource: AuthenticationSource = .test
 
-    private var modelContext: ModelContext {
-        sharedModelContainer.mainContext
-    }
-
-    enum RootModal {
-        case signIn
-        case recordBikePath
-        case addBikePath
-        case searchCommunityPaths
-        case userPath
-    }
-    var presentedRootModal: RootModal = .searchCommunityPaths
-
-    func isPresentingRootModal(_ modal: RootModal) -> Binding<Bool> {
-        Binding {
-            self.presentedRootModal == modal
-        } set: { isPresented in
-            if isPresented {
-                self.presentedRootModal = modal
-            } else {
-                self.presentedRootModal = .searchCommunityPaths
-            }
-        }
-    }
+    var presentedSheetItem: ContentSheetItem = .pathBrowsing
 
     var isRootMapForcePresented = false
 
@@ -56,9 +24,9 @@ final class BestBikePathModel {
         isRootMapForcePresented ||
         !routes.isEmpty ||
         !mapItems.isEmpty ||
-        presentedRootModal == .recordBikePath ||
-        presentedRootModal == .addBikePath ||
-        presentedRootModal == .userPath
+        presentedSheetItem == .pathRecording ||
+        presentedSheetItem == .pathInsertion // ||
+        // presentedSheetItem == .userPath
     }
 
     func cleanMap() {
@@ -79,7 +47,7 @@ final class BestBikePathModel {
         didSet {
             if let user {
                 var descriptor = FetchDescriptor<BikePathEntry>.init()
-                self.userPaths = (try? modelContext.fetch(descriptor)) ?? []
+                self.userPaths = (try? modelSource.mainContext.fetch(descriptor)) ?? []
             } else {
                 self.userPaths.removeAll()
             }
@@ -117,6 +85,41 @@ final class BestBikePathModel {
 
     var selectedPath: BikePathEntry?
 
+    static var locationManager: LocationManager = .shared
+
+    func openRecordingView() {
+        if [.authorizedAlways, .authorizedWhenInUse].contains(Self.locationManager.authorizationStatus) {
+            presentedSheetItem = .pathRecording
+        } else {
+            presentedSheetItem = .locationAccess
+        }
+    }
+
+    var recordLocations: [CLLocation] = []
+    func addCurrentLocation() {
+        guard let newLocation = Self.locationManager.location else { return }
+        recordLocations.append(newLocation)
+        Task {
+            var mapItems: [MKMapItem] = []
+            for location in recordLocations {
+                if let mapItem = try? await MKReverseGeocodingRequest(location: location)?.mapItems.first {
+                    mapItems.append(mapItem)
+                }
+            }
+            var trip: [MKRoute] = []
+            for (source, destination) in zip(mapItems, mapItems.dropFirst()) {
+                if let route = await getDirections(source: source, destination: destination) {
+                    trip.append(route)
+                }
+            }
+            withAnimation {
+                //self.mapItems = mapItems
+                self.mapItems = [mapItems.first, mapItems.last].compactMap { $0 }
+                routes = trip.map { ($0, nil) }
+            }
+        }
+    }
+
     func searchCommunityResultPaths() {
         communityResultPaths = [.makeLecCom(), .makeLecCanCom(), .makeLecOggCom(), .makeLecCantCom()]
     }
@@ -140,38 +143,38 @@ final class BestBikePathModel {
             mode: .manual
         )
 
-        modelContext.insert(pathEntry)
+        modelSource.mainContext.insert(pathEntry)
         userPaths.insert(pathEntry, at: 0)
     }
 
-    func checkUser(username: String) -> Bool {
-        // Build a fetch descriptor to find a User with a matching username
-        let predicate = #Predicate<User> { $0.username == username }
-        var descriptor = FetchDescriptor<User>(predicate: predicate)
-        descriptor.fetchLimit = 1
-        return try! modelContext.fetch(descriptor).count > 0
-    }
+//    func checkUser(username: String) -> Bool {
+//        // Build a fetch descriptor to find a User with a matching username
+//        let predicate = #Predicate<User> { $0.username == username }
+//        var descriptor = FetchDescriptor<User>(predicate: predicate)
+//        descriptor.fetchLimit = 1
+//        return try! modelContext.fetch(descriptor).count > 0
+//    }
 
-    func loginUser(username: String, password: String) -> Bool {
-        let predicate = #Predicate<User> { $0.username == username && $0.password == password }
-        var descriptor = FetchDescriptor<User>(predicate: predicate)
-        descriptor.fetchLimit = 1
-        if let user = try! modelContext.fetch(descriptor).first {
-            self.user = user
-            presentedRootModal = .searchCommunityPaths
-            return true
-        } else {
-            return false
-        }
-    }
+//    func loginUser(username: String, password: String) -> Bool {
+//        let predicate = #Predicate<User> { $0.username == username && $0.password == password }
+//        var descriptor = FetchDescriptor<User>(predicate: predicate)
+//        descriptor.fetchLimit = 1
+//        if let user = try! modelContext.fetch(descriptor).first {
+//            self.user = user
+//            presentedSheetItem = .pathBrowsing
+//            return true
+//        } else {
+//            return false
+//        }
+//    }
 
-    func registerUser(username: String, password: String) {
-        let user = User(username: username, password: password, pathEntries: [])
-
-        modelContext.insert(user)
-        self.user = user
-        presentedRootModal = .searchCommunityPaths
-    }
+//    func registerUser(username: String, password: String) {
+//        let user = User(username: username, password: password, pathEntries: [])
+//
+//        modelContext.insert(user)
+//        self.user = user
+//        presentedSheetItem = .pathBrowsing
+//    }
 }
 
 private extension BestBikePathModel {

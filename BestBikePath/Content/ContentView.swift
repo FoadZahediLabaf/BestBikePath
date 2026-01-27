@@ -57,7 +57,7 @@ struct ContentView: View {
                     Text("You need to sign in to create new bike paths, but you can still search for community bike paths.")
                 } actions: {
                     Button("Sign In ", systemImage: "person.fill") {
-                        appModel.presentedRootModal = .signIn
+                        appModel.presentedSheetItem = .authentication
                     }
                 }
             } else if appModel.userPaths.isEmpty {
@@ -70,24 +70,24 @@ struct ContentView: View {
                 Section {
                     ScrollView(.horizontal) {
                         HStack {
-//                            addPathButton
-//                                .aspectRatio(3/2, contentMode: .fill)
-//                                .containerRelativeFrame(.horizontal) { (l, _) in l*2/5 }
+                            //                            addPathButton
+                            //                                .aspectRatio(3/2, contentMode: .fill)
+                            //                                .containerRelativeFrame(.horizontal) { (l, _) in l*2/5 }
 
                             ForEach(appModel.userPaths) { path in
                                 Button {
                                     appModel.userSelectedPath = path
                                     appModel.displayUserPath(path)
-                                    appModel.presentedRootModal = .userPath
+                                    //appModel.presentedSheetItem = .pathDetail
                                 } label: {
                                     PathMap(path)
                                         .allowsHitTesting(false)
                                 }
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .aspectRatio(3/2, contentMode: .fill)
-                                    .containerRelativeFrame(.horizontal) { (l, _) in l*3/5 }
-                                    .background(.background.secondary)
-                                    .cornerRadius(24)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .aspectRatio(3/2, contentMode: .fill)
+                                .containerRelativeFrame(.horizontal) { (l, _) in l*3/5 }
+                                .background(.background.secondary)
+                                .cornerRadius(24)
                             }
                         }
                         .scrollTargetLayout()
@@ -108,12 +108,12 @@ struct ContentView: View {
             if appModel.user != nil {
                 HStack {
                     Button("Record Path", systemImage: "record.circle") {
-                        appModel.presentedRootModal = .recordBikePath
+                        appModel.openRecordingView()
                     }
                     .tint(.red)
 
                     Button("Add Path", systemImage: "plus.circle") {
-                        appModel.presentedRootModal = .addBikePath
+                        appModel.presentedSheetItem = .pathInsertion
                     }
                     .tint(.accentColor)
                 }
@@ -123,7 +123,6 @@ struct ContentView: View {
                 .fontWeight(.medium)
                 .scenePadding(.horizontal)
                 .padding(.vertical)
-                .padding(.bottom)
             }
         }
         .scrollBounceBehavior(.basedOnSize)
@@ -135,78 +134,85 @@ struct ContentView: View {
     var body: some View {
         @Bindable var appModel = appModel
 
-        NavigationStack {
-            ZStack {
-                userScrollView
+        ZStack {
+            userScrollView
 
-                map
-                    .blur(radius: appModel.isRootMapPresented ? 0 : 32)
-                    .opacity(appModel.isRootMapPresented ? 1 : 0)
-                    .animation(.default, value: appModel.isRootMapPresented)
-            }
-            .safeAreaInset(edge: .bottom) {
-                Spacer()
-                    .frame(height: 480)
-            }
-            .navigationTitle("Best Bike Paths")
-            .toolbarTitleDisplayMode(.inlineLarge)
-            .toolbar(content: {
-                ToolbarItem(placement: .topBarTrailing) {
+            map
+                .blur(radius: appModel.isRootMapPresented ? 0 : 32)
+                .opacity(appModel.isRootMapPresented ? 1 : 0)
+                .animation(.default, value: appModel.isRootMapPresented)
+        }
+        .navigationTitle("Best Bike Paths")
+        .toolbarTitleDisplayMode(.inlineLarge)
+        .toolbar(content: {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Account", systemImage: "person.crop.circle") {
                     if appModel.user == nil {
-                        Button("Account", systemImage: "person.crop.circle") {
-                            appModel.presentedRootModal = .signIn
-                        }
+                        appModel.presentedSheetItem = .authentication
                     } else {
-                        Menu("Account", systemImage: "person.crop.circle") {
-                            Button("Sign Out", systemImage: "rectangle.portrait.and.arrow.right", role: .destructive) {
-                                appModel.user = nil
-                            }
-                        }
+                        appModel.presentedSheetItem = .account
                     }
                 }
-            })
+            }
+        })
+        .safeAreaInsetsSheet(item: Binding($appModel.presentedSheetItem, default: .pathBrowsing), isAppliedToMap: appModel.isRootMapPresented) { item in
+            switch item {
+            case .pathBrowsing:
+                CommunitySearch()
+                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+            case .authentication:
+                NavigationStack {
+                    AuthenticationView()
+                        .toolbarTitleDisplayMode(.inlineLarge)
+                }
+                .presentationDetents([.medium, .large])
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+            case .account:
+                NavigationStack {
+                    AccountView()
+                        .toolbarTitleDisplayMode(.inlineLarge)
+                }
+                .presentationDetents([.medium, .large])
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+            case .locationAccess:
+                NavigationStack {
+                    LocationAccessView()
+                        .toolbarTitleDisplayMode(.inlineLarge)
+                }
+                .presentationDetents([.large])
+            case .pathInsertion:
+                NavigationStack {
+                    AddBikePathView()
+                }
+                .presentationDetents([.medium, .large])
+                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                .interactiveDismissDisabled()
+            case .pathRecording:
+                NavigationStack {
+                    RecordBikePathView()
+                }
+                .presentationDetents([.height(240), .fraction(0.8)])
+                .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.8)))
+                .interactiveDismissDisabled()
+            default:
+                EmptyView()
+            }
+
         }
         .animation(.default, value: appModel.user == nil)
-        .sheet(isPresented: appModel.isPresentingRootModal(.searchCommunityPaths)) {
-            CommunitySearch()
-                .presentationBackgroundInteraction(.enabled)
-        }
-        .sheet(isPresented: appModel.isPresentingRootModal(.signIn)) {
-            NavigationStack {
-                UserSignView()
-                    .toolbarTitleDisplayMode(.inlineLarge)
-            }
-            .presentationDetents([.medium, .large])
-        }
-        .sheet(isPresented: appModel.isPresentingRootModal(.recordBikePath)) {
-            NavigationStack {
-                RecordBikePathView()
-            }
-            .presentationDetents([.medium])
-            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-            .interactiveDismissDisabled()
-        }
-        .sheet(isPresented: appModel.isPresentingRootModal(.addBikePath)) {
-            NavigationStack {
-                AddBikePathView()
-            }
-            .presentationDetents([.medium, .large])
-            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-            .interactiveDismissDisabled()
-        }
-        .sheet(isPresented: appModel.isPresentingRootModal(.userPath)) {
-            NavigationStack {
-                UserPathView()
-                    .toolbarTitleDisplayMode(.inlineLarge)
-            }
-            .presentationDetents([.medium, .large])
-        }
+        //        .sheet(isPresented: appModel.isPresentingRootModal(.userPath)) {
+        //            NavigationStack {
+        //                UserPathView()
+        //                    .toolbarTitleDisplayMode(.inlineLarge)
+        //            }
+        //            .presentationDetents([.medium, .large])
+        //        }
     }
 
 
     var addPathButton: some View {
         Button {
-            appModel.presentedRootModal = .recordBikePath
+            appModel.presentedSheetItem = .pathRecording
         } label: {
             VStack {
                 Image(systemName: "plus.circle.fill")

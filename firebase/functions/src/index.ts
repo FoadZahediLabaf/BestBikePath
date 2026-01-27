@@ -8,13 +8,35 @@
  */
 
 import { setGlobalOptions } from "firebase-functions";
-import { onCall } from "firebase-functions/https";
+import { onCall, HttpsError } from "firebase-functions/https";
+import * as admin from "firebase-admin";
 
-import { signIn as signInManager } from "./userManager";
+import * as userManager from "./userManager";
+
+admin.initializeApp();
 
 setGlobalOptions({ maxInstances: 10 });
 
+// MARK: - User Management
+
+export const createUser = onCall(async (request) => {
+    const { email, password, name } = request.data;
+    return await userManager.createUser(email, password, name);
+});
+
+export const deleteUser = onCall(async (request) => {
+    if (!request.auth) {
+        throw new HttpsError("unauthenticated", "The user must be authenticated.");
+    }
+    const { email } = request.data;
+    if (email !== request.auth.token.email) {
+        throw new HttpsError("permission-denied", "The email does not match the authenticated user.");
+    }
+
+    return await userManager.deleteUser(email);
+});
+
 export const signIn = onCall(async (request) => {
-    const { username, password } = request.data;
-    return await signInManager(username, password);
+    const { email, password } = request.data;
+    return await userManager.signIn(email, password);
 });

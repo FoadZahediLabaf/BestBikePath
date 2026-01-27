@@ -3,50 +3,32 @@ import * as admin from "firebase-admin";
 
 const apiKeyParam = defineString("API_KEY");
 
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-
-export interface NewUser {
-  email: string;
-  username: string;
-  password: string;
-}
-
-export async function registerUser(user: NewUser): Promise<string> {
-  //User creation
+export async function createUser(email: string, password: string, name: string): Promise<string> {
+  // Create user in Firebase Auth
   const firebaseUser = await admin.auth().createUser({
-    email: user.email,
-    password: user.password,
+    email: email,
+    password: password,
   });
 
-  //Save user info on the firestore
+  // Save user info on the firestore
   await admin.firestore().collection("users").doc(firebaseUser.uid).set({
-    username: user.username,
-    email: user.email,
+    email: email,
+    name: name,
   });
 
-  return firebaseUser.uid;
+  // Generate Custom Token
+  return await admin.auth().createCustomToken(firebaseUser.uid);
 }
 
-export async function deleteUserAccount(uid: string): Promise<void> {
-  // Deleting from firebse auth
-  await admin.auth().deleteUser(uid);
+export async function deleteUser(email: string): Promise<void> {
+  const user = await admin.auth().getUserByEmail(email);
+  await admin.auth().deleteUser(user.uid);
 
   //Deleting user document from firestore
-  await admin.firestore().collection("users").doc(uid).delete();
+  await admin.firestore().collection("users").doc(user.uid).delete();
 }
 
-export async function signIn(username: string, password: string): Promise<string> {
-  const usersSnapshot = await admin.firestore().collection("users").where("username", "==", username).get();
-
-  if (usersSnapshot.empty) {
-    throw new Error("User not found");
-  }
-
-  const userDoc = usersSnapshot.docs[0];
-  const email = userDoc.data().email;
-
+export async function signIn(email: string, password: string): Promise<string> {
   // Verify password using Identity Toolkit API
   const apiKey = apiKeyParam.value();
 

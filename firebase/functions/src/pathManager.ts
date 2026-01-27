@@ -17,6 +17,11 @@ export interface NewPath {
   locations: PathLocation[];
 }
 
+/**
+ * Saves a new path to Firestore.
+ * @param {NewPath} path - The path data to save
+ * @return {Promise<string>} The new document ID
+ */
 export async function savePath(path: NewPath) {
   const docRef = await admin.firestore().collection("paths").add({
     userId: path.userId,
@@ -29,6 +34,11 @@ export async function savePath(path: NewPath) {
   return docRef.id;
 }
 
+/**
+ * Retrieves all paths for a specific user.
+ * @param {string} userId - The user ID
+ * @return {Promise<any[]>} List of user paths
+ */
 export async function getUserPaths(userId: string) {
   const snapshot = await admin.firestore()
     .collection("paths")
@@ -36,12 +46,18 @@ export async function getUserPaths(userId: string) {
     .orderBy("createdAt", "desc")
     .get();
 
-  return snapshot.docs.map(doc => ({
+  return snapshot.docs.map((doc) => ({
     id: doc.id,
-    ...doc.data()
+    ...doc.data(),
   }));
 }
 
+/**
+ * Deletes a path if the user is authorized.
+ * @param {string} pathId - The ID of the path to delete
+ * @param {string} userId - The ID of the requesting user
+ * @return {Promise<void>}
+ */
 export async function deleteUserPath(pathId: string, userId: string) {
   const docRef = admin.firestore().collection("paths").doc(pathId);
   const doc = await docRef.get();
@@ -57,23 +73,33 @@ export async function deleteUserPath(pathId: string, userId: string) {
   await docRef.delete();
 }
 
-export async function togglePrivacy(pathId: string, userId: string, isPublic: boolean) {
-      const pathRef = admin.firestore().collection("paths").doc(pathId);
-      const pathSnap = await pathRef.get();
-  
-      if (!pathSnap.exists) {
-       throw new Error("Path not found");
-      }
-  
-      const pathData = pathSnap.data();
-      if (pathData?.userId !== userId) {
-        throw new Error("Can't update path");
-      }
-  
-      await pathRef.update({
-        isPublic
-      });
-  
+/**
+ * Toggles the public status of a path.
+ * @param {string} pathId - The ID of the path to update
+ * @param {string} userId - The ID of the requesting user
+ * @param {boolean} isPublic - The new public status
+ * @return {Promise<void>}
+ */
+export async function togglePrivacy(
+  pathId: string,
+  userId: string,
+  isPublic: boolean
+) {
+  const pathRef = admin.firestore().collection("paths").doc(pathId);
+  const pathSnap = await pathRef.get();
+
+  if (!pathSnap.exists) {
+    throw new Error("Path not found");
+  }
+
+  const pathData = pathSnap.data();
+  if (pathData?.userId !== userId) {
+    throw new Error("Can't update path");
+  }
+
+  await pathRef.update({
+    isPublic,
+  });
 }
 
 

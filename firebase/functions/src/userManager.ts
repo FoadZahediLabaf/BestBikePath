@@ -1,7 +1,12 @@
 import { defineString } from "firebase-functions/params";
 import * as admin from "firebase-admin";
 
+import * as nodemailer from "nodemailer";
+
 const apiKeyParam = defineString("API_KEY");
+const emailUserParam = defineString("EMAIL_USER");
+const emailPassParam = defineString("EMAIL_PASS");
+const emailServiceParam = defineString("EMAIL_SERVICE");
 
 /**
  * Creates a new user in Firebase Auth and Firestore.
@@ -15,6 +20,16 @@ export async function createUser(
   password: string,
   name: string
 ): Promise<string> {
+  // Check if email is verified
+  const verificationDoc = await admin.firestore()
+    .collection("email_verifications")
+    .doc(email)
+    .get();
+
+  if (!verificationDoc.exists || !verificationDoc.data()?.verified) {
+    throw new Error("Email not verified");
+  }
+
   // Create user in Firebase Auth
   const firebaseUser = await admin.auth().createUser({
     email: email,
@@ -27,8 +42,89 @@ export async function createUser(
     name: name,
   });
 
+  // Delete verification document after successful creation
+  await admin.firestore().collection("email_verifications").doc(email).delete();
+
   // Generate Custom Token
   return await admin.auth().createCustomToken(firebaseUser.uid);
+}
+
+/**
+ * Sends a verification code to the provided email.
+ * @param {string} email - User email
+ * @return {Promise<void>}
+ */
+export async function sendEmailVerificationCode(email: string): Promise<void> {
+  // Create transporter using params
+  const transporter = nodemailer.createTransport({
+    service: emailServiceParam.value(),
+    auth: {
+      user: emailUserParam.value(),
+      pass: emailPassParam.value(),
+    },
+  });
+
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  // 10 minutes
+  const expiresAt = admin.firestore.Timestamp.fromMillis(
+    Date.now() + 10 * 60 * 1000
+  );
+
+  await admin.firestore().collection("email_verifications").doc(email).set({
+    code: code,
+    expiresAt: expiresAt,
+    verified: false,
+  });
+
+  const mailOptions = {
+    from: emailUserParam.value(),
+    to: email,
+    subject: "Your Verification Code",
+    text: `Your verification code is: ${code}`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Verification code sent to ${email}`);
+  } catch (error) {
+    console.error("Error sending email:", error);
+    throw new Error("Failed to send verification email.");
+  }
+}
+
+/**
+ * Checks the verification code for the provided email.
+ * @param {string} email - User email
+ * @param {string} code - Verification code
+ * @return {Promise<boolean>} True if verified, false otherwise
+ */
+export async function checkEmailVerificationCode(
+  email: string,
+  code: string
+): Promise<boolean> {
+  const doc = await admin.firestore()
+    .collection("email_verifications")
+    .doc(email)
+    .get();
+
+  if (!doc.exists) {
+    return false;
+  }
+
+  const data = doc.data();
+  if (!data || data.code !== code) {
+    return false;
+  }
+
+  if (data.expiresAt.toMillis() < Date.now()) {
+    return false;
+  }
+
+  await admin.firestore().collection("email_verifications").doc(email).update({
+    verified: true,
+  });
+
+  return true;
 }
 
 /**
@@ -54,17 +150,21 @@ export async function signIn(email: string, password: string): Promise<string> {
   // Verify password using Identity Toolkit API
   const apiKey = apiKeyParam.value();
 
-  const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: email,
-      password: password,
-      returnSecureToken: true,
-    }),
-  });
+  const response = await fetch(
+    "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword" +
+    `?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+        returnSecureToken: true,
+      }),
+    }
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const data = await response.json() as any;
@@ -89,8 +189,9 @@ export async function checkUserExists(email: string): Promise<boolean> {
   try {
     await admin.auth().getUserByEmail(email);
     return true;
-  } catch (error: any) {
-    if (error.code === 'auth/user-not-found') {
+  } catch (error: unknown) {
+    const authError = error as { code: string };
+    if (authError.code === "auth/user-not-found") {
       return false;
     }
     throw error;

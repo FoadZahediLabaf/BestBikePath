@@ -1,4 +1,5 @@
 import { defineString } from "firebase-functions/params";
+import { HttpsError } from "firebase-functions/https";
 import * as admin from "firebase-admin";
 
 import * as nodemailer from "nodemailer";
@@ -175,13 +176,16 @@ export async function signIn(email: string, password: string): Promise<string> {
  */
 export async function checkUserExists(email: string): Promise<boolean> {
   try {
-    await admin.auth().getUserByEmail(email);
-    return true;
-  } catch (error: unknown) {
-    const authError = error as { code: string };
-    if (authError.code === "auth/user-not-found") {
-      return false;
+    const result = await admin.auth().getUsers([{ email }]);
+    return result.users.length > 0;
+  } catch (error: any) {
+    const code = error.code || "unknown";
+    const message = error.message || "Unknown error";
+
+    if (code === "auth/invalid-email") {
+      throw new HttpsError("invalid-argument", message, { code, message });
     }
-    throw error;
+
+    throw new HttpsError("internal", message, { code, message });
   }
 }

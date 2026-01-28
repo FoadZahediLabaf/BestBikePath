@@ -64,23 +64,21 @@ export const checkEmailVerificationCode = onCall(async (request) => {
   return await userManager.checkEmailVerificationCode(email, code);
 });
 
-// MARK: - Manual Path Insertion Management
+// MARK: - Path Management
 
-export const createPath = onCall(async (request) => {
+export const savePath = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The user must be authenticated.");
   }
 
-  const { isPublic, status, locations, performance, weather } = request.data;
+  const userPath = request.data;
 
-  return await pathManager.createPath({
-    userId: request.auth.uid,
-    isPublic,
-    status,
-    locations,
-    performance,
-    weather,
-  });
+  if (userPath.userId !== request.auth.uid) {
+    throw new HttpsError("permission-denied",
+      "User ID does not match authenticated user.");
+  }
+
+  return await pathManager.savePath(userPath);
 });
 
 export const getUserPaths = onCall(async (request) => {
@@ -88,16 +86,48 @@ export const getUserPaths = onCall(async (request) => {
     throw new HttpsError("unauthenticated", "The user must be authenticated.");
   }
 
-  return await pathManager.getUserPaths(request.auth.uid);
+  const { userID } = request.data;
+
+  if (!userID) {
+    throw new HttpsError("invalid-argument", "userID is required");
+  }
+
+  if (userID !== request.auth.uid) {
+    throw new HttpsError("permission-denied",
+      "User ID does not match authenticated user.");
+  }
+
+  return await pathManager.getUserPaths(userID, request.auth.uid);
 });
 
-export const updatePath = onCall(async (request) => {
+export const updatePathPrivacy = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The user must be authenticated.");
   }
 
-  const { pathId, ...updates } = request.data;
-  await pathManager.updatePath(pathId, request.auth.uid, updates);
+  const { id: pathId, isPublic } = request.data;
+
+  if (!pathId) {
+    throw new HttpsError("invalid-argument", "Path ID is required");
+  }
+
+  await pathManager.updatePathPrivacy(pathId, request.auth.uid, isPublic);
+});
+
+export const updatePathStatus = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+  }
+
+  const { id: idOrPath, status } = request.data;
+
+  const pathId = typeof idOrPath === "string" ? idOrPath : idOrPath?.id;
+
+  if (!pathId) {
+    throw new HttpsError("invalid-argument", "Path ID is required");
+  }
+
+  await pathManager.updatePathStatus(pathId, request.auth.uid, status);
 });
 
 export const deletePath = onCall(async (request) => {
@@ -105,13 +135,13 @@ export const deletePath = onCall(async (request) => {
     throw new HttpsError("unauthenticated", "The user must be authenticated.");
   }
 
-  const { pathId } = request.data;
-  await pathManager.deletePath(pathId, request.auth.uid);
-});
+  const { id: idOrPath } = request.data;
 
-export const getPathDetails = onCall(async (request) => {
-  const { pathId } = request.data;
-  // request.auth?.uid might be undefined if not logged in,
-  // which is allowed for public paths
-  return await pathManager.getPathDetails(pathId, request.auth?.uid);
+  const pathId = typeof idOrPath === "string" ? idOrPath : idOrPath?.id;
+
+  if (!pathId) {
+    throw new HttpsError("invalid-argument", "Path ID is required");
+  }
+
+  await pathManager.deletePath(pathId, request.auth.uid);
 });

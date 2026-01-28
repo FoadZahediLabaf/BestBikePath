@@ -102,4 +102,42 @@ export async function togglePrivacy(
   });
 }
 
+/**
+ * Retrieves details of a single path with privacy enforcement.
+ * Public paths are accessible by anyone.
+ * Private paths are accessible only by the owner.
+ * @param {string} pathId - The ID of the path
+ * @param {string | undefined} userId - The requesting user ID (if authenticated)
+ * @return {Promise<any>} Path data
+ */
+export async function getPathDetails(
+  pathId: string,
+  userId?: string
+) {
+  const docRef = admin.firestore().collection("paths").doc(pathId);
+  const docSnap = await docRef.get();
+
+  if (!docSnap.exists) {
+    throw new Error("Path not found");
+  }
+
+  const pathData = docSnap.data();
+
+  if (pathData?.isPublic === true) {
+    return {
+      id: docSnap.id,
+      ...pathData,
+    };
+  }
+
+  if (userId && pathData?.userId === userId) {
+    return {
+      id: docSnap.id,
+      ...pathData,
+    };
+  }
+
+  throw new Error("unauthorized");
+}
+
 

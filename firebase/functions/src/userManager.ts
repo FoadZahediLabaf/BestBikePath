@@ -181,9 +181,10 @@ export async function checkUserExists(email: string): Promise<boolean> {
   try {
     const result = await admin.auth().getUsers([{ email }]);
     return result.users.length > 0;
-  } catch (error: any) {
-    const code = error.code || "unknown";
-    const message = error.message || "Unknown error";
+  } catch (error: unknown) {
+    const firebaseError = error as { code?: string; message?: string };
+    const code = firebaseError.code || "unknown";
+    const message = firebaseError.message || "Unknown error";
 
     if (code === "auth/invalid-email") {
       throw new HttpsError("invalid-argument", message, { code, message });

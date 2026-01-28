@@ -13,6 +13,7 @@ import { onCall, HttpsError } from "firebase-functions/https";
 import * as admin from "firebase-admin";
 
 import * as userManager from "./userManager";
+import * as pathManager from "./pathManager";
 
 admin.initializeApp();
 
@@ -61,4 +62,56 @@ export const sendEmailVerificationCode = onCall(async (request) => {
 export const checkEmailVerificationCode = onCall(async (request) => {
   const { email, code } = request.data;
   return await userManager.checkEmailVerificationCode(email, code);
+});
+
+// MARK: - Manual Path Insertion Management
+
+export const createPath = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+  }
+
+  const { isPublic, status, locations, performance, weather } = request.data;
+
+  return await pathManager.createPath({
+    userId: request.auth.uid,
+    isPublic,
+    status,
+    locations,
+    performance,
+    weather,
+  });
+});
+
+export const getUserPaths = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+  }
+
+  return await pathManager.getUserPaths(request.auth.uid);
+});
+
+export const updatePath = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+  }
+
+  const { pathId, ...updates } = request.data;
+  await pathManager.updatePath(pathId, request.auth.uid, updates);
+});
+
+export const deletePath = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+  }
+
+  const { pathId } = request.data;
+  await pathManager.deletePath(pathId, request.auth.uid);
+});
+
+export const getPathDetails = onCall(async (request) => {
+  const { pathId } = request.data;
+  // request.auth?.uid might be undefined if not logged in,
+  // which is allowed for public paths
+  return await pathManager.getPathDetails(pathId, request.auth?.uid);
 });

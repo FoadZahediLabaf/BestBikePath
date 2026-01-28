@@ -8,6 +8,7 @@ const apiKeyParam = defineString("API_KEY");
 const emailUserParam = defineString("EMAIL_USER");
 const emailPassParam = defineString("EMAIL_PASS");
 const emailServiceParam = defineString("EMAIL_SERVICE");
+const emailFromParam = defineString("EMAIL_FROM");
 
 /**
  * Creates a new user in Firebase Auth and Firestore.
@@ -73,7 +74,7 @@ export async function sendEmailVerificationCode(email: string): Promise<void> {
   });
 
   const mailOptions = {
-    from: emailUserParam.value(),
+    from: emailFromParam.value(),
     to: email,
     subject: "Your Verification Code",
     text: `Your verification code is: ${code}`,

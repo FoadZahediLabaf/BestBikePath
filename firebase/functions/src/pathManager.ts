@@ -107,7 +107,7 @@ export async function togglePrivacy(
  * Public paths are accessible by anyone.
  * Private paths are accessible only by the owner.
  * @param {string} pathId - The ID of the path
- * @param {string | undefined} userId - The requesting user ID (if authenticated)
+ * @param {string | undefined} userId - Requesting user ID (if authenticated)
  * @return {Promise<any>} Path data
  */
 export async function getPathDetails(

@@ -8,13 +8,11 @@
  * https://firebase.google.com/docs/functions
  */
 
-
 import { setGlobalOptions } from "firebase-functions";
 import { onCall, HttpsError } from "firebase-functions/https";
 import * as admin from "firebase-admin";
 
 import * as userManager from "./userManager";
-import * as pathManager from "./pathManager";
 
 admin.initializeApp();
 
@@ -23,8 +21,13 @@ setGlobalOptions({ maxInstances: 10 });
 // MARK: - User Management
 
 export const createUser = onCall(async (request) => {
-  const { email, password, name } = request.data;
-  return await userManager.createUser(email, password, name);
+  const { email, password, displayName, emailVerificationCode } = request.data;
+  return await userManager.createUser(
+    email,
+    password,
+    displayName,
+    emailVerificationCode
+  );
 });
 
 export const deleteUser = onCall(async (request) => {
@@ -58,58 +61,4 @@ export const sendEmailVerificationCode = onCall(async (request) => {
 export const checkEmailVerificationCode = onCall(async (request) => {
   const { email, code } = request.data;
   return await userManager.checkEmailVerificationCode(email, code);
-});
-
-// MARK: - Path Management
-
-export const savePath = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Authentication required.");
-  }
-
-  const { isPublic, rating, locations } = request.data;
-
-  return await pathManager.savePath({
-    userId: request.auth.uid,
-    isPublic,
-    rating,
-    locations,
-  });
-});
-
-export const getUserPaths = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Authentication required.");
-  }
-
-  return await pathManager.getUserPaths(request.auth.uid);
-});
-
-export const deletePath = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Authentication required.");
-  }
-
-  const { pathId } = request.data;
-  return await pathManager.deleteUserPath(pathId, request.auth.uid);
-});
-
-export const togglePathPrivacy = onCall(async (request) => {
-  if (!request.auth) {
-    throw new HttpsError("unauthenticated", "Authentication required.");
-  }
-
-  const { pathId, isPublic } = request.data;
-  return await pathManager.togglePrivacy(
-    pathId,
-    request.auth.uid,
-    isPublic
-  );
-});
-
-export const getPathDetails = onCall(async (request) => {
-  const { pathId } = request.data;
-  const userId = request.auth?.uid;
-
-  return await pathManager.getPathDetails(pathId, userId);
 });

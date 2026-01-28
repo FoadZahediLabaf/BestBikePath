@@ -12,34 +12,30 @@ const emailServiceParam = defineString("EMAIL_SERVICE");
  * Creates a new user in Firebase Auth and Firestore.
  * @param {string} email - User email
  * @param {string} password - User password
- * @param {string} name - User display name
+ * @param {string} displayName - User display name
+ * @param {string} emailVerificationCode - The code to verify email
  * @return {Promise<string>} Custom auth token
  */
 export async function createUser(
   email: string,
   password: string,
-  name: string
+  displayName: string,
+  emailVerificationCode: string
 ): Promise<string> {
-  // Check if email is verified
-  const verificationDoc = await admin.firestore()
-    .collection("email_verifications")
-    .doc(email)
-    .get();
-
-  if (!verificationDoc.exists || !verificationDoc.data()?.verified) {
+  const emailVerified = await checkEmailVerificationCode(
+    email,
+    emailVerificationCode
+  );
+  if (!emailVerified) {
     throw new Error("Email not verified");
   }
 
   // Create user in Firebase Auth
   const firebaseUser = await admin.auth().createUser({
+    displayName: displayName,
     email: email,
+    emailVerified: true,
     password: password,
-  });
-
-  // Save user info on the firestore
-  await admin.firestore().collection("users").doc(firebaseUser.uid).set({
-    email: email,
-    name: name,
   });
 
   // Delete verification document after successful creation
@@ -73,7 +69,6 @@ export async function sendEmailVerificationCode(email: string): Promise<void> {
   await admin.firestore().collection("email_verifications").doc(email).set({
     code: code,
     expiresAt: expiresAt,
-    verified: false,
   });
 
   const mailOptions = {
@@ -120,10 +115,6 @@ export async function checkEmailVerificationCode(
     return false;
   }
 
-  await admin.firestore().collection("email_verifications").doc(email).update({
-    verified: true,
-  });
-
   return true;
 }
 
@@ -135,9 +126,6 @@ export async function checkEmailVerificationCode(
 export async function deleteUser(email: string): Promise<void> {
   const user = await admin.auth().getUserByEmail(email);
   await admin.auth().deleteUser(user.uid);
-
-  // Deleting user document from firestore
-  await admin.firestore().collection("users").doc(user.uid).delete();
 }
 
 /**

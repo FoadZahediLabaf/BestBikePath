@@ -29,7 +29,9 @@ export async function createUser(
     emailVerificationCode
   );
   if (!emailVerified) {
-    throw new Error("Email not verified");
+    const code = "invalid-email";
+    const message = "Email is not verified";
+    throw new HttpsError("invalid-argument", message, { code, message });
   }
 
   // Create user in Firebase Auth

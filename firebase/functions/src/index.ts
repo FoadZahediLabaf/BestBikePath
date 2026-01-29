@@ -33,12 +33,12 @@ export const createUser = onCall(async (request) => {
 
 export const deleteUser = onCall(async (request) => {
   if (!request.auth) {
-    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+    throw new HttpsError("unauthenticated", "The user must be authenticated");
   }
   const { email } = request.data;
   if (email !== request.auth.token.email) {
     throw new HttpsError("permission-denied",
-      "The email does not match the authenticated user.");
+      "The email does not match the authenticated user");
   }
 
   return await userManager.deleteUser(email);
@@ -68,14 +68,14 @@ export const checkEmailVerificationCode = onCall(async (request) => {
 
 export const savePath = onCall(async (request) => {
   if (!request.auth) {
-    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+    throw new HttpsError("unauthenticated", "The user must be authenticated");
   }
 
   const userPath = request.data;
 
   if (userPath.userId !== request.auth.uid) {
     throw new HttpsError("permission-denied",
-      "User ID does not match authenticated user.");
+      "User ID does not match authenticated user");
   }
 
   return await pathManager.savePath(userPath);
@@ -83,7 +83,7 @@ export const savePath = onCall(async (request) => {
 
 export const getUserPaths = onCall(async (request) => {
   if (!request.auth) {
-    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+    throw new HttpsError("unauthenticated", "The user must be authenticated");
   }
 
   const { userID } = request.data;
@@ -92,17 +92,12 @@ export const getUserPaths = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "userID is required");
   }
 
-  if (userID !== request.auth.uid) {
-    throw new HttpsError("permission-denied",
-      "User ID does not match authenticated user.");
-  }
-
   return await pathManager.getUserPaths(userID, request.auth.uid);
 });
 
 export const updatePathPrivacy = onCall(async (request) => {
   if (!request.auth) {
-    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+    throw new HttpsError("unauthenticated", "The user must be authenticated");
   }
 
   const { id: pathId, isPublic } = request.data;
@@ -116,12 +111,10 @@ export const updatePathPrivacy = onCall(async (request) => {
 
 export const updatePathStatus = onCall(async (request) => {
   if (!request.auth) {
-    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+    throw new HttpsError("unauthenticated", "The user must be authenticated");
   }
 
-  const { id: idOrPath, status } = request.data;
-
-  const pathId = typeof idOrPath === "string" ? idOrPath : idOrPath?.id;
+  const { id: pathId, status } = request.data;
 
   if (!pathId) {
     throw new HttpsError("invalid-argument", "Path ID is required");
@@ -132,12 +125,10 @@ export const updatePathStatus = onCall(async (request) => {
 
 export const deletePath = onCall(async (request) => {
   if (!request.auth) {
-    throw new HttpsError("unauthenticated", "The user must be authenticated.");
+    throw new HttpsError("unauthenticated", "The user must be authenticated");
   }
 
-  const { id: idOrPath } = request.data;
-
-  const pathId = typeof idOrPath === "string" ? idOrPath : idOrPath?.id;
+  const { id: pathId } = request.data;
 
   if (!pathId) {
     throw new HttpsError("invalid-argument", "Path ID is required");

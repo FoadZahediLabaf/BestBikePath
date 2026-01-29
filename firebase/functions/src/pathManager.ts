@@ -122,12 +122,12 @@ export async function getUserPaths(
  * Matches: func updatePathPrivacy(id: UserPath, isPrivate: Bool) async throws
  * @param {string} pathId - ID of the path
  * @param {string} userId - Requesting user ID (owner)
- * @param {boolean} isPrivate - The new privacy state
+ * @param {boolean} isPublic - The new privacy state
  */
 export async function updatePathPrivacy(
   pathId: string,
   userId: string,
-  isPrivate: boolean
+  isPublic: boolean
 ) {
   const docRef = admin.firestore().collection("paths").doc(pathId);
   const doc = await docRef.get();
@@ -135,11 +135,11 @@ export async function updatePathPrivacy(
   if (!doc.exists) throw new HttpsError("not-found", "Path not found");
   if (doc.data()?.userId !== userId) {
     throw new HttpsError("permission-denied",
-      "The user is not authorized to update this path.");
+      "The user is not authorized to update this path");
   }
 
   await docRef.update({
-    isPublic: !isPrivate,
+    isPublic: isPublic,
     updatedAt: FieldValue.serverTimestamp(),
   });
 }
@@ -168,7 +168,7 @@ export async function updatePathStatus(
   if (!doc.exists) throw new HttpsError("not-found", "Path not found");
   if (doc.data()?.userId !== userId) {
     throw new HttpsError("permission-denied",
-      "The user is not authorized to update this path.");
+      "The user is not authorized to update this path");
   }
 
   await docRef.update({
@@ -194,7 +194,7 @@ export async function deletePath(pathId: string, userId: string) {
 
   if (doc.data()?.userId !== userId) {
     throw new HttpsError("permission-denied",
-      "The user is not authorized to delete this path.");
+      "The user is not authorized to delete this path");
   }
 
   await docRef.delete();

@@ -2,36 +2,13 @@ import * as admin from "firebase-admin";
 import { COLLECTIONS } from "./collections";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
-
-if (!admin.apps.length) {
-  admin.initializeApp();
-}
-
-export interface PathLocation {
-  latitude: number;
-  longitude: number;
-}
-
-export interface Path {
-  locations: PathLocation[];
-}
-
-export interface PathPerformance {
-  distance: number;
-  averageSpeed: number;
-  peakSpeed: number;
-}
-
-export interface PathWeather {
-  temperature: number;
-  humidity: number;
-  windSpeed: number;
-}
+import { Path, PathPerformance, PathWeather } from "./pathManager";
+import { findMatchingPath, createPath } from "./pathManager";
 
 export interface UserPath {
   id: string;
   userId: string;
-  creationDate: string | Date | Timestamp;
+  date?: Timestamp;
   isPublic: boolean;
   path: Path;
   status: number;
@@ -42,10 +19,11 @@ export interface UserPath {
 /**
  * Saves (creates or updates) a user path.
  * Matches: func savePath(_ path: UserPath) async throws
- * @param {UserPath} userPath - The user path data
+ * @param {UserPath} userPath - The user path including geometry
  * @return {Promise<void>}
  */
-export async function savePath(userPath: UserPath): Promise<void> {
+export async function saveUserPath(userPath: UserPath): Promise<void> {
+  // Validate Status
   if (!Number.isInteger(userPath.status) ||
     userPath.status < 1 ||
     userPath.status > 5) {
@@ -58,17 +36,30 @@ export async function savePath(userPath: UserPath): Promise<void> {
     throw new HttpsError("invalid-argument", "Path ID is required");
   }
 
-  const docRef = admin.firestore().collection(COLLECTIONS.USER_PATHS).doc(userPath.id);
+  const locations = userPath.path.locations;
+  if (!locations || locations.length < 2) {
+    throw new HttpsError("invalid-argument",
+      "Path must have at least 2 coordinates");
+  }
+
+  // Deduplication / Path Creation
+  let pathId = await findMatchingPath(locations);
+  if (!pathId) {
+    pathId = await createPath(locations);
+  }
+
+  const docRef = admin.firestore()
+    .collection(COLLECTIONS.USER_PATHS)
+    .doc(userPath.id);
 
   await docRef.set({
     userId: userPath.userId,
-    creationDate: userPath.creationDate,
+    ...(userPath.date && { date: userPath.date }),
     isPublic: userPath.isPublic,
-    path: userPath.path, // Contains locations
+    pathId: pathId,
     status: userPath.status,
     ...(userPath.performance && { performance: userPath.performance }),
-    ...(userPath.weather && { weather: userPath.weather }),
-    updatedAt: FieldValue.serverTimestamp(),
+    ...(userPath.weather && { weather: userPath.weather })
   });
 }
 
@@ -81,7 +72,7 @@ export async function savePath(userPath: UserPath): Promise<void> {
  */
 export async function getUserPaths(
   targetUserId: string,
-  requestingUserId?: string
+  requestingUserId: string,
 ): Promise<UserPath[]> {
   const snapshot = await admin.firestore()
     .collection(COLLECTIONS.USER_PATHS)
@@ -91,8 +82,7 @@ export async function getUserPaths(
   const paths: UserPath[] = [];
 
   for (const doc of snapshot.docs) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = doc.data() as any;
+    const data = doc.data() as Omit<UserPath, "path"> & { pathId: string };
 
     // Privacy Check
     // If getting own paths, return all.
@@ -101,13 +91,29 @@ export async function getUserPaths(
       continue;
     }
 
-    // Map back to UserPath interface
+    // Fetch the linked Path geometry
+    const pathId = data.pathId;
+    let path: Path | null = null;
+
+    if (pathId) {
+      const pathDoc = await admin.firestore()
+        .collection(COLLECTIONS.PATHS)
+        .doc(pathId)
+        .get();
+      if (pathDoc.exists) {
+        path = pathDoc.data() as Path;
+      }
+    }
+    if (!path) {
+      continue;
+    }
+
     const userPath: UserPath = {
       id: doc.id,
       userId: data.userId,
-      creationDate: data.creationDate,
+      date: data.date,
       isPublic: data.isPublic,
-      path: data.path || { locations: data.locations || [] },
+      path: path,
       status: data.status,
       performance: data.performance,
       weather: data.weather,
@@ -121,16 +127,18 @@ export async function getUserPaths(
 /**
  * Updates path privacy.
  * Matches: func updatePathPrivacy(id: UserPath, isPrivate: Bool) async throws
- * @param {string} pathId - ID of the path
+ * @param {string} userPathId - ID of the user path
  * @param {string} userId - Requesting user ID (owner)
  * @param {boolean} isPublic - The new privacy state
  */
-export async function updatePathPrivacy(
-  pathId: string,
+export async function updateUserPathPrivacy(
+  userPathId: string,
   userId: string,
   isPublic: boolean
 ) {
-  const docRef = admin.firestore().collection(COLLECTIONS.USER_PATHS).doc(pathId);
+  const docRef = admin.firestore()
+    .collection(COLLECTIONS.USER_PATHS)
+    .doc(userPathId);
   const doc = await docRef.get();
 
   if (!doc.exists) throw new HttpsError("not-found", "Path not found");
@@ -149,12 +157,12 @@ export async function updatePathPrivacy(
  * Updates path status.
  * Matches: func updatePathStatus(id: UserPath, status: UserPath.Status)
  * async throws
- * @param {string} pathId - ID of the path
+ * @param {string} userPathId - ID of the user path
  * @param {string} userId - Requesting user ID (owner)
  * @param {number} status - The new status (1-5)
  */
-export async function updatePathStatus(
-  pathId: string,
+export async function updateUserPathStatus(
+  userPathId: string,
   userId: string,
   status: number
 ) {
@@ -163,7 +171,9 @@ export async function updatePathStatus(
       "Status must be an integer between 1 and 5");
   }
 
-  const docRef = admin.firestore().collection(COLLECTIONS.USER_PATHS).doc(pathId);
+  const docRef = admin.firestore()
+    .collection(COLLECTIONS.USER_PATHS)
+    .doc(userPathId);
   const doc = await docRef.get();
 
   if (!doc.exists) throw new HttpsError("not-found", "Path not found");
@@ -185,18 +195,41 @@ export async function updatePathStatus(
  * @param {string} userId - The ID of the requesting user
  * @return {Promise<void>}
  */
-export async function deletePath(pathId: string, userId: string) {
-  const docRef = admin.firestore().collection(COLLECTIONS.USER_PATHS).doc(pathId);
+export async function deleteUserPath(userPathId: string, userId: string) {
+  const docRef = admin.firestore()
+    .collection(COLLECTIONS.USER_PATHS)
+    .doc(userPathId);
   const doc = await docRef.get();
 
   if (!doc.exists) {
     throw new HttpsError("not-found", "Path not found");
   }
 
-  if (doc.data()?.userId !== userId) {
+  const data = doc.data();
+
+  if (data?.userId !== userId) {
     throw new HttpsError("permission-denied",
       "The user is not authorized to delete this path");
   }
 
+  const pathId = data.pathId;
+
   await docRef.delete();
+
+  // Orphan Path Cleanup
+  if (pathId) {
+    const otherReferences = await admin.firestore()
+      .collection(COLLECTIONS.USER_PATHS)
+      .where("pathId", "==", pathId)
+      .limit(1) // We only need to know if at least one exists
+      .get();
+
+    if (otherReferences.empty) {
+      // No other user paths reference this geometry, delete it
+      await admin.firestore()
+        .collection(COLLECTIONS.PATHS)
+        .doc(pathId)
+        .delete();
+    }
+  }
 }

@@ -123,6 +123,8 @@ export const updateUserPathStatus = onCall(async (request) => {
   await pathManager.updatePathStatus(pathId, request.auth.uid, status);
 });
 
+import * as communityPathManager from "./communityPathManager";
+
 export const deleteUserPath = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The user must be authenticated");
@@ -136,3 +138,18 @@ export const deleteUserPath = onCall(async (request) => {
 
   await pathManager.deletePath(pathId, request.auth.uid);
 });
+
+// MARK: - Community Paths
+
+export const getCommunityPaths = onCall(async (request) => {
+  const { origin, destination } = request.data;
+
+  if (!origin || !destination) {
+    throw new HttpsError("invalid-argument",
+      "Origin and destination are required");
+  }
+
+  return await communityPathManager.getCommunityPaths(origin, destination);
+});
+
+// MARK: - CommunityPath Management

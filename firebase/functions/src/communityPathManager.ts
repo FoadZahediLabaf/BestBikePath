@@ -1,104 +1,78 @@
-
-export interface Coordinate {
-  lat: number;
-  lng: number;
-}
-
-export interface Path {
-  streets: string[];
-  coordinates: Coordinate[];
-  status: number;
-  createdAt: number;
-}
+import * as admin from "firebase-admin";
+import { COLLECTIONS } from "./collections";
+import { Path, PathLocation } from "./pathManager";
+import { distance } from "./pathManager";
 
 export interface CommunityPath {
-  coordinates: Coordinate[];
-  status: number;
-}
-
-
-const MAX_DISTANCE = 50; // meters
-
-/**
- * Filters paths based on start and end coordinates.
- * @param {Path[]} paths - The list of paths to filter.
- * @param {Coordinate} start - The start coordinate.
- * @param {Coordinate} end - The end coordinate.
- * @return {Path[]} The filtered paths.
- */
-export function filterPaths(
-  paths: Path[],
-  start: Coordinate,
-  end: Coordinate
-): Path[] {
-  const maxDis = 0.001;
-  return paths.filter((p) => {
-    const startDiff = Math.hypot(
-      p.coordinates[0].lat - start.lat,
-      p.coordinates[0].lng - start.lng
-    );
-    const endDiff = Math.hypot(
-      p.coordinates[p.coordinates.length - 1].lat - end.lat,
-      p.coordinates[p.coordinates.length - 1].lng - end.lng
-    );
-    return startDiff < maxDis && endDiff < maxDis;
-  });
+  id: string;
+  path: Path; // The geometry/location data
+  status: number; // Calculated from linked UserPaths
 }
 
 /**
- * Calculates the rank weight based on index.
- * @param {number} index - The index.
- * @param {number} max - The maximum value.
- * @return {number} The calculated weight.
+ * Retrieves community paths based on origin and destination.
+ * @param {PathLocation} origin - The origin coordinate.
+ * @param {PathLocation} destination - The destination coordinate.
+ * @return {Promise<CommunityPath[]>} The list of community paths.
  */
-export function rankWeight(index: number, max: number): number {
-  const minWeight = 0.3; // how much the oldest still counts
-  const t = index / (max - 1);
-  return 1 - t * (1 - minWeight);
-}
+export async function getCommunityPaths(
+  origin: PathLocation,
+  destination: PathLocation
+): Promise<CommunityPath[]> {
+  const range = 0.05; // ~5km radius search? Or smaller?
+  // Let's use a reasonably large area for "nearby" paths
 
-/**
- * Calculates the distance between two coordinates.
- * @param {Coordinate} c1 - The first coordinate.
- * @param {Coordinate} c2 - The second coordinate.
- * @return {number} The distance in meters.
- */
-export function distance(c1: Coordinate, c2: Coordinate): number {
-  const latDistance = 111000 * (c2.lat - c1.lat);
-  const lngDistance = 111000 * Math.cos(c1.lat * Math.PI / 180) *
-    (c2.lng - c1.lng);
-  return Math.sqrt(latDistance ** 2 + lngDistance ** 2);
-}
+  const snapshot = await admin.firestore().collection(COLLECTIONS.PATHS)
+    .where("startLatitude", ">=", origin.latitude - range)
+    .where("startLatitude", "<=", origin.latitude + range)
+    .get();
 
-/**
- * Checks if two paths are similar.
- * @param {Coordinate[]} pathA - The first path.
- * @param {Coordinate[]} pathB - The second path.
- * @return {boolean} True if similar, false otherwise.
- */
-export function areSimilar(pathA: Coordinate[], pathB: Coordinate[]): boolean {
-  let i = 0; let j = 0; let diffCount = 0;
-  const totalPoints = Math.max(pathA.length, pathB.length);
+  const results: CommunityPath[] = [];
 
-  while (i < pathA.length && j < pathB.length) {
-    const d = distance(pathA[i], pathB[j]);
-    if (d <= MAX_DISTANCE) {
-      i++;
-      j++;
-    } else if (i + 1 < pathA.length && distance(pathA[i + 1], pathB[j]) < d) {
-      i++;
-    } else if (j + 1 < pathB.length && distance(pathA[i], pathB[j + 1]) < d) {
-      j++;
-    } else {
-      diffCount++;
-      i++;
-      j++;
+  for (const doc of snapshot.docs) {
+    const path = doc.data() as Path;
+
+    // Filter by similarity to requested origin/dest loosely?
+    // Or just return all paths that start near origin and end near destination?
+    // Requirement says: "Query the Path collection for paths matching the
+    // origin and destination."
+
+    const startDist = distance(origin,
+      { latitude: path.startLatitude, longitude: path.startLongitude });
+    const endDist = distance(destination,
+      { latitude: path.endLatitude, longitude: path.endLongitude });
+
+    const PROXIMITY_THRESHOLD = 500; // meters
+
+    if (startDist < PROXIMITY_THRESHOLD && endDist < PROXIMITY_THRESHOLD) {
+      // Calculate status from UserPaths
+      const userPathsSnapshot = await admin.firestore()
+        .collection(COLLECTIONS.USER_PATHS)
+        .where("pathId", "==", doc.id)
+        .get();
+
+      let totalStatus = 0;
+      let count = 0;
+
+      userPathsSnapshot.forEach((userPathDoc) => {
+        const up = userPathDoc.data();
+        if (up.status) {
+          totalStatus += up.status;
+          count++;
+        }
+      });
+
+      // Simple average for now
+      const avgStatus = count > 0 ?
+        Math.round(totalStatus / count) : 0;
+
+      results.push({
+        id: doc.id,
+        path: path,
+        status: avgStatus,
+      });
     }
   }
 
-  // count remaining unmatched points
-  diffCount += (pathA.length - i) + (pathB.length - j);
-
-  // similar if the number of points that are different is less than 1%
-  return diffCount / totalPoints <= 0.01;
+  return results;
 }

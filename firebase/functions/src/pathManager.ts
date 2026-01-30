@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { COLLECTIONS } from "./collections";
+import { HttpsError } from "firebase-functions/v2/https";
 
 export interface PathLocation {
   latitude: number;
@@ -122,7 +123,7 @@ export async function findMatchingPath(
  */
 export async function createPath(locations: PathLocation[]): Promise<string> {
   if (locations.length < 2) {
-    throw new Error("Cannot create a path with fewer than 2 coordinates");
+    throw new HttpsError("invalid-argument", "Cannot create a path with fewer than 2 coordinates");
   }
 
   const start = locations[0];

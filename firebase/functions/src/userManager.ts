@@ -91,7 +91,7 @@ export async function sendEmailVerificationCode(email: string): Promise<void> {
     console.log(`Verification code sent to ${email}`);
   } catch (error) {
     console.error("Error sending email:", error);
-    throw new Error("Failed to send verification email.");
+    throw new HttpsError("unavailable", "Failed to send verification email.");
   }
 }
 
@@ -166,7 +166,7 @@ export async function signIn(email: string, password: string): Promise<string> {
   const data = await response.json() as any;
 
   if (!response.ok) {
-    throw new Error(data.error?.message || "Authentication failed");
+    throw new HttpsError("unauthenticated", data.error?.message || "Authentication failed");
   }
 
   // Generate Custom Token
@@ -194,6 +194,6 @@ export async function checkUserExists(email: string): Promise<boolean> {
       throw new HttpsError("invalid-argument", message, { code, message });
     }
 
-    throw new HttpsError("internal", message, { code, message });
+    throw new HttpsError("unknown", message, { code, message });
   }
 }

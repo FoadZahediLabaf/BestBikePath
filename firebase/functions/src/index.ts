@@ -95,7 +95,7 @@ export const getUserPaths = onCall(async (request) => {
   return await pathManager.getUserPaths(userID, request.auth.uid);
 });
 
-export const updatePathPrivacy = onCall(async (request) => {
+export const updateUserPathPrivacy = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The user must be authenticated");
   }
@@ -109,7 +109,7 @@ export const updatePathPrivacy = onCall(async (request) => {
   await pathManager.updatePathPrivacy(pathId, request.auth.uid, isPublic);
 });
 
-export const updatePathStatus = onCall(async (request) => {
+export const updateUserPathStatus = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The user must be authenticated");
   }

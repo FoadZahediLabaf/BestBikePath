@@ -13,7 +13,7 @@ import { onCall, HttpsError } from "firebase-functions/https";
 import * as admin from "firebase-admin";
 
 import * as userManager from "./userManager";
-import * as pathManager from "./pathManager";
+import * as pathManager from "./userPathManager";
 
 admin.initializeApp();
 

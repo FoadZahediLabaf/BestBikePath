@@ -1,6 +1,7 @@
 import { defineString } from "firebase-functions/params";
 import { HttpsError } from "firebase-functions/https";
 import * as admin from "firebase-admin";
+import { COLLECTIONS } from "./collections";
 
 import * as nodemailer from "nodemailer";
 
@@ -43,7 +44,7 @@ export async function createUser(
   });
 
   // Delete verification document after successful creation
-  await admin.firestore().collection("email_verifications").doc(email).delete();
+  await admin.firestore().collection(COLLECTIONS.EMAIL_VERIFICATIONS).doc(email).delete();
 
   // Generate Custom Token
   return await admin.auth().createCustomToken(firebaseUser.uid);
@@ -70,7 +71,7 @@ export async function sendEmailVerificationCode(email: string): Promise<void> {
     Date.now() + 10 * 60 * 1000
   );
 
-  await admin.firestore().collection("email_verifications").doc(email).set({
+  await admin.firestore().collection(COLLECTIONS.EMAIL_VERIFICATIONS).doc(email).set({
     code: code,
     expiresAt: expiresAt,
   });
@@ -102,7 +103,7 @@ export async function checkEmailVerificationCode(
   code: string
 ): Promise<boolean> {
   const doc = await admin.firestore()
-    .collection("email_verifications")
+    .collection(COLLECTIONS.EMAIL_VERIFICATIONS)
     .doc(email)
     .get();
 

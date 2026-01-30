@@ -1,4 +1,5 @@
 import * as admin from "firebase-admin";
+import { COLLECTIONS } from "./collections";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 
@@ -57,7 +58,7 @@ export async function savePath(userPath: UserPath): Promise<void> {
     throw new HttpsError("invalid-argument", "Path ID is required");
   }
 
-  const docRef = admin.firestore().collection("paths").doc(userPath.id);
+  const docRef = admin.firestore().collection(COLLECTIONS.USER_PATHS).doc(userPath.id);
 
   await docRef.set({
     userId: userPath.userId,
@@ -83,7 +84,7 @@ export async function getUserPaths(
   requestingUserId?: string
 ): Promise<UserPath[]> {
   const snapshot = await admin.firestore()
-    .collection("paths")
+    .collection(COLLECTIONS.USER_PATHS)
     .where("userId", "==", targetUserId)
     .get();
 
@@ -129,7 +130,7 @@ export async function updatePathPrivacy(
   userId: string,
   isPublic: boolean
 ) {
-  const docRef = admin.firestore().collection("paths").doc(pathId);
+  const docRef = admin.firestore().collection(COLLECTIONS.USER_PATHS).doc(pathId);
   const doc = await docRef.get();
 
   if (!doc.exists) throw new HttpsError("not-found", "Path not found");
@@ -162,7 +163,7 @@ export async function updatePathStatus(
       "Status must be an integer between 1 and 5");
   }
 
-  const docRef = admin.firestore().collection("paths").doc(pathId);
+  const docRef = admin.firestore().collection(COLLECTIONS.USER_PATHS).doc(pathId);
   const doc = await docRef.get();
 
   if (!doc.exists) throw new HttpsError("not-found", "Path not found");
@@ -185,7 +186,7 @@ export async function updatePathStatus(
  * @return {Promise<void>}
  */
 export async function deletePath(pathId: string, userId: string) {
-  const docRef = admin.firestore().collection("paths").doc(pathId);
+  const docRef = admin.firestore().collection(COLLECTIONS.USER_PATHS).doc(pathId);
   const doc = await docRef.get();
 
   if (!doc.exists) {

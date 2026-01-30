@@ -12,7 +12,7 @@ export interface PathLocation {
   longitude: number;
 }
 
-export interface PathData {
+export interface Path {
   locations: PathLocation[];
 }
 
@@ -33,7 +33,7 @@ export interface UserPath {
   userId: string;
   creationDate: string | Date | Timestamp;
   isPublic: boolean;
-  path: PathData;
+  path: Path;
   status: number;
   performance?: PathPerformance;
   weather?: PathWeather;

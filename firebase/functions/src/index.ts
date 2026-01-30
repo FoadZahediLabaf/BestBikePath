@@ -64,9 +64,9 @@ export const checkEmailVerificationCode = onCall(async (request) => {
   return await userManager.checkEmailVerificationCode(email, code);
 });
 
-// MARK: - Path Management
+// MARK: - UserPath Management
 
-export const savePath = onCall(async (request) => {
+export const saveUserPath = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The user must be authenticated");
   }
@@ -123,7 +123,7 @@ export const updatePathStatus = onCall(async (request) => {
   await pathManager.updatePathStatus(pathId, request.auth.uid, status);
 });
 
-export const deletePath = onCall(async (request) => {
+export const deleteUserPath = onCall(async (request) => {
   if (!request.auth) {
     throw new HttpsError("unauthenticated", "The user must be authenticated");
   }

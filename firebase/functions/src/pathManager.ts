@@ -1,5 +1,4 @@
 import * as admin from "firebase-admin";
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { COLLECTIONS } from "./collections";
 import { HttpsError } from "firebase-functions/v2/https";
 
@@ -107,7 +106,7 @@ export async function findMatchingPath(
     .get();
 
   for (const doc of snapshot.docs) {
-    const path = doc.data() as Path & PathMetadata;
+    const path = { ...doc.data(), id: doc.id } as Path & PathMetadata;
 
     // Filter by start/end longitude and end latitude strictly in memory
     if (Math.abs(path.startLongitude - start.longitude) > range) continue;
@@ -115,7 +114,7 @@ export async function findMatchingPath(
     if (Math.abs(path.endLongitude - end.longitude) > range) continue;
 
     if (areSimilar(locations, path.locations)) {
-      return doc.id;
+      return path.id;
     }
   }
 
@@ -124,7 +123,7 @@ export async function findMatchingPath(
 
 /**
  * Creates a new path in the database.
- * @param {PathLocation[]} locations - The path locations.
+ * @param {Path} path - The path object excluding ID for creation context.
  * @return {Promise<void>}
  */
 export async function savePath(path: Path): Promise<void> {
@@ -141,7 +140,7 @@ export async function savePath(path: Path): Promise<void> {
     startLatitude: start.latitude,
     startLongitude: start.longitude,
     endLatitude: end.latitude,
-    endLongitude: end.longitude
+    endLongitude: end.longitude,
   };
 
   await admin.firestore()

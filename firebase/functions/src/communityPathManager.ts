@@ -55,7 +55,10 @@ export async function getCommunityPaths(
       let count = 0;
 
       userPathsSnapshot.forEach((userPathDoc) => {
-        const userPath = { ...userPathDoc.data(), id: userPathDoc.id } as Omit<UserPath, "path"> & { pathId: string };
+        const userPath = {
+          ...userPathDoc.data(),
+          id: userPathDoc.id,
+        } as Omit<UserPath, "path"> & { pathId: string };
         if (userPath.status) {
           totalStatus += userPath.status;
           count++;

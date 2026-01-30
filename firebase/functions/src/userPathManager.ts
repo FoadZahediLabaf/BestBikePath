@@ -89,7 +89,10 @@ export async function getUserPaths(
   const userPaths: UserPath[] = [];
 
   for (const doc of snapshot.docs) {
-    const userPath = { ...doc.data(), id: doc.id } as Omit<UserPath, "path"> & { pathId: string };
+    const userPath = {
+      ...doc.data(),
+      id: doc.id,
+    } as Omit<UserPath, "path"> & { pathId: string };
 
     // Privacy Check
     // If getting own paths, return all.

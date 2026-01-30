@@ -71,10 +71,13 @@ export async function sendEmailVerificationCode(email: string): Promise<void> {
     Date.now() + 10 * 60 * 1000
   );
 
-  await admin.firestore().collection(COLLECTIONS.EMAIL_VERIFICATIONS).doc(email).set({
-    code: code,
-    expiresAt: expiresAt,
-  });
+  await admin.firestore()
+    .collection(COLLECTIONS.EMAIL_VERIFICATIONS)
+    .doc(email)
+    .set({
+      code: code,
+      expiresAt: expiresAt,
+    });
 
   const mailOptions = {
     from: emailFromParam.value(),

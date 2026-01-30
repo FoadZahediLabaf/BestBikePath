@@ -10,10 +10,13 @@
 
 import { setGlobalOptions } from "firebase-functions";
 import { onCall, HttpsError } from "firebase-functions/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 import * as admin from "firebase-admin";
 
 import * as userManager from "./userManager";
-import * as pathManager from "./userPathManager";
+import * as userPathManager from "./userPathManager";
+import * as communityPathManager from "./communityPathManager";
+import { REGIONS } from "./collections";
 
 admin.initializeApp();
 
@@ -78,7 +81,7 @@ export const saveUserPath = onCall(async (request) => {
       "User ID does not match authenticated user");
   }
 
-  return await pathManager.savePath(userPath);
+  return await userPathManager.saveUserPath(userPath);
 });
 
 export const getUserPaths = onCall(async (request) => {
@@ -92,7 +95,7 @@ export const getUserPaths = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "userID is required");
   }
 
-  return await pathManager.getUserPaths(userID, request.auth.uid);
+  return await userPathManager.getUserPaths(userID, request.auth.uid);
 });
 
 export const updateUserPathPrivacy = onCall(async (request) => {
@@ -106,7 +109,7 @@ export const updateUserPathPrivacy = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "Path ID is required");
   }
 
-  await pathManager.updatePathPrivacy(pathId, request.auth.uid, isPublic);
+  await userPathManager.updateUserPathPrivacy(pathId, request.auth.uid, isPublic);
 });
 
 export const updateUserPathStatus = onCall(async (request) => {
@@ -120,10 +123,8 @@ export const updateUserPathStatus = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "Path ID is required");
   }
 
-  await pathManager.updatePathStatus(pathId, request.auth.uid, status);
+  await userPathManager.updateUserPathStatus(pathId, request.auth.uid, status);
 });
-
-import * as communityPathManager from "./communityPathManager";
 
 export const deleteUserPath = onCall(async (request) => {
   if (!request.auth) {
@@ -136,10 +137,10 @@ export const deleteUserPath = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "Path ID is required");
   }
 
-  await pathManager.deletePath(pathId, request.auth.uid);
+  await userPathManager.deleteUserPath(pathId, request.auth.uid);
 });
 
-// MARK: - Community Paths
+// MARK: - CommunityPath Management
 
 export const getCommunityPaths = onCall(async (request) => {
   const { origin, destination } = request.data;
@@ -152,4 +153,11 @@ export const getCommunityPaths = onCall(async (request) => {
   return await communityPathManager.getCommunityPaths(origin, destination);
 });
 
-// MARK: - CommunityPath Management
+// MARK: - Scheduled Functions
+
+export const cleanupVerificationCodes = onSchedule({
+  schedule: "every 1 hours",
+  region: REGIONS.DEFAULT,
+}, async () => {
+  await userManager.cleanupExpiredVerificationCodes();
+});

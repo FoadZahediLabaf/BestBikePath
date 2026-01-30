@@ -197,3 +197,28 @@ export async function checkUserExists(email: string): Promise<boolean> {
     throw new HttpsError("unknown", message, { code, message });
   }
 }
+
+/**
+ * Cleans up expired verification codes from Firestore.
+ * This should be scheduled to run periodically (e.g., every hour).
+ * @return {Promise<void>}
+ */
+export async function cleanupExpiredVerificationCodes(): Promise<void> {
+  const now = admin.firestore.Timestamp.now();
+  const snapshot = await admin.firestore()
+    .collection(COLLECTIONS.EMAIL_VERIFICATIONS)
+    .where("expiresAt", "<", now)
+    .get();
+
+  if (snapshot.empty) {
+    return;
+  }
+
+  const batch = admin.firestore().batch();
+  snapshot.docs.forEach((doc) => {
+    batch.delete(doc.ref);
+  });
+
+  await batch.commit();
+  console.log(`Deleted ${snapshot.size} expired verification codes.`);
+}

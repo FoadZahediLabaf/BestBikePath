@@ -9,12 +9,15 @@ export interface PathLocation {
 }
 
 export interface Path {
+  id: string;
   locations: PathLocation[];
+}
+
+export interface PathMetadata {
   startLatitude: number;
   startLongitude: number;
   endLatitude: number;
   endLongitude: number;
-  createdAt: Timestamp;
 }
 
 export interface PathPerformance {
@@ -104,7 +107,7 @@ export async function findMatchingPath(
     .get();
 
   for (const doc of snapshot.docs) {
-    const path = doc.data() as Path;
+    const path = doc.data() as Path & PathMetadata;
 
     // Filter by start/end longitude and end latitude strictly in memory
     if (Math.abs(path.startLongitude - start.longitude) > range) continue;
@@ -122,29 +125,27 @@ export async function findMatchingPath(
 /**
  * Creates a new path in the database.
  * @param {PathLocation[]} locations - The path locations.
- * @return {Promise<string>} The new path ID.
+ * @return {Promise<void>}
  */
-export async function createPath(locations: PathLocation[]): Promise<string> {
-  if (locations.length < 2) {
+export async function savePath(path: Path): Promise<void> {
+  if (path.locations.length < 2) {
     throw new HttpsError("invalid-argument",
       "Cannot create a path with fewer than 2 coordinates");
   }
 
-  const start = locations[0];
-  const end = locations[locations.length - 1];
+  const start = path.locations[0];
+  const end = path.locations[path.locations.length - 1];
 
-  const pathData: Omit<Path, "id"> = {
-    locations,
+  const pathData: Omit<Path, "id"> & PathMetadata = {
+    locations: path.locations,
     startLatitude: start.latitude,
     startLongitude: start.longitude,
     endLatitude: end.latitude,
-    endLongitude: end.longitude,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    createdAt: FieldValue.serverTimestamp() as any,
+    endLongitude: end.longitude
   };
 
-  const docRef = await admin.firestore()
+  await admin.firestore()
     .collection(COLLECTIONS.PATHS)
-    .add(pathData);
-  return docRef.id;
+    .doc(path.id)
+    .set(pathData);
 }

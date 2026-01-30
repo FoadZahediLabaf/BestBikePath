@@ -4,16 +4,17 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import {
   Path,
+  PathMetadata,
   PathPerformance,
   PathWeather,
   findMatchingPath,
-  createPath,
+  savePath,
 } from "./pathManager";
 
 export interface UserPath {
   id: string;
   userId: string;
-  date?: Timestamp;
+  date: Timestamp;
   isPublic: boolean;
   path: Path;
   status: number;
@@ -50,7 +51,8 @@ export async function saveUserPath(userPath: UserPath): Promise<void> {
   // Deduplication / Path Creation
   let pathId = await findMatchingPath(locations);
   if (!pathId) {
-    pathId = await createPath(locations);
+    await savePath(userPath.path);
+    pathId = userPath.path.id;
   }
 
   const docRef = admin.firestore()
@@ -59,7 +61,7 @@ export async function saveUserPath(userPath: UserPath): Promise<void> {
 
   await docRef.set({
     userId: userPath.userId,
-    ...(userPath.date && { date: userPath.date }),
+    date: userPath.date,
     isPublic: userPath.isPublic,
     pathId: pathId,
     status: userPath.status,
@@ -84,20 +86,20 @@ export async function getUserPaths(
     .where("userId", "==", targetUserId)
     .get();
 
-  const paths: UserPath[] = [];
+  const userPaths: UserPath[] = [];
 
   for (const doc of snapshot.docs) {
-    const data = doc.data() as Omit<UserPath, "path"> & { pathId: string };
+    const userPath = { ...doc.data(), id: doc.id } as Omit<UserPath, "path"> & { pathId: string };
 
     // Privacy Check
     // If getting own paths, return all.
     // If getting other's paths, return only isPublic == true.
-    if (targetUserId !== requestingUserId && !data.isPublic) {
+    if (targetUserId !== requestingUserId && !userPath.isPublic) {
       continue;
     }
 
     // Fetch the linked Path geometry
-    const pathId = data.pathId;
+    const pathId = userPath.pathId;
     let path: Path | null = null;
 
     if (pathId) {
@@ -106,27 +108,29 @@ export async function getUserPaths(
         .doc(pathId)
         .get();
       if (pathDoc.exists) {
-        path = pathDoc.data() as Path;
+        path = { ...pathDoc.data(), id: pathId } as Path & PathMetadata;
       }
     }
     if (!path) {
       continue;
     }
 
-    const userPath: UserPath = {
+    userPaths.push({
       id: doc.id,
-      userId: data.userId,
-      date: data.date,
-      isPublic: data.isPublic,
-      path: path,
-      status: data.status,
-      performance: data.performance,
-      weather: data.weather,
-    };
-    paths.push(userPath);
+      userId: userPath.userId,
+      date: userPath.date,
+      isPublic: userPath.isPublic,
+      path: {
+        id: pathId,
+        locations: path.locations,
+      },
+      status: userPath.status,
+      performance: userPath.performance,
+      weather: userPath.weather,
+    });
   }
 
-  return paths;
+  return userPaths;
 }
 
 /**

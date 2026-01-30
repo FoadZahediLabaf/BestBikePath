@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import { COLLECTIONS } from "./collections";
-import { Path, PathLocation, distance } from "./pathManager";
+import { Path, PathMetadata, PathLocation, distance } from "./pathManager";
+import { UserPath } from "./userPathManager";
 
 export interface CommunityPath {
   id: string;
@@ -29,7 +30,7 @@ export async function getCommunityPaths(
   const results: CommunityPath[] = [];
 
   for (const doc of snapshot.docs) {
-    const path = doc.data() as Path;
+    const path = { ...doc.data(), id: doc.id } as Path & PathMetadata;
 
     // Filter by similarity to requested origin/dest loosely?
     // Or just return all paths that start near origin and end near destination?
@@ -47,16 +48,16 @@ export async function getCommunityPaths(
       // Calculate status from UserPaths
       const userPathsSnapshot = await admin.firestore()
         .collection(COLLECTIONS.USER_PATHS)
-        .where("pathId", "==", doc.id)
+        .where("pathId", "==", path.id)
         .get();
 
       let totalStatus = 0;
       let count = 0;
 
       userPathsSnapshot.forEach((userPathDoc) => {
-        const up = userPathDoc.data();
-        if (up.status) {
-          totalStatus += up.status;
+        const userPath = { ...userPathDoc.data(), id: userPathDoc.id } as Omit<UserPath, "path"> & { pathId: string };
+        if (userPath.status) {
+          totalStatus += userPath.status;
           count++;
         }
       });
@@ -66,8 +67,11 @@ export async function getCommunityPaths(
         Math.round(totalStatus / count) : 0;
 
       results.push({
-        id: doc.id,
-        path: path,
+        id: path.id,
+        path: {
+          id: path.id,
+          locations: path.locations,
+        },
         status: avgStatus,
       });
     }

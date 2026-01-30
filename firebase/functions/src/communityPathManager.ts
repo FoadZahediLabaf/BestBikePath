@@ -1,7 +1,6 @@
 import * as admin from "firebase-admin";
 import { COLLECTIONS } from "./collections";
-import { Path, PathLocation } from "./pathManager";
-import { distance } from "./pathManager";
+import { Path, PathLocation, distance } from "./pathManager";
 
 export interface CommunityPath {
   id: string;

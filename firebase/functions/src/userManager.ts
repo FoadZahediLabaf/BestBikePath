@@ -44,7 +44,10 @@ export async function createUser(
   });
 
   // Delete verification document after successful creation
-  await admin.firestore().collection(COLLECTIONS.EMAIL_VERIFICATIONS).doc(email).delete();
+  await admin.firestore()
+    .collection(COLLECTIONS.EMAIL_VERIFICATIONS)
+    .doc(email)
+    .delete();
 
   // Generate Custom Token
   return await admin.auth().createCustomToken(firebaseUser.uid);
@@ -166,7 +169,8 @@ export async function signIn(email: string, password: string): Promise<string> {
   const data = await response.json() as any;
 
   if (!response.ok) {
-    throw new HttpsError("unauthenticated", data.error?.message || "Authentication failed");
+    throw new HttpsError("unauthenticated",
+      data.error?.message || "Authentication failed");
   }
 
   // Generate Custom Token

@@ -57,7 +57,10 @@ export function distance(c1: PathLocation, c2: PathLocation): number {
  * @param {PathLocation[]} pathB - The second path.
  * @return {boolean} True if similar, false otherwise.
  */
-export function areSimilar(pathA: PathLocation[], pathB: PathLocation[]): boolean {
+export function areSimilar(
+  pathA: PathLocation[],
+  pathB: PathLocation[]
+): boolean {
   if (pathA.length === 0 || pathB.length === 0) return false;
 
   // Quick check on start and end points
@@ -123,7 +126,8 @@ export async function findMatchingPath(
  */
 export async function createPath(locations: PathLocation[]): Promise<string> {
   if (locations.length < 2) {
-    throw new HttpsError("invalid-argument", "Cannot create a path with fewer than 2 coordinates");
+    throw new HttpsError("invalid-argument",
+      "Cannot create a path with fewer than 2 coordinates");
   }
 
   const start = locations[0];

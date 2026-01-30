@@ -2,8 +2,13 @@ import * as admin from "firebase-admin";
 import { COLLECTIONS } from "./collections";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
-import { Path, PathPerformance, PathWeather } from "./pathManager";
-import { findMatchingPath, createPath } from "./pathManager";
+import {
+  Path,
+  PathPerformance,
+  PathWeather,
+  findMatchingPath,
+  createPath,
+} from "./pathManager";
 
 export interface UserPath {
   id: string;
@@ -59,7 +64,7 @@ export async function saveUserPath(userPath: UserPath): Promise<void> {
     pathId: pathId,
     status: userPath.status,
     ...(userPath.performance && { performance: userPath.performance }),
-    ...(userPath.weather && { weather: userPath.weather })
+    ...(userPath.weather && { weather: userPath.weather }),
   });
 }
 
@@ -191,7 +196,7 @@ export async function updateUserPathStatus(
 /**
  * Deletes a path.
  * Matches: func deletePath(id: UserPath) async throws
- * @param {string} pathId - The ID of the path to delete
+ * @param {string} userPathId - The ID of the path to delete
  * @param {string} userId - The ID of the requesting user
  * @return {Promise<void>}
  */

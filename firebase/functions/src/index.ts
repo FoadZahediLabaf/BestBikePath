@@ -109,7 +109,11 @@ export const updateUserPathPrivacy = onCall(async (request) => {
     throw new HttpsError("invalid-argument", "Path ID is required");
   }
 
-  await userPathManager.updateUserPathPrivacy(pathId, request.auth.uid, isPublic);
+  await userPathManager.updateUserPathPrivacy(
+    pathId,
+    request.auth.uid,
+    isPublic
+  );
 });
 
 export const updateUserPathStatus = onCall(async (request) => {

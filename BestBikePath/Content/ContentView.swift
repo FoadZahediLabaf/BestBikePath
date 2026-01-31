@@ -58,6 +58,18 @@ struct ContentView: View {
                             appModel.presentedSheetItem = .userAuthentication
                         }
                     }
+                } else if appModel.syncCurrentUserPathsError != nil {
+                    ContentUnavailableView {
+                        Label("No Bike Paths Found", systemImage: "exclamationmark.circle")
+                    } description: {
+                        Text("An error occurred while syncing your bike paths.")
+                    } actions: {
+                        Button("Try Again", systemImage: "arrow.2.circlepath") {
+                            Task {
+                                await appModel.syncCurrentUserPaths()
+                            }
+                        }
+                    }
                 } else {
                     ProgressView {
                         Label("Loading your paths", systemImage: "figure.outdoor.cycle")

@@ -56,11 +56,14 @@ final class BestBikePathModel {
         }
     }
 
+    var syncCurrentUserPathsError: Error?
     func syncCurrentUserPaths(userID: User.ID? = nil) async {
+        syncCurrentUserPathsError = nil
         if let userID = userID ?? userSource.currentUser?.id {
             do {
                 currentUserPaths = try await userPathSource.getUserPaths(userID: userID)
             } catch {
+                syncCurrentUserPathsError = error
                 currentUserPaths = nil
             }
         } else {

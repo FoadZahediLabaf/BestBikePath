@@ -151,21 +151,7 @@ struct UserAuthenticationView: View {
         }
         .safeAreaInset(edge: .bottom) {
             AsyncButton(action: buttonAction) {
-                HStack {
-                    if isLoading {
-                        ProgressView()
-                            .tint(.white)
-                            .controlSize(.regular)
-                    }
-
-                    buttonTitle
-
-                    if isLoading {
-                        ProgressView()
-                            .controlSize(.regular)
-                            .hidden()
-                    }
-                }
+                buttonTitle
             }
             .buttonStyle(.borderedProminent)
             .buttonSizing(.flexible)
@@ -173,6 +159,7 @@ struct UserAuthenticationView: View {
             .fontWeight(.semibold)
             .disabled(!isButtonValid)
             .scenePadding(.horizontal)
+            .scenePadding(.bottom)
             .animation(.default, value: isLoading)
             .animation(.default, value: isButtonValid)
         }

@@ -19,7 +19,7 @@ struct ContentMap: View {
 
             ForEach(appModel.mapCoordinator.subtleRoutes, id: \.description) { route in
                 MapPolyline(route)
-                    .stroke(Color.accent.mix(with: Color(.systemBackground), by: 0.25), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
+                    .stroke(Color.accent.mix(with: .white, by: 0.5), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
             }
 
             ForEach(appModel.mapCoordinator.highlightedRoutes, id: \.description) { route in

@@ -315,6 +315,11 @@ struct UserPathRecordingView: View {
                     appModel.presentedSheetItem = .communityPathSearch
                 }
             }
+            .onAppear {
+                if let suggestedRoutes = appModel.nextSuggestedRoutesForUserPathRecording {
+                    appModel.mapCoordinator.subtleRoutes = suggestedRoutes
+                }
+            }
     }
 
     func updatePerformanceMetrics() {
@@ -347,7 +352,8 @@ struct UserPathRecordingView: View {
             isPublic: isPublic,
             path: path,
             status: pathStatus,
-            performance: performance
+            performance: performance,
+            weather: weather
         )
         try await appModel.userPathSource.saveUserPath(userPath)
         await appModel.syncCurrentUserPaths()

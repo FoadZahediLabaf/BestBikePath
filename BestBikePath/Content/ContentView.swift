@@ -74,6 +74,7 @@ struct ContentView: View {
             if appModel.userSource.currentUser != nil {
                 HStack {
                     Button("Record Path", systemImage: "record.circle") {
+                        appModel.nextSuggestedRoutesForUserPathRecording = nil
                         appModel.presentUserPathRecording()
                     }
                     .tint(.red)

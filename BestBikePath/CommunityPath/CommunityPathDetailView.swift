@@ -49,28 +49,28 @@ struct CommunityPathDetailView: View {
             }
 
             Section {
-                DisclosureGroup("Locations") {
-                    mapItemsView
-                }
-                .onChange(of: appModel.mapCoordinator.highlightedRoutes, initial: true) {
-                    Task {
-                        guard
-                            let startMapItem = appModel.mapCoordinator.mapItems.first,
-                            let endMapItem = appModel.mapCoordinator.mapItems.last
-                        else {
-                            return
-                        }
-                        let locations = communityPath.path.locations.dropFirst().dropLast()
-                        var mapItems: [MKMapItem] = []
-                        mapItems.append(startMapItem)
-                        for location in locations {
-                            let mapItem = await location.mapItemGeocoded
-                            mapItems.append(mapItem)
-                        }
-                        mapItems.append(endMapItem)
-                        self.mapItems = mapItems
-                    }
-                }
+//                DisclosureGroup("Locations") {
+//                    mapItemsView
+//                }
+//                .onChange(of: appModel.mapCoordinator.highlightedRoutes, initial: true) {
+//                    Task {
+//                        guard
+//                            let startMapItem = appModel.mapCoordinator.mapItems.first,
+//                            let endMapItem = appModel.mapCoordinator.mapItems.last
+//                        else {
+//                            return
+//                        }
+//                        let locations = communityPath.path.locations.dropFirst().dropLast()
+//                        var mapItems: [MKMapItem] = []
+//                        mapItems.append(startMapItem)
+//                        for location in locations {
+//                            let mapItem = await location.mapItemGeocoded
+//                            mapItems.append(mapItem)
+//                        }
+//                        mapItems.append(endMapItem)
+//                        self.mapItems = mapItems
+//                    }
+//                }
 
                 DisclosureGroup("Directions") {
                     ForEach(routeSteps, id: \.description) { step in
@@ -97,6 +97,7 @@ struct CommunityPathDetailView: View {
             if appModel.currentUser != nil {
                 Section {
                     Button {
+                        appModel.nextSuggestedRoutesForUserPathRecording = appModel.mapCoordinator.highlightedRoutes
                         appModel.presentUserPathRecording()
                     } label: {
                         Label {

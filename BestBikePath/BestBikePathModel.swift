@@ -120,6 +120,7 @@ final class BestBikePathModel {
 
     static var locationManager: LocationManager = .shared
 
+    var nextSuggestedRoutesForUserPathRecording: [MKRoute]?
     func presentUserPathRecording() {
         if ![.authorizedAlways, .authorizedWhenInUse].contains(locationManager.authorizationStatus) {
             presentedSheetItem = .locationAccess
@@ -129,52 +130,4 @@ final class BestBikePathModel {
             presentedSheetItem = .userPathRecording
         }
     }
-}
-
-private extension BestBikePathModel {
-
-    func getDirections(source: MKMapItem, destination: MKMapItem) async -> MKRoute? {
-        let request = MKDirections.Request()
-        request.source = source
-        request.destination = destination
-        request.transportType = .cycling
-
-        let directions = MKDirections(request: request)
-        let response = try? await directions.calculate()
-        return response?.routes.first
-    }
-
-    func boundingRegion(for locations: [CLLocation], margin: Double) -> MKCoordinateRegion? {
-        guard !locations.isEmpty else { fatalError() }
-
-        // Compute min/max lat/lon
-        var minLat = locations.first!.coordinate.latitude
-        var maxLat = locations.first!.coordinate.latitude
-        var minLon = locations.first!.coordinate.longitude
-        var maxLon = locations.first!.coordinate.longitude
-
-        for location in locations.dropFirst() {
-            let lat = location.coordinate.latitude
-            let lon = location.coordinate.longitude
-            minLat = min(minLat, lat)
-            maxLat = max(maxLat, lat)
-            minLon = min(minLon, lon)
-            maxLon = max(maxLon, lon)
-        }
-
-        // Center
-        let center = CLLocationCoordinate2D(
-            latitude: (minLat + maxLat) / 2,
-            longitude: (minLon + maxLon) / 2
-        )
-
-        // Span (+ a small padding)
-        let span = MKCoordinateSpan(
-            latitudeDelta: (maxLat - minLat) * margin,
-            longitudeDelta: (maxLon - minLon) * margin
-        )
-
-        return MKCoordinateRegion(center: center, span: span)
-    }
-
 }

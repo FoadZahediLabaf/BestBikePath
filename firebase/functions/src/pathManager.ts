@@ -24,6 +24,7 @@ export interface PathMetadata {
 }
 
 export interface PathPerformance {
+  time: number;
   distance: number;
   averageSpeed: number;
   peakSpeed: number;

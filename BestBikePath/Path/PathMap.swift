@@ -70,7 +70,6 @@ private func boundingRegion(for locations: [CLLocation], margin: Double) -> MKCo
         latitudeDelta: (maxLat - minLat) * margin,
         longitudeDelta: (maxLon - minLon) * margin
     )
-    print(span)
 
     return MKCoordinateRegion(center: center, span: span)
 }

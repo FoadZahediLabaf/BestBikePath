@@ -16,14 +16,10 @@ struct FirebaseUserPathSource: UserPathSource {
     }
 
     func saveUserPath(_ path: UserPath) async throws {
-        do {
-            typealias Request = UserPath
-            struct Response: Decodable {}
+        typealias Request = UserPath
+        struct Response: Decodable {}
 
-            try await call("saveUserPath", path)
-        } catch {
-            print("JFK", error)
-        }
+        try await call("saveUserPath", path)
     }
 
     func getUserPaths(userID: User.ID) async throws -> [UserPath] {

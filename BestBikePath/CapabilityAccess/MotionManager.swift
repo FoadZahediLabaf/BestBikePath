@@ -39,7 +39,6 @@ class MotionManager {
 
             if CMMotionActivityManager.isActivityAvailable() {
                 activityManager.startActivityUpdates(to: .main) { (activity) in
-                    print("Attività rilevata: \(activity)")
                     continuation.yield(activity)
                 }
             }
@@ -75,7 +74,6 @@ class MotionManager {
 
                     if totalAcceleration > threshold && self.obstacleDetectionCoordinator.lastDetection.timeIntervalSinceNow <= -5 {
                         self.obstacleDetectionCoordinator.lastDetection = .now
-                        print("Buca rilevata! Intensità: \(totalAcceleration) G")
                         continuation.yield(UUID())
                     }
                 }

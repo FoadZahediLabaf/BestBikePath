@@ -66,7 +66,6 @@ final class BestBikePathModel {
             do {
                 currentUserPaths = try await userPathSource.getUserPaths(userID: userID)
             } catch {
-                print(error)
                 currentUserPaths = nil
             }
         } else {
@@ -174,7 +173,6 @@ private extension BestBikePathModel {
             latitudeDelta: (maxLat - minLat) * margin,
             longitudeDelta: (maxLon - minLon) * margin
         )
-        print(span)
 
         return MKCoordinateRegion(center: center, span: span)
     }

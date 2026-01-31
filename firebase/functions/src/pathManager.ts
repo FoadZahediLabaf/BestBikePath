@@ -1,6 +1,7 @@
 import * as admin from "firebase-admin";
 import { COLLECTIONS } from "./collections";
 import { HttpsError } from "firebase-functions/v2/https";
+import * as turf from "@turf/turf";
 
 export interface PathLocation {
   latitude: number;
@@ -30,7 +31,7 @@ export interface PathWeather {
   humidity: number;
   windSpeed: number;
 }
-const MAX_DISTANCE = 50; // meters
+
 
 /**
  * Calculates the distance between two coordinates.
@@ -63,26 +64,34 @@ export function areSimilar(
   pathA: PathLocation[],
   pathB: PathLocation[]
 ): boolean {
-  if (pathA.length === 0 || pathB.length === 0) return false;
+  if (pathA.length < 2 || pathB.length < 2) return false;
 
-  // Quick check on start and end points
-  const startDist = distance(pathA[0], pathB[0]);
-  const endDist = distance(pathA[pathA.length - 1], pathB[pathB.length - 1]);
+  // 1. Convert to LineString
+  const lineA = turf.lineString(
+    pathA.map((p) => [p.longitude, p.latitude])
+  );
+  // const lineB = turf.lineString(
+  //   pathB.map((p) => [p.longitude, p.latitude])
+  // );
 
-  if (startDist > MAX_DISTANCE || endDist > MAX_DISTANCE) return false;
+  // 2. Create a 'tube' of 20 meters around path A
+  // 0.02 km = 20 meters
+  const bufferA = turf.buffer(lineA, 0.02, { units: "kilometers" });
 
-  // Simple sampling check for now to improve performance
-  // over checking every point. Checks 10 points along the path
-  const steps = 10;
-  for (let i = 0; i <= steps; i++) {
-    const idxA = Math.floor(i * (pathA.length - 1) / steps);
-    const idxB = Math.floor(i * (pathB.length - 1) / steps);
-    if (distance(pathA[idxA], pathB[idxB]) > MAX_DISTANCE * 2) {
-      return false;
-    }
+  // 3. Check if points of B fall within the tube of A
+  const pointsB = turf.points(
+    pathB.map((p) => [p.longitude, p.latitude])
+  );
+
+  // If buffer creation failed, return false (should guard against undefined result)
+  if (!bufferA) {
+    return false;
   }
 
-  return true;
+  const pointsWithin = turf.pointsWithinPolygon(pointsB, bufferA);
+
+  // If 90% of points are inside, it's the same path
+  return pointsWithin.features.length / pathB.length > 0.90;
 }
 
 /**

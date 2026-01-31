@@ -132,6 +132,52 @@ describe('userManager', () => {
     });
   });
 
+  });
+
+  describe('checkEmailVerificationCode', () => {
+    it('should return false if code is expired', async () => {
+       const mockDocGet = jest.fn().mockResolvedValue({
+        exists: true,
+        data: () => ({ 
+            code: '123456', 
+            // Expired 1000ms ago
+            expiresAt: { toMillis: () => Date.now() - 1000 } 
+        }),
+      });
+      
+      const mockCollectionFn = jest.fn().mockReturnValue({
+        doc: jest.fn().mockReturnValue({
+          get: mockDocGet,
+        }),
+      });
+      (admin.firestore as any).mockReturnValue({ collection: mockCollectionFn });
+
+      const result = await userManager.checkEmailVerificationCode('test@example.com', '123456');
+      expect(result).toBe(false);
+    });
+
+    it('should return true if code is valid and not expired', async () => {
+       const mockDocGet = jest.fn().mockResolvedValue({
+        exists: true,
+        data: () => ({ 
+            code: '123456', 
+            // Expires in 10000ms
+            expiresAt: { toMillis: () => Date.now() + 10000 } 
+        }),
+      });
+      
+      const mockCollectionFn = jest.fn().mockReturnValue({
+        doc: jest.fn().mockReturnValue({
+          get: mockDocGet,
+        }),
+      });
+      (admin.firestore as any).mockReturnValue({ collection: mockCollectionFn });
+
+      const result = await userManager.checkEmailVerificationCode('test@example.com', '123456');
+      expect(result).toBe(true);
+    });
+  });
+
   describe('sendEmailVerificationCode', () => {
     it('should send an email and save code to firestore', async () => {
       const mockSet = jest.fn();
@@ -184,6 +230,5 @@ describe('userManager', () => {
       expect(mockAuth.deleteUser).toHaveBeenCalledWith('test-uid');
     });
   });
-});
 });
 

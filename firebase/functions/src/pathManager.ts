@@ -86,7 +86,8 @@ export function arePathsSimilar(
     pathB.map((p) => [p.longitude, p.latitude])
   );
 
-  // If buffer creation failed, return false (should guard against undefined result)
+  // If buffer creation failed, return false
+  // (should guard against undefined result)
   if (!bufferA) {
     return false;
   }
@@ -111,7 +112,11 @@ export async function getSimilarPath(
   const destination = locations[locations.length - 1];
   const radiusInM = 200; // 200m
 
-  const filteredPaths = await getConnectingPaths(origin, destination, radiusInM);
+  const filteredPaths = await getConnectingPaths(
+    origin,
+    destination,
+    radiusInM
+  );
 
   for (const path of filteredPaths) {
     if (arePathsSimilar(locations, path.locations)) {
@@ -122,16 +127,23 @@ export async function getSimilarPath(
   return null;
 }
 
+/**
+ * Retrieves paths that connect broadly between an origin and destination area.
+ * @param {PathLocation} origin - The origin coordinate.
+ * @param {PathLocation} destination - The destination coordinate.
+ * @param {number} radiusInM - Sample radius in meters.
+ * @return {Promise<any[]>} List of candidate paths.
+ */
 export async function getConnectingPaths(
   origin: PathLocation,
   destination: PathLocation,
   radiusInM: number
 ): Promise<(Path & PathMetadata)[]> {
-
-  // https://firebase.google.com/docs/firestore/solutions/geoqueries
-
   const originCenter: [number, number] = [origin.latitude, origin.longitude];
-  const destinationCenter: [number, number] = [destination.latitude, destination.longitude];
+  const destinationCenter: [number, number] = [
+    destination.latitude,
+    destination.longitude,
+  ];
 
   // Each item in 'bounds' represents a startAt/endAt pair. We have to issue
   // a separate query for each pair. There can be up to 9 pairs of bounds
@@ -150,7 +162,7 @@ export async function getConnectingPaths(
   // Collect all the query results together into a single list
   const snapshots = await Promise.all(promises);
 
-  const docs = snapshots.flatMap(snap => snap.docs);
+  const docs = snapshots.flatMap((snap) => snap.docs);
   const paths: (Path & PathMetadata)[] = [];
   for (const doc of docs) {
     const path = { ...doc.data(), id: doc.id } as Path & PathMetadata;
@@ -191,8 +203,12 @@ export async function savePath(path: Path): Promise<void> {
   const origin = path.locations[0];
   const destination = path.locations[path.locations.length - 1];
 
-  const originGeohash = geofire.geohashForLocation([origin.latitude, origin.longitude]);
-  const destinationGeohash = geofire.geohashForLocation([destination.latitude, destination.longitude]);
+  const originGeohash = geofire.geohashForLocation(
+    [origin.latitude, origin.longitude]
+  );
+  const destinationGeohash = geofire.geohashForLocation(
+    [destination.latitude, destination.longitude]
+  );
 
   const pathData: Omit<Path, "id"> & PathMetadata = {
     locations: path.locations,

@@ -26,7 +26,6 @@ export async function getCommunityPaths(
   const communityPaths: CommunityPath[] = [];
 
   for (const path of paths) {
-
     // Calculate status from UserPaths
     const userPathsSnapshot = await admin.firestore()
       .collection(COLLECTIONS.USER_PATHS)

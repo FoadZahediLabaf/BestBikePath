@@ -31,6 +31,7 @@ export interface PathPerformance {
 }
 
 export interface PathWeather {
+  condition: string;
   temperature: number;
   humidity: number;
   windSpeed: number;

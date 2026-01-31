@@ -31,7 +31,7 @@ struct PathMap: View {
         Map(initialPosition: initialPosition, interactionModes: []) {
             ForEach(routes, id: \.description) { route in
                 MapPolyline(route)
-                    .stroke(.blue, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
+                    .stroke(Color.accent, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
             }
         }
         .task {

@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import { COLLECTIONS } from "./collections";
 import { Path, PathLocation, getConnectingPaths } from "./pathManager";
 import { UserPath } from "./userPathManager";
+import { Timestamp } from "firebase-admin/firestore";
 
 export interface CommunityPath {
   id: string;
@@ -35,7 +36,10 @@ export async function getCommunityPaths(
     const userPaths = userPathsSnapshot.docs.map((userPathDoc) => ({
       ...userPathDoc.data(),
       id: userPathDoc.id,
-    } as Omit<UserPath, "path"> & { pathId: string }));
+    } as Omit<UserPath, "path" | "date"> & {
+      pathId: string;
+      date: Timestamp;
+    }));
 
     const status = calculateCommunityPathStatus(userPaths);
 
@@ -59,7 +63,10 @@ export async function getCommunityPaths(
  * @return {number} The calculated status (1-5) or 0 if no data
  */
 export function calculateCommunityPathStatus(
-  userPaths: (Omit<UserPath, "path"> & { pathId: string })[]
+  userPaths: (Omit<UserPath, "path" | "date"> & {
+    pathId: string;
+    date: Timestamp;
+  })[]
 ): number {
   // Filter valid statuses and timestamps
   const validReports = userPaths

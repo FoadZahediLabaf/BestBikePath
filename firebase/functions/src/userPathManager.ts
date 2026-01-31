@@ -14,7 +14,7 @@ import {
 export interface UserPath {
   id: string;
   userId: string;
-  date: Timestamp;
+  date: number;
   isPublic: boolean;
   path: Path;
   status: number;
@@ -61,7 +61,8 @@ export async function saveUserPath(userPath: UserPath): Promise<void> {
 
   await docRef.set({
     userId: userPath.userId,
-    date: userPath.date,
+    // Ensure date is a Firestore Timestamp
+    date: getTimestampFromInput(userPath.date),
     isPublic: userPath.isPublic,
     pathId: pathId,
     status: userPath.status,
@@ -92,7 +93,7 @@ export async function getUserPaths(
     const userPath = {
       ...doc.data(),
       id: doc.id,
-    } as Omit<UserPath, "path"> & { pathId: string };
+    } as Omit<UserPath, "path" | "date"> & { pathId: string, date: Timestamp };
 
     // Privacy Check
     // If getting own paths, return all.
@@ -121,7 +122,7 @@ export async function getUserPaths(
     userPaths.push({
       id: doc.id,
       userId: userPath.userId,
-      date: userPath.date,
+      date: userPath.date.toDate().getMilliseconds(),
       isPublic: userPath.isPublic,
       path: {
         id: pathId,
@@ -244,4 +245,33 @@ export async function deleteUserPath(userPathId: string, userId: string) {
         .delete();
     }
   }
+}
+
+/**
+ * Helper to convert various input date formats to Firestore Timestamp.
+ * @param {any} inputDate - Date, Timestamp, string, or number
+ * @return {Timestamp} Firestore Timestamp
+ */
+function getTimestampFromInput(inputDate: unknown): Timestamp {
+  if (!inputDate) return Timestamp.now();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const v = inputDate as any;
+
+  if (v instanceof Timestamp) {
+    return v;
+  }
+
+  // Handle standard Date object
+  if (v instanceof Date) {
+    return Timestamp.fromDate(v);
+  }
+
+  // Handle number (millis) or string (ISO)
+  const date = new Date(v);
+  if (!isNaN(date.getTime())) {
+    return Timestamp.fromDate(date);
+  }
+
+  return Timestamp.now();
 }

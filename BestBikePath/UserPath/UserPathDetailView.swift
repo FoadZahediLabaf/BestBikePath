@@ -16,6 +16,8 @@ struct UserPathDetailView: View {
 
     @State private var routeSteps: [MKRoute.Step] = []
 
+    @State private var isCancelConfirmationShown = false
+
     var rawStatusBinding: Binding<Double> {
         Binding {
             Double(userPath.status.rawValue)
@@ -191,13 +193,21 @@ struct UserPathDetailView: View {
             }
 
             if isUserPath {
-                AsyncButton(role: .destructive) {
-                    try await deletePath()
-                } label: {
-                    Label("Delete", systemImage: "trash")
+                Button(role: .destructive) {
+                    isCancelConfirmationShown = true
                 }
                 .tint(.red)
                 .foregroundStyle(.red)
+                .confirmationDialog("Delete Path", isPresented: $isCancelConfirmationShown, titleVisibility: .visible) {
+                    AsyncButton("Delete", role: .destructive) {
+                        try await deletePath()
+                    }
+                    Button("Cancel", role: .cancel) {
+                        isCancelConfirmationShown = false
+                    }
+                } message: {
+                    Text("You’ll loose all your path data.")
+                }
             }
         }
         .animation(.default, value: appModel.mapCoordinator.mapItems)

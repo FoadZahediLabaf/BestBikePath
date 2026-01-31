@@ -334,7 +334,9 @@ struct UserPathRecordingView: View {
                     Button("Delete", role: .destructive) {
                         appModel.presentedSheetItem = .communityPathSearch
                     }
-                    Button("Cancel", role: .cancel) {}
+                    Button("Cancel", role: .cancel) {
+                        isCancelConfirmationShown = false
+                    }
                 } message: {
                     Text("You’ll loose all your progress.")
                 }

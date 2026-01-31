@@ -73,7 +73,9 @@ struct UserAccountView: View {
                         try await appModel.userSource.signOut()
                         appModel.presentedSheetItem = .communityPathSearch
                     }
-                    Button("Cancel", role: .cancel) {}
+                    Button("Cancel", role: .cancel) {
+                        isSignOutConfirmationShown = false
+                    }
                 } message: {
                     Text("You’ll need to sign in again to access your account.")
                 }
@@ -87,7 +89,9 @@ struct UserAccountView: View {
                     try await appModel.userSource.deleteUser(email: user.email)
                     appModel.presentedSheetItem = .communityPathSearch
                 }
-                Button("Cancel", role: .cancel) {}
+                Button("Cancel", role: .cancel) {
+                    isDeleteAccountConfirmationShown = false
+                }
             } message: {
                 Text("This action is permanent and will remove your data.")
             }

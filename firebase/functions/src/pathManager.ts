@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { COLLECTIONS } from "./collections";
+import { COLLECTIONS } from "./constants";
 import { HttpsError } from "firebase-functions/v2/https";
 import * as turf from "@turf/turf";
 import * as geofire from "geofire-common";

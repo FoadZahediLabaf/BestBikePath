@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { COLLECTIONS } from "./collections";
+import { COLLECTIONS } from "./constants";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { HttpsError } from "firebase-functions/v2/https";
 import {

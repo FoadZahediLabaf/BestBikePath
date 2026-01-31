@@ -1,7 +1,7 @@
 import { defineString } from "firebase-functions/params";
 import { HttpsError } from "firebase-functions/https";
 import * as admin from "firebase-admin";
-import { COLLECTIONS } from "./collections";
+import { COLLECTIONS } from "./constants";
 
 import * as nodemailer from "nodemailer";
 

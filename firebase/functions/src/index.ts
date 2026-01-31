@@ -16,7 +16,7 @@ import * as admin from "firebase-admin";
 import * as userManager from "./userManager";
 import * as userPathManager from "./userPathManager";
 import * as communityPathManager from "./communityPathManager";
-import { REGIONS } from "./collections";
+import { REGIONS } from "./constants";
 
 admin.initializeApp();
 

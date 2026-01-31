@@ -1,6 +1,6 @@
 
 import * as pathManager from '../pathManager';
-import { COLLECTIONS } from '../collections';
+import { COLLECTIONS } from '../constants';
 import * as admin from 'firebase-admin';
 import { HttpsError } from 'firebase-functions/v2/https';
 

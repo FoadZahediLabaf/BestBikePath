@@ -1,5 +1,5 @@
 import * as admin from "firebase-admin";
-import { COLLECTIONS } from "./collections";
+import { COLLECTIONS } from "./constants";
 import { Path, PathLocation, getConnectingPaths } from "./pathManager";
 import { UserPath } from "./userPathManager";
 import { Timestamp } from "firebase-admin/firestore";

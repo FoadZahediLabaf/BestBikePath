@@ -2,7 +2,7 @@ import SwiftUI
 
 struct CommunityPathRow: View {
 
-    let path: BikePathEntry
+    let path: CommunityPath
 
     var statusValue: Double {
         switch path.status {
@@ -24,20 +24,20 @@ struct CommunityPathRow: View {
         case .excellent:
             "100%"
         case .good:
-            "80%"
+            "75%"
         case .fair:
-            "60%"
+            "50%"
         case .poor:
-            "40%"
+            "25%"
         case .impassable:
-            "20%"
+            "0%"
         }
     }
 
     var body: some View {
         Label {
             VStack {
-                Gauge(value: statusValue, in: 0...5) {
+                Gauge(value: statusValue, in: 1...5) {
                     Label("Status", systemImage: "road.lanes.curved.right")
                 } currentValueLabel: {
                     Text(statusPercentage)
@@ -64,7 +64,7 @@ struct CommunityPathRow: View {
                 .foregroundStyle(.secondary)
             }
         } icon: {
-            PathMap(path, margin: 1.2)
+            PathMap(path.path, margin: 1.2)
                 .cornerRadius(16)
                 .allowsHitTesting(false)
         }

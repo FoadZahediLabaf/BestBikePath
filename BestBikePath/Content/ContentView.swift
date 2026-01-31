@@ -15,97 +15,69 @@ struct ContentView: View {
 
     @State private var searchPathQuery: String = ""
 
-    @ViewBuilder
-    var map: some View {
-        @Bindable var appModel = appModel
-
-        Map(position: $appModel.mapCameraPosition) {
-            UserAnnotation()
-
-            ForEach(appModel.mapItems, id: \.description) { mapItem in
-                Marker(item: mapItem)
-            }
-
-            let routes: [(route: MKRoute, isHighlighted: Bool)] = appModel.routes.map { route in
-                let isHighlighted: Bool = route.path.map { $0 == appModel.selectedPath } ?? true
-                return (route.route, isHighlighted)
-            }.sorted { !$0.isHighlighted && $1.isHighlighted }
-
-            ForEach(routes, id: \.route.description) { (route, isHighlighted) in
-                MapPolyline(route)
-                    .stroke(isHighlighted ? Color.blue : Color.blue.mix(with: .white, by: 0.5), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
-            }
-        }
-        .animation(.default, value: appModel.selectedPath)
-        .onMapCameraChange {
-            appModel.mapRegion = $0.region
-        }
-        .mapControls {
-            MapUserLocationButton()
-            MapCompass()
-            MapScaleView()
-            MapPitchToggle()
-        }
-    }
-
     var userScrollView: some View {
         ScrollView {
-            if appModel.user == nil {
-                ContentUnavailableView {
-                    Label("Not Signed In", systemImage: "person.slash.fill")
-                } description: {
-                    Text("You need to sign in to create new bike paths, but you can still search for community bike paths.")
-                } actions: {
-                    Button("Sign In ", systemImage: "person.fill") {
-                        appModel.presentedSheetItem = .authentication
-                    }
-                }
-            } else if appModel.userPaths.isEmpty {
-                ContentUnavailableView {
-                    Label("No Bike Paths Yet", systemImage: "bicycle.circle")
-                } description: {
-                    Text("You haven’t recorded or saved any bike paths yet. Start tracking your first ride or explore routes shared by the community.")
-                }
-            } else {
-                Section {
-                    ScrollView(.horizontal) {
-                        HStack {
-                            //                            addPathButton
-                            //                                .aspectRatio(3/2, contentMode: .fill)
-                            //                                .containerRelativeFrame(.horizontal) { (l, _) in l*2/5 }
-
-                            ForEach(appModel.userPaths) { path in
-                                Button {
-                                    appModel.userSelectedPath = path
-                                    appModel.displayUserPath(path)
-                                    //appModel.presentedSheetItem = .pathDetail
-                                } label: {
-                                    PathMap(path)
-                                        .allowsHitTesting(false)
+            VStack {
+                if let currentUserPaths = appModel.currentUserPaths, !currentUserPaths.isEmpty {
+                    Section {
+                        ScrollView(.horizontal) {
+                            HStack {
+                                ForEach(currentUserPaths) { userPath in
+                                    Button {
+                                        appModel.presentUserPathDetail(userPath)
+                                    } label: {
+                                        PathMap(userPath.path)
+                                            .allowsHitTesting(false)
+                                    }
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                    .aspectRatio(3/2, contentMode: .fill)
+                                    .containerRelativeFrame(.horizontal) { (l, _) in l*3/5 }
+                                    .background(.background.secondary)
+                                    .cornerRadius(24)
                                 }
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .aspectRatio(3/2, contentMode: .fill)
-                                .containerRelativeFrame(.horizontal) { (l, _) in l*3/5 }
-                                .background(.background.secondary)
-                                .cornerRadius(24)
                             }
+                            .scrollTargetLayout()
+                            .scenePadding(.horizontal)
                         }
-                        .scrollTargetLayout()
-                        .scenePadding(.horizontal)
+                        .scrollIndicators(.hidden)
+                        .scrollTargetBehavior(.viewAligned)
+                    } header: {
+                        Text("Your Bike Paths")
+                            .font(.title3)
+                            .fontWeight(.semibold)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .scenePadding(.horizontal)
                     }
-                    .scrollIndicators(.hidden)
-                    .scrollTargetBehavior(.viewAligned)
-                } header: {
-                    Text("Your Bike Paths")
-                        .font(.title3)
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .scenePadding(.horizontal)
+                } else if let currentUserPaths = appModel.currentUserPaths, currentUserPaths.isEmpty {
+                    ContentUnavailableView {
+                        Label("No Bike Paths Yet", systemImage: "figure.outdoor.cycle")
+                    } description: {
+                        Text("You haven’t recorded or saved any bike paths yet. Start tracking your first ride or explore routes shared by the community.")
+                    }
+                } else if appModel.userSource.currentUser == nil {
+                    ContentUnavailableView {
+                        Label("Not Signed In", systemImage: "person.slash.fill")
+                    } description: {
+                        Text("You need to sign in to create new bike paths, but you can still search for community bike paths.")
+                    } actions: {
+                        Button("Sign In", systemImage: "person.fill") {
+                            appModel.presentedSheetItem = .userAuthentication
+                        }
+                    }
+                } else {
+                    ProgressView {
+                        Label("Loading your paths", systemImage: "figure.outdoor.cycle")
+                    }
+                    .controlSize(.extraLarge)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .containerRelativeFrame(.vertical)
         }
+        .transition(.opacity)
+        .animation(.default, value: appModel.currentUserPaths)
         .safeAreaInset(edge: .bottom) {
-            if appModel.user != nil {
+            if appModel.userSource.currentUser != nil {
                 HStack {
                     Button("Record Path", systemImage: "record.circle") {
                         appModel.openRecordingView()
@@ -113,7 +85,8 @@ struct ContentView: View {
                     .tint(.red)
 
                     Button("Add Path", systemImage: "plus.circle") {
-                        appModel.presentedSheetItem = .pathInsertion
+                        appModel.presentedSheetItem = .userPathInsertion
+                        appModel.mapCoordinator.reset()
                     }
                     .tint(.accentColor)
                 }
@@ -128,7 +101,7 @@ struct ContentView: View {
         .scrollBounceBehavior(.basedOnSize)
         .defaultScrollAnchor(.center)
         .animation(.default, value: appModel.userPaths)
-        .animation(.default, value: appModel.user)
+        .animation(.default, value: appModel.userSource.currentUser)
     }
 
     var body: some View {
@@ -137,82 +110,99 @@ struct ContentView: View {
         ZStack {
             userScrollView
 
-            map
-                .blur(radius: appModel.isRootMapPresented ? 0 : 32)
-                .opacity(appModel.isRootMapPresented ? 1 : 0)
-                .animation(.default, value: appModel.isRootMapPresented)
+            ContentMap()
+                .blur(radius: appModel.isMapPresented ? 0 : 32)
+                .opacity(appModel.isMapPresented ? 1 : 0)
+                .animation(.default, value: appModel.isMapPresented)
+                .onChange(of: appModel.presentedSheetItem) {
+                    appModel.mapCoordinator.reset()
+                    appModel.searchedCommunityPaths = nil
+                }
         }
         .navigationTitle("Best Bike Paths")
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar(content: {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Account", systemImage: "person.crop.circle") {
-                    if appModel.user == nil {
-                        appModel.presentedSheetItem = .authentication
+                    if let user = appModel.userSource.currentUser {
+                        appModel.presentedSheetItem = .userAccount(user: user)
                     } else {
-                        appModel.presentedSheetItem = .account
+                        appModel.presentedSheetItem = .userAuthentication
                     }
                 }
             }
         })
-        .safeAreaInsetsSheet(item: Binding($appModel.presentedSheetItem, default: .pathBrowsing), isAppliedToMap: appModel.isRootMapPresented) { item in
-            switch item {
-            case .pathBrowsing:
-                CommunitySearch()
+        .safeAreaInsetsSheet(item: Binding($appModel.presentedSheetItem, default: .communityPathSearch), isAppliedToMap: appModel.isMapPresented) { item in
+            switch item.role {
+            case .communityPathSearch:
+                CommunityPathSearch()
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-            case .authentication:
+            case .communityPathDetail:
+                if let communityPath = item.communityPath {
+                    NavigationStack {
+                        CommunityPathDetailView(communityPath: communityPath)
+                            .toolbarTitleDisplayMode(.inlineLarge)
+                    }
+                    .presentationDetents([.medium, .large])
+                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                }
+            case .userAuthentication:
                 NavigationStack {
-                    AuthenticationView()
+                    UserAuthenticationView()
                         .toolbarTitleDisplayMode(.inlineLarge)
                 }
                 .presentationDetents([.medium, .large])
                 .presentationBackgroundInteraction(.enabled(upThrough: .medium))
-            case .account:
-                NavigationStack {
-                    AccountView()
-                        .toolbarTitleDisplayMode(.inlineLarge)
+            case .userAccount:
+                if let user = item.user {
+                    NavigationStack {
+                        UserAccountView(user: user)
+                            .toolbarTitleDisplayMode(.inlineLarge)
+                    }
+                    .presentationDetents([.medium, .large])
+                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
-                .presentationDetents([.medium, .large])
-                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
             case .locationAccess:
                 NavigationStack {
                     LocationAccessView()
                         .toolbarTitleDisplayMode(.inlineLarge)
                 }
                 .presentationDetents([.large])
-            case .pathInsertion:
+            case .userPathInsertion:
                 NavigationStack {
                     AddBikePathView()
                 }
                 .presentationDetents([.medium, .large])
                 .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 .interactiveDismissDisabled()
-            case .pathRecording:
+            case .userPathRecording:
                 NavigationStack {
                     RecordBikePathView()
                 }
                 .presentationDetents([.height(240), .fraction(0.8)])
                 .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.8)))
                 .interactiveDismissDisabled()
+            case .userPathDetail:
+                if let userPath = item.userPath {
+                    NavigationStack {
+                        UserPathDetailView(userPath: userPath)
+                            .toolbarTitleDisplayMode(.inlineLarge)
+                    }
+                    .presentationDetents([.medium, .large])
+                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                }
             default:
                 EmptyView()
             }
 
         }
-        .animation(.default, value: appModel.user == nil)
-        //        .sheet(isPresented: appModel.isPresentingRootModal(.userPath)) {
-        //            NavigationStack {
-        //                UserPathView()
-        //                    .toolbarTitleDisplayMode(.inlineLarge)
-        //            }
-        //            .presentationDetents([.medium, .large])
-        //        }
+        .animation(.default, value: appModel.userSource.currentUser == nil)
     }
 
 
     var addPathButton: some View {
         Button {
-            appModel.presentedSheetItem = .pathRecording
+            appModel.presentedSheetItem = .userPathRecording
         } label: {
             VStack {
                 Image(systemName: "plus.circle.fill")
@@ -236,6 +226,6 @@ struct ContentView: View {
     NavigationStack {
         ContentView()
     }
-    .modelContainer(for: User.self, inMemory: true)
+    .modelContainer(for: UserModel.self, inMemory: true)
     .environment(appModel)
 }

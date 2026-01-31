@@ -5,23 +5,28 @@
 //  Created by Lorenzo Fiamingo on 05/11/25.
 //
 
+import AsyncButton
 import SwiftUI
 import SwiftData
 
-struct AuthenticationView: View {
+struct UserAuthenticationView: View {
 
     @Environment(BestBikePathModel.self) private var appModel
 
-    @State private var username: String = ""
-    @State private var verificationCode: String = ""
+    @State private var email: String = ""
+    @State private var emailVerificationCode: String = ""
     @State private var password: String = ""
     @State private var passwordConfirmation: String = ""
-    @State private var name: String = ""
+    @State private var displayName: String = ""
     @State private var areTermsAccepted = false
     @State private var isLoading: Bool = false
     @State private var errorMessage: String?
     @State private var mode: Mode = .idle
     @FocusState private var focusedField: Field?
+
+    @State private var generator = UINotificationFeedbackGenerator()
+    @State private var showingErrorAlert = false
+    @State private var localizedError: AnyLocalizedError?
 
     enum Field {
         case username, verificationCode, password, passwordConfirmation, name, termsAcceptance
@@ -34,18 +39,18 @@ struct AuthenticationView: View {
     var body: some View {
         ScrollView {
             VStack {
-                TextField("Email", text: $username)
+                TextField("Email", text: $email)
                     .textContentType(.username)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .focused($focusedField, equals: .username)
                     .submitLabel(.next)
-                    .onSubmit(buttonAction)
+                    .onSubmit(performButtonAction)
                     .padding()
                     .background(.background.secondary, in: .rect)
                     .cornerRadius(12)
-                    .onChange(of: username) {
+                    .onChange(of: email) {
                         if mode != .idle {
                             mode = .idle
                             errorMessage = nil
@@ -53,14 +58,14 @@ struct AuthenticationView: View {
                     }
 
                 if [.emailVerify].contains(mode) {
-                    TextField("Verification Code", text: $verificationCode)
+                    TextField("Verification Code", text: $emailVerificationCode)
                         .textContentType(.oneTimeCode)
                         .keyboardType(.default)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .focused($focusedField, equals: .verificationCode)
                         .submitLabel(.next)
-                        .onSubmit(buttonAction)
+                        .onSubmit(performButtonAction)
                         .padding()
                         .background(.background.secondary, in: .rect)
                         .cornerRadius(12)
@@ -76,7 +81,7 @@ struct AuthenticationView: View {
                             case .idle, .emailVerify:
                                 break
                             case .signIn:
-                                buttonAction()
+                                performButtonAction()
                             case .signUp:
                                 focusedField = .passwordConfirmation
                             }
@@ -91,20 +96,20 @@ struct AuthenticationView: View {
                         .textContentType(.password)
                         .focused($focusedField, equals: .passwordConfirmation)
                         .submitLabel(.go)
-                        .onSubmit(buttonAction)
+                        .onSubmit(performButtonAction)
                         .padding()
                         .background(.background.secondary, in: .rect)
                         .cornerRadius(12)
                 }
 
                 if [.signUp].contains(mode) {
-                    TextField("Name", text: $name)
+                    TextField("Name", text: $displayName)
                         .textContentType(.name)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                         .focused($focusedField, equals: .name)
                         .submitLabel(.next)
-                        .onSubmit(buttonAction)
+                        .onSubmit(performButtonAction)
                         .padding()
                         .background(.background.secondary, in: .rect)
                         .cornerRadius(12)
@@ -145,7 +150,7 @@ struct AuthenticationView: View {
             .scenePadding(.horizontal)
         }
         .safeAreaInset(edge: .bottom) {
-            Button(action: buttonAction) {
+            AsyncButton(action: buttonAction) {
                 HStack {
                     if isLoading {
                         ProgressView()
@@ -173,6 +178,14 @@ struct AuthenticationView: View {
         }
         .onAppear { focusedField = .username }
         .navigationTitle("Account")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(role: .cancel) {
+                    appModel.cleanMap()
+                    appModel.presentedSheetItem = .communityPathSearch
+                }
+            }
+        }
     }
 
     private var buttonTitle: Text {
@@ -202,68 +215,107 @@ struct AuthenticationView: View {
         }
     }
 
-
-
     private var isButtonValid: Bool {
+        if isLoading { return false }
         switch mode {
         case .idle:
-            !username.isEmpty && !isLoading
+            return !email.isEmpty
         case .signIn:
-            !username.isEmpty && !password.isEmpty && !isLoading
+            let hasEmail = !email.isEmpty
+            let hasPassword = !password.isEmpty
+            return hasEmail && hasPassword
         case .emailVerify:
-            !username.isEmpty && !verificationCode.isEmpty && !isLoading
+            let hasEmail = !email.isEmpty
+            let hasCode = !emailVerificationCode.isEmpty
+            return hasEmail && hasCode
         case .signUp:
-            !username.isEmpty && !password.isEmpty && password == passwordConfirmation && !name.isEmpty && areTermsAccepted && !isLoading
+            let hasEmail = !email.isEmpty
+            let hasPassword = !password.isEmpty
+            let passwordsMatch = password == passwordConfirmation
+            let hasName = !displayName.isEmpty
+            let accepted = areTermsAccepted
+            return hasEmail && hasPassword && passwordsMatch && hasName && accepted
         }
     }
 
-    private func buttonAction() {
-        Task { @MainActor in
-            guard isButtonValid else {
+    private func performButtonAction() {
+        guard isButtonValid else {
+            return
+        }
+        Task {
+            generator.prepare()
+            do {
+                try await buttonAction()
+                generator.notificationOccurred(.success)
+            } catch {
+                generator.notificationOccurred(.error)
+                let localizedError = error as? LocalizedError ?? UnlocalizedError(error: error)
+                self.localizedError = AnyLocalizedError(erasing: localizedError)
+                showingErrorAlert = true
+            }
+        }
+    }
+
+    private func buttonAction() async throws {
+        guard isButtonValid else {
+            return
+        }
+
+        isLoading = true
+        defer {
+            isLoading = false
+        }
+
+        errorMessage = nil
+
+        switch mode {
+        case .idle:
+            let userExists: Bool
+            do {
+                userExists = try await appModel.userSource.checkUserExists(email: email)
+            } catch let error as FirebaseUserSource.InvalidEmail {
+                errorMessage = error.failureReason
                 return
             }
-
-            isLoading = true
-            defer {
-                isLoading = false
+            if userExists {
+                mode = .signIn
+                focusedField = .password
+            } else {
+                try await appModel.userSource.sendEmailVerificationCode(email: email)
+                mode = .emailVerify
+                focusedField = .verificationCode
             }
-
-            try? await Task.sleep(for: .seconds(1.2)) // 1s
-
-            errorMessage = nil
-
-            switch mode {
-            case .idle:
-                if try await appModel.authenticationSource.userExists(email: username) {
-                    mode = .signIn
-                    focusedField = .password
-                } else {
-                    mode = .emailVerify
-                    focusedField = .verificationCode
-                }
-            case .emailVerify:
+        case .emailVerify:
+            if try await appModel.userSource.checkEmailVerificationCode(email: email, code: emailVerificationCode) {
                 mode = .signUp
-            case .signIn:
-                do {
-                    try await appModel.authenticationSource.signIn(email: username, password: password)
-                } catch {
-                    errorMessage = "Wrong password for this email."
-                }
-            case .signUp:
-                try await appModel.authenticationSource.createUser(email: username, password: password)
+            } else {
+                errorMessage = "That verification code is not correct."
             }
+        case .signIn:
+            do {
+                try await appModel.userSource.signIn(email: email, password: password)
+                appModel.presentedSheetItem = .communityPathSearch
+            } catch {
+                errorMessage = "That password is not correct."
+            }
+        case .signUp:
+            try await appModel.userSource.createUser(
+                email: email,
+                password: password,
+                displayName: displayName,
+                emailVerificationCode: emailVerificationCode
+            )
+            appModel.presentedSheetItem = .communityPathSearch
         }
     }
-
-
 }
 
 #Preview {
     @Previewable @State var appModel = BestBikePathModel()
 
     NavigationStack {
-        AuthenticationView()
+        UserAuthenticationView()
     }
-    .modelContainer(for: User.self, inMemory: true)
+    .modelContainer(for: UserModel.self, inMemory: true)
     .environment(appModel)
 }

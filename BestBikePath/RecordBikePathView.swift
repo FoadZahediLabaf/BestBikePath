@@ -157,7 +157,7 @@ struct RecordBikePathView: View {
                     if isCompleted {
                         Button {
                             // Save to disk the trip
-                            appModel.presentedSheetItem = .pathBrowsing
+                            appModel.presentedSheetItem = .communityPathSearch
                         } label: {
                             Label {
                                 Text("Save")
@@ -229,7 +229,7 @@ struct RecordBikePathView: View {
             .animation(.default, value: confirmingObstacles)
             .toolbar {
                 Button(role: .cancel) {
-                    appModel.presentedSheetItem = .pathBrowsing
+                    appModel.presentedSheetItem = .communityPathSearch
                 }
             }
     }

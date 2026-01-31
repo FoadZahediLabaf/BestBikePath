@@ -7,48 +7,30 @@ struct ContentMap: View {
 
     private var locationManager = BestBikePathModel.locationManager
 
-    var mapItems: [MKMapItem] {
-        appModel.mapItems
-    }
-
-    var highlightedRoutes: [MKRoute] {
-        appModel.routes
-            .filter { route in
-                route.path == appModel.selectedPath
-            }.map(\.route)
-    }
-
-    var subtleRoutes: [MKRoute] {
-        appModel.routes
-            .filter { route in
-                route.path != appModel.selectedPath
-            }.map(\.route)
-    }
-
-
     var body: some View {
         @Bindable var appModel = appModel
 
-        Map(position: $appModel.mapCameraPosition) {
+        Map(position: $appModel.mapCoordinator.mapCameraPosition) {
             UserAnnotation()
 
-            ForEach(appModel.mapItems, id: \.description) { mapItem in
+            ForEach(appModel.mapCoordinator.mapItems, id: \.description) { mapItem in
                 Marker(item: mapItem)
             }
 
-            ForEach(highlightedRoutes, id: \.description) { route in
+            ForEach(appModel.mapCoordinator.highlightedRoutes, id: \.description) { route in
                 MapPolyline(route)
                     .stroke(Color.blue, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
             }
 
-            ForEach(subtleRoutes, id: \.description) { route in
+            ForEach(appModel.mapCoordinator.subtleRoutes, id: \.description) { route in
                 MapPolyline(route)
                     .stroke(Color.blue.mix(with: .white, by: 0.5), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
             }
         }
-        .animation(.default, value: appModel.selectedPath)
+        .animation(.default, value: appModel.mapCoordinator.mapCameraPosition)
+        .animation(.default, value: appModel.selectedCommunityPath)
         .onMapCameraChange {
-            appModel.mapRegion = $0.region
+            appModel.mapCoordinator.coordinateRegion = $0.region
         }
         .mapControls {
             if [.authorizedAlways, .authorizedWhenInUse].contains(locationManager.authorizationStatus) {

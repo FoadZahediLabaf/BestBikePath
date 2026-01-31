@@ -9,16 +9,16 @@ import Foundation
 import SwiftData
 
 @Model
-final class User {
+final class UserModel {
 
     var username: String
 
     @Attribute(.allowsCloudEncryption)
     var password: String
 
-    var pathEntries: [BikePathEntry]
+    var pathEntries: [UserPathModel]
 
-    init(username: String, password: String, pathEntries: [BikePathEntry]) {
+    init(username: String, password: String, pathEntries: [UserPathModel]) {
         self.username = username
         self.password = password
         self.pathEntries = pathEntries
@@ -26,9 +26,9 @@ final class User {
 }
 
 @Model
-final class BikePathEntry {
+final class UserPathModel {
 
-    var user: User
+    var user: UserModel
 
     var date: Date
 
@@ -82,7 +82,7 @@ final class BikePathEntry {
         }
     }
 
-    init(user: User, date: Date, isPublic: Bool, path: BikePath, performance: Performance?, weather: Weather? = nil, mode: BikePathEntryMode, obstaclesCount: Int? = nil, manualStatus: BikePathStatus? = nil) {
+    init(user: UserModel, date: Date, isPublic: Bool, path: BikePath, performance: Performance?, weather: Weather? = nil, mode: BikePathEntryMode, obstaclesCount: Int? = nil, manualStatus: BikePathStatus? = nil) {
         self.user = user
         self.date = date
         self.isPublic = isPublic
@@ -108,7 +108,7 @@ final class BikePath {
 
     var hasHighways: Bool
 
-    var entries: [BikePathEntry]
+    var entries: [UserPathModel]
 
     var publicStatus: BikePathStatus? {
         let publicEntries = entries.filter { $0.isPublic }
@@ -134,7 +134,7 @@ final class BikePath {
         return statusCount.max(by: { $0.value < $1.value })?.key
     }
 
-    init(streets: [StreetLocation], hasHighways: Bool, entries: [BikePathEntry] = []) {
+    init(streets: [StreetLocation], hasHighways: Bool, entries: [UserPathModel] = []) {
         self.streets = streets
         self.hasHighways = hasHighways
         self.entries = entries
@@ -165,9 +165,9 @@ enum BikePathStatus: Int, Codable {
 }
 
 
-extension BikePathEntry {
-    static func makeLecCom() -> BikePathEntry {
-        BikePathEntry(
+extension UserPathModel {
+    static func makeLecCom() -> UserPathModel {
+        UserPathModel(
             user: .init(username: "test", password: "test", pathEntries: []),
             date: .now,
             isPublic: true,
@@ -183,8 +183,8 @@ extension BikePathEntry {
         )
     }
 
-    static func makeLecCanCom() -> BikePathEntry {
-        BikePathEntry(
+    static func makeLecCanCom() -> UserPathModel {
+        UserPathModel(
             user: .init(username: "test", password: "test", pathEntries: []),
             date: .now,
             isPublic: true,
@@ -201,8 +201,8 @@ extension BikePathEntry {
         )
     }
 
-    static func makeLecOggCom() -> BikePathEntry {
-        BikePathEntry(
+    static func makeLecOggCom() -> UserPathModel {
+        UserPathModel(
             user: .init(username: "test", password: "test", pathEntries: []),
             date: .now,
             isPublic: true,
@@ -219,8 +219,8 @@ extension BikePathEntry {
         )
     }
 
-    static func makeLecCantCom() -> BikePathEntry {
-        BikePathEntry(
+    static func makeLecCantCom() -> UserPathModel {
+        UserPathModel(
             user: .init(username: "test", password: "test", pathEntries: []),
             date: .now,
             isPublic: true,
@@ -238,8 +238,8 @@ extension BikePathEntry {
         )
     }
 
-    static func makeMilBre() -> BikePathEntry {
-        BikePathEntry(
+    static func makeMilBre() -> UserPathModel {
+        UserPathModel(
             user: .init(username: "test", password: "test", pathEntries: []),
             date: .now,
             isPublic: true,
@@ -255,8 +255,8 @@ extension BikePathEntry {
         )
     }
 
-    static func makeMilCreBre() -> BikePathEntry {
-        BikePathEntry(
+    static func makeMilCreBre() -> UserPathModel {
+        UserPathModel(
             user: .init(username: "test", password: "test", pathEntries: []),
             date: .now,
             isPublic: true,
@@ -273,8 +273,8 @@ extension BikePathEntry {
         )
     }
 
-    static func makeMilBerBre() -> BikePathEntry {
-        BikePathEntry(
+    static func makeMilBerBre() -> UserPathModel {
+        UserPathModel(
             user: .init(username: "test", password: "test", pathEntries: []),
             date: .now,
             isPublic: true,

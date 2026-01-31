@@ -14,20 +14,112 @@ final class BestBikePathModel {
 
     let modelSource: SwiftDataModelSource = .swiftData
 
-    let authenticationSource: AuthenticationSource = .test
+    let userSource: UserSource = .firebase
 
-    var presentedSheetItem: ContentSheetItem = .pathBrowsing
+    let userPathSource: UserPathSource = .firebase
 
-    var isRootMapForcePresented = false
+    let communityPathSource: CommunityPathSource = .firebase
 
-    var isRootMapPresented: Bool {
-        isRootMapForcePresented ||
-        !routes.isEmpty ||
-        !mapItems.isEmpty ||
-        presentedSheetItem == .pathRecording ||
-        presentedSheetItem == .pathInsertion // ||
-        // presentedSheetItem == .userPath
+    var currentUserStreamTask: Task<Void, Never>?
+
+    var presentedSheetItem: ContentSheetItem = .communityPathSearch
+
+    var currentUser: User?
+
+    var currentUserPaths: [UserPath]?
+
+    var searchedCommunityPaths: [CommunityPath]?
+
+    var mapCoordinator = ContentMapCoordinator()
+
+    var selectedCommunityPath: CommunityPath?
+
+    var isMapForcePresented = false
+
+    var isMapPresented: Bool {
+        isMapForcePresented ||
+        mapCoordinator.isContentPresented ||
+        [
+            .userPathRecording,
+            .userPathInsertion,
+            .userPathDetail,
+            .communityPathDetail
+        ].contains(presentedSheetItem.role)
     }
+
+    init() {
+        currentUserStreamTask = Task {
+            for await currentUser in userSource.currentUserStream {
+                self.currentUser = currentUser
+                await syncCurrentUserPaths(userID: currentUser?.id)
+            }
+        }
+    }
+
+    func syncCurrentUserPaths(userID: User.ID? = nil) async {
+        if let userID = userID ?? userSource.currentUser?.id {
+            do {
+                currentUserPaths = try await userPathSource.getUserPaths(userID: userID)
+            } catch {
+                print(error)
+                currentUserPaths = nil
+            }
+        } else {
+            currentUserPaths = nil
+        }
+    }
+
+    func searchCommunityPaths() async throws {
+        guard
+            let originMapItem = mapCoordinator.mapItems.first,
+            let destinationMapItem = mapCoordinator.mapItems.last
+        else {
+            searchedCommunityPaths = nil
+            return
+        }
+        
+        let origin = PathLocation(from: originMapItem)
+        let destination = PathLocation(from: destinationMapItem)
+
+        let communityPaths = try await communityPathSource.getCommunityPaths(origin: origin, destination: destination)
+        searchedCommunityPaths = communityPaths
+        var mapCoordinator = self.mapCoordinator
+        try await mapCoordinator.makeCachedPathRoutes(from: communityPaths.map(\.path))
+
+        selectedCommunityPath = searchedCommunityPaths?.first
+        mapCoordinator.selectCachedPathRoutes(id: searchedCommunityPaths?.first?.path.id)
+        self.mapCoordinator = mapCoordinator
+    }
+
+    func presentUserPathDetail(_ userPath: UserPath) {
+        Task {
+            var mapCoordinator = mapCoordinator
+            try await mapCoordinator.displayPath(from: userPath.path)
+            withAnimation {
+                self.mapCoordinator = mapCoordinator
+            }
+        }
+        presentedSheetItem = .userPathDetail(userPath: userPath)
+    }
+
+    func presentCommunityPathDetail(_ communityPath: CommunityPath) {
+        Task {
+            var mapCoordinator = mapCoordinator
+            try await mapCoordinator.displayPath(from: communityPath.path)
+            withAnimation {
+                self.mapCoordinator = mapCoordinator
+            }
+        }
+        presentedSheetItem = .communityPathDetail(communityPath: communityPath)
+    }
+
+
+
+
+
+
+
+
 
     func cleanMap() {
         routes.removeAll()
@@ -35,32 +127,30 @@ final class BestBikePathModel {
         communityResultPaths = nil
     }
 
-    var routes: [(route: MKRoute, path: BikePathEntry?)] = []
+    var routes: [(route: MKRoute, path: UserPathModel?)] = []
 
     var mapItems: [MKMapItem] = []
 
-    var mapCameraPosition: MapCameraPosition = .automatic
 
-    var mapRegion = MKCoordinateRegion()
+//    var user: User? = .some(.init(username: "", password: "", pathEntries: [])) {
+//        didSet {
+//            if let user {
+//                var descriptor = FetchDescriptor<BikePathEntry>.init()
+//                self.userPaths = (try? modelSource.mainContext.fetch(descriptor)) ?? []
+//            } else {
+//                self.userPaths.removeAll()
+//            }
+//        }
+//    }
 
-    var user: User? = .some(.init(username: "", password: "", pathEntries: [])) {
-        didSet {
-            if let user {
-                var descriptor = FetchDescriptor<BikePathEntry>.init()
-                self.userPaths = (try? modelSource.mainContext.fetch(descriptor)) ?? []
-            } else {
-                self.userPaths.removeAll()
-            }
-        }
-    }
 
-    var userPaths: [BikePathEntry] = [.makeLecCanCom()]
+    var userPaths: [UserPathModel] = [.makeLecCanCom()]
 
-    var userSelectedPath: BikePathEntry?
+    var userSelectedPath: UserPathModel?
 
-    func displayUserPath(_ path: BikePathEntry) {
+    func displayUserPath(_ path: UserPathModel) {
         let locations = path.path.streets.map { CLLocation(latitude: $0.latitude, longitude: $0.longitude) }
-        mapCameraPosition = .region(boundingRegion(for: locations, margin: 1.2)!)
+        mapCoordinator.mapCameraPosition = .region(boundingRegion(for: locations, margin: 1.2)!)
         Task {
             var mapItems: [MKMapItem] = []
             for location in locations {
@@ -81,15 +171,13 @@ final class BestBikePathModel {
         }
     }
 
-    var communityResultPaths: [BikePathEntry]?
-
-    var selectedPath: BikePathEntry?
+    var communityResultPaths: [UserPathModel]?
 
     static var locationManager: LocationManager = .shared
 
     func openRecordingView() {
         if [.authorizedAlways, .authorizedWhenInUse].contains(Self.locationManager.authorizationStatus) {
-            presentedSheetItem = .pathRecording
+            presentedSheetItem = .userPathRecording
         } else {
             presentedSheetItem = .locationAccess
         }
@@ -125,26 +213,26 @@ final class BestBikePathModel {
     }
 
     func addManualPath(isPublic: Bool) {
-        guard let user else { fatalError() }
-        let hasHighways = routes.contains { $0.route.hasHighways }
-        let streets = mapItems.map { item in
-            StreetLocation(latitude: item.location.coordinate.latitude, longitude: item.location.coordinate.longitude)
-        }
-        let bikePath = BikePath(
-            streets: streets,
-            hasHighways: hasHighways
-        )
-        let pathEntry = BikePathEntry(
-            user: user,
-            date: .now,
-            isPublic: isPublic,
-            path: bikePath,
-            performance: nil,
-            mode: .manual
-        )
-
-        modelSource.mainContext.insert(pathEntry)
-        userPaths.insert(pathEntry, at: 0)
+//        guard let user else { fatalError() }
+//        let hasHighways = routes.contains { $0.route.hasHighways }
+//        let streets = mapItems.map { item in
+//            StreetLocation(latitude: item.location.coordinate.latitude, longitude: item.location.coordinate.longitude)
+//        }
+//        let bikePath = BikePath(
+//            streets: streets,
+//            hasHighways: hasHighways
+//        )
+//        let pathEntry = BikePathEntry(
+//            user: user,
+//            date: .now,
+//            isPublic: isPublic,
+//            path: bikePath,
+//            performance: nil,
+//            mode: .manual
+//        )
+//
+//        modelSource.mainContext.insert(pathEntry)
+//        userPaths.insert(pathEntry, at: 0)
     }
 
 //    func checkUser(username: String) -> Bool {
@@ -161,7 +249,7 @@ final class BestBikePathModel {
 //        descriptor.fetchLimit = 1
 //        if let user = try! modelContext.fetch(descriptor).first {
 //            self.user = user
-//            presentedSheetItem = .pathBrowsing
+//            presentedSheetItem = .communityPathSearch
 //            return true
 //        } else {
 //            return false
@@ -173,7 +261,7 @@ final class BestBikePathModel {
 //
 //        modelContext.insert(user)
 //        self.user = user
-//        presentedSheetItem = .pathBrowsing
+//        presentedSheetItem = .communityPathSearch
 //    }
 }
 

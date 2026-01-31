@@ -1,5 +1,5 @@
 {
-  "originHash" : "c681d5bed6fcc249771e684acda007ef04ed4d6560a547726374422bd4ad0ff4",
+  "originHash" : "b708e2e88caadd2f8437fdd9d8b0f6672db76f13d3cc1e2b9a5a38863d1fca4e",
   "pins" : [
     {
       "identity" : "abseil-cpp-binary",
@@ -116,6 +116,15 @@
       "state" : {
         "revision" : "540318ecedd63d883069ae7f1ed811a2df00b6ac",
         "version" : "2.4.0"
+      }
+    },
+    {
+      "identity" : "swiftui-async-button",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/lorenzofiamingo/swiftui-async-button",
+      "state" : {
+        "revision" : "34341f690ca9c2f87fc18def918eeb417e22ded8",
+        "version" : "1.2.0"
       }
     },
     {

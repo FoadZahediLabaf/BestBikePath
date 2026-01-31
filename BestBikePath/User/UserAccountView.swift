@@ -5,12 +5,15 @@
 //  Created by Lorenzo Fiamingo on 05/11/25.
 //
 
+import AsyncButton
 import SwiftUI
 import SwiftData
 
-struct AccountView: View {
+struct UserAccountView: View {
 
     @Environment(BestBikePathModel.self) private var appModel
+
+    let user: User
 
     @Environment(\.dismiss) private var dismiss
 
@@ -20,11 +23,11 @@ struct AccountView: View {
     var body: some View {
         List {
             Section {
-                Label("John Appleseed", systemImage: "person")
+                Label(user.displayName, systemImage: "person")
                     .fontWeight(.medium)
                     .foregroundStyle(.primary)
 
-                Label("john.appleseed@bbp.com" as String, systemImage: "envelope")
+                Label(user.email, systemImage: "envelope")
                     .foregroundStyle(.primary)
             }
 
@@ -56,8 +59,9 @@ struct AccountView: View {
                     isSignOutConfirmationShown = true
                 }
                 .confirmationDialog("Sign out", isPresented: $isSignOutConfirmationShown, titleVisibility: .visible) {
-                    Button("Sign Out", role: .destructive) {
-                        appModel.user = nil
+                    AsyncButton("Sign Out", role: .destructive) {
+                        try await appModel.userSource.signOut()
+                        appModel.presentedSheetItem = .communityPathSearch
                     }
                     Button("Cancel", role: .cancel) {}
                 } message: {
@@ -66,13 +70,12 @@ struct AccountView: View {
 
                 Button("Delete Account", systemImage: "xmark.rectangle.portrait.fill", role: .destructive) {
                     isDeleteAccountConfirmationShown = true
-                    dismiss()
                 }
             }
             .confirmationDialog("Delete account", isPresented: $isDeleteAccountConfirmationShown, titleVisibility: .visible) {
-                Button("Delete Account", role: .destructive) {
-                    appModel.user = nil
-                    dismiss()
+                AsyncButton("Delete Account", role: .destructive) {
+                    try await appModel.userSource.deleteUser(email: user.email)
+                    appModel.presentedSheetItem = .communityPathSearch
                 }
                 Button("Cancel", role: .cancel) {}
             } message: {
@@ -80,6 +83,14 @@ struct AccountView: View {
             }
         }
         .navigationTitle("Account")
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button(role: .cancel) {
+                    appModel.cleanMap()
+                    appModel.presentedSheetItem = .communityPathSearch
+                }
+            }
+        }
     }
 }
 
@@ -87,8 +98,8 @@ struct AccountView: View {
     @Previewable @State var appModel = BestBikePathModel()
 
     NavigationStack {
-        AccountView()
+        UserAccountView(user: .test)
     }
-    .modelContainer(for: User.self, inMemory: true)
+    .modelContainer(for: UserModel.self, inMemory: true)
     .environment(appModel)
 }

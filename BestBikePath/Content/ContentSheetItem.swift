@@ -1,42 +1,67 @@
 struct ContentSheetItem: Identifiable, Hashable {
+
     enum Role {
-        case pathBrowsing
-        case authentication
-        case account
+        case communityPathSearch
+        case communityPathDetail
+        case userAuthentication
+        case userAccount
         case locationAccess
-        case pathRecording
-        case pathInsertion
+        case userPathRecording
+        case userPathInsertion
+        case userPathDetail
     }
+
     let role: Role
 
-    var id: Role {
-        role
+    let user: User?
+
+    let userPath: UserPath?
+
+    let communityPath: CommunityPath?
+
+    var id: Self {
+        self
+    }
+
+    fileprivate init(role: Role, user: User? = nil, userPath: UserPath? = nil, communityPath: CommunityPath? = nil) {
+        self.role = role
+        self.user = user
+        self.userPath = userPath
+        self.communityPath = communityPath
     }
 }
 
 extension ContentSheetItem {
 
-    static var pathBrowsing: ContentSheetItem {
-        ContentSheetItem(role: .pathBrowsing)
+    static var communityPathSearch: ContentSheetItem {
+        ContentSheetItem(role: .communityPathSearch)
     }
 
-    static var authentication: ContentSheetItem {
-        ContentSheetItem(role: .authentication)
+    static func communityPathDetail(communityPath: CommunityPath) -> ContentSheetItem {
+        ContentSheetItem(role: .communityPathDetail, communityPath: communityPath)
     }
 
-    static var account: ContentSheetItem {
-        ContentSheetItem(role: .account)
+    static var userAuthentication: ContentSheetItem {
+        ContentSheetItem(role: .userAuthentication)
+    }
+
+    static func userAccount(user: User) -> ContentSheetItem {
+        ContentSheetItem(role: .userAccount, user: user)
     }
 
     static var locationAccess: ContentSheetItem {
         ContentSheetItem(role: .locationAccess)
     }
 
-    static var pathRecording: ContentSheetItem {
-        ContentSheetItem(role: .pathRecording)
+    static var userPathRecording: ContentSheetItem {
+        ContentSheetItem(role: .userPathRecording)
     }
 
-    static var pathInsertion: ContentSheetItem {
-        ContentSheetItem(role: .pathInsertion)
+    static var userPathInsertion: ContentSheetItem {
+        ContentSheetItem(role: .userPathInsertion)
+    }
+
+    static func userPathDetail(userPath: UserPath) -> ContentSheetItem {
+        ContentSheetItem(role: .userPathDetail, userPath: userPath)
     }
 }

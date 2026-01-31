@@ -7,11 +7,16 @@
 
 import SwiftUI
 import SwiftData
+import FirebaseCore
 
 @main
 struct BestBikePathApp: App {
 
     @State private var appModel = BestBikePathModel()
+
+    init() {
+        FirebaseApp.configure()
+    }
 
     var body: some Scene {
         WindowGroup {

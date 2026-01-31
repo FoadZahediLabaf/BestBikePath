@@ -18,7 +18,7 @@ struct SwiftDataModelSource: ModelSource {
 
     private static let sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            User.self, BikePathEntry.self, BikePath.self, StreetLocation.self
+            UserModel.self, UserPathModel.self, BikePath.self, StreetLocation.self
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
 

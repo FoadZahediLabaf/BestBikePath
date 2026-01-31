@@ -10,6 +10,8 @@
 		A60C06542F267BA100C5FA7B /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = A60C06532F267BA100C5FA7B /* SwiftUIIntrospect */; };
 		A60C06682F291A4B00C5FA7B /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = A60C06672F291A4B00C5FA7B /* FirebaseAuth */; };
 		A60C066A2F291A4B00C5FA7B /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = A60C06692F291A4B00C5FA7B /* FirebaseFunctions */; };
+		A6920E802F2DD043004BF643 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = A6920E7F2F2DD043004BF643 /* FirebaseFirestore */; };
+		A6A2FD9F2F2A261A00DBD898 /* AsyncButton in Frameworks */ = {isa = PBXBuildFile; productRef = A6A2FD9E2F2A261A00DBD898 /* AsyncButton */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,7 +45,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				A60C066A2F291A4B00C5FA7B /* FirebaseFunctions in Frameworks */,
+				A6A2FD9F2F2A261A00DBD898 /* AsyncButton in Frameworks */,
 				A60C06542F267BA100C5FA7B /* SwiftUIIntrospect in Frameworks */,
+				A6920E802F2DD043004BF643 /* FirebaseFirestore in Frameworks */,
 				A60C06682F291A4B00C5FA7B /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -51,10 +55,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A6920E7E2F2DD043004BF643 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		A6E28BB12EBBD62F000EECF0 = {
 			isa = PBXGroup;
 			children = (
 				A6E28BBC2EBBD62F000EECF0 /* BestBikePath */,
+				A6920E7E2F2DD043004BF643 /* Frameworks */,
 				A6E28BBB2EBBD62F000EECF0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +102,8 @@
 				A60C06532F267BA100C5FA7B /* SwiftUIIntrospect */,
 				A60C06672F291A4B00C5FA7B /* FirebaseAuth */,
 				A60C06692F291A4B00C5FA7B /* FirebaseFunctions */,
+				A6A2FD9E2F2A261A00DBD898 /* AsyncButton */,
+				A6920E7F2F2DD043004BF643 /* FirebaseFirestore */,
 			);
 			productName = BestBikePath;
 			productReference = A6E28BBA2EBBD62F000EECF0 /* BestBikePath.app */;
@@ -122,6 +136,7 @@
 			packageReferences = (
 				A60C06522F267BA100C5FA7B /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 				A60C06662F291A4B00C5FA7B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				A6A2FD9D2F2A261A00DBD898 /* XCRemoteSwiftPackageReference "swiftui-async-button" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = A6E28BBB2EBBD62F000EECF0 /* Products */;
@@ -387,6 +402,14 @@
 				minimumVersion = 12.8.0;
 			};
 		};
+		A6A2FD9D2F2A261A00DBD898 /* XCRemoteSwiftPackageReference "swiftui-async-button" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/lorenzofiamingo/swiftui-async-button";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -404,6 +427,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = A60C06662F291A4B00C5FA7B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFunctions;
+		};
+		A6920E7F2F2DD043004BF643 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A60C06662F291A4B00C5FA7B /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		A6A2FD9E2F2A261A00DBD898 /* AsyncButton */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A6A2FD9D2F2A261A00DBD898 /* XCRemoteSwiftPackageReference "swiftui-async-button" */;
+			productName = AsyncButton;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

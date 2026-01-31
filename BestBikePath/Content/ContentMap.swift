@@ -17,15 +17,18 @@ struct ContentMap: View {
                 Marker(item: mapItem)
             }
 
+            ForEach(appModel.mapCoordinator.subtleRoutes, id: \.description) { route in
+                MapPolyline(route)
+                    .stroke(Color.blue.mix(with: .white, by: 0.5), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
+            }
+
             ForEach(appModel.mapCoordinator.highlightedRoutes, id: \.description) { route in
                 MapPolyline(route)
                     .stroke(Color.blue, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
             }
 
-            ForEach(appModel.mapCoordinator.subtleRoutes, id: \.description) { route in
-                MapPolyline(route)
-                    .stroke(Color.blue.mix(with: .white, by: 0.5), style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
-            }
+            MapPolyline(coordinates: appModel.mapCoordinator.monitoredLocations.map(\.coordinate))
+                .stroke(Color.blue, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
         }
         .animation(.default, value: appModel.mapCoordinator.mapCameraPosition)
         .animation(.default, value: appModel.selectedCommunityPath)
@@ -58,7 +61,7 @@ struct ContentMap: View {
             }
             .sheet(isPresented: $isLocationAuthorizationViewPresented) {
                 NavigationStack {
-                    LocationAccessView()
+                    LocationAccessView(nextAction: appModel.presentUserPathRecording)
                 }
             }
             .safeAreaInsetsSheet(isPresented: $isTestSheetPresented, isAppliedToMap: true) {

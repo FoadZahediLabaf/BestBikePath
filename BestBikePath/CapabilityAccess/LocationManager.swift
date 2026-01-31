@@ -8,16 +8,17 @@ class LocationManager {
 
         var onChangeAuthorizationStatus: ((CLAuthorizationStatus) -> Void)?
 
-        var onLocationUpdate: ((CLLocation?) -> Void)?
+        var onLocationsUpdateHandlers: [Int :(([CLLocation]) -> Void)] = [:]
 
         func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
             onChangeAuthorizationStatus?(manager.authorizationStatus)
         }
 
         func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-            onLocationUpdate?(locations.last)
+            for handler in onLocationsUpdateHandlers.values {
+                handler(locations)
+            }
         }
-
     }
     let coordinator: Coordinator
 
@@ -25,26 +26,37 @@ class LocationManager {
 
     var authorizationStatus: CLAuthorizationStatus
 
-    var location: CLLocation?
-
     init() {
         self.authorizationStatus = manager.authorizationStatus
         self.coordinator = Coordinator()
         coordinator.onChangeAuthorizationStatus = { [weak self] status in
             self?.authorizationStatus = status
         }
-        coordinator.onLocationUpdate = { [weak self] location in
-            self?.location = location
-        }
         manager.delegate = coordinator
+        manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
+        manager.pausesLocationUpdatesAutomatically = true
     }
 
     func requestAlwaysAuthorization() {
-        manager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
         manager.requestAlwaysAuthorization()
     }
 
-    func startUpdatingLocation() {
-        manager.startUpdatingLocation()
+    var locationsStream: AsyncStream<[CLLocation]> {
+        AsyncStream { continuation in
+            continuation.onTermination = { termination in
+                Task { @MainActor in
+                    self.coordinator.onLocationsUpdateHandlers[continuation.hashValue] = nil
+                    if self.coordinator.onLocationsUpdateHandlers.isEmpty {
+                        self.manager.stopUpdatingLocation()
+                    }
+                }
+            }
+            coordinator.onLocationsUpdateHandlers[continuation.hashValue] = { locations in
+                continuation.yield(locations)
+            }
+            if coordinator.onLocationsUpdateHandlers.count < 2 {
+                self.manager.startUpdatingLocation()
+            }
+        }
     }
 }

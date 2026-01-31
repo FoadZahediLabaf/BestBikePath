@@ -8,9 +8,14 @@
 import MapKit
 import SwiftUI
 import SwiftData
+import CoreMotion
 
 @Observable
 final class BestBikePathModel {
+
+    let locationManager: LocationManager = .shared
+
+    let motionManager: MotionManager = .shared
 
     let modelSource: SwiftDataModelSource = .swiftData
 
@@ -34,10 +39,10 @@ final class BestBikePathModel {
 
     var selectedCommunityPath: CommunityPath?
 
-    var isMapForcePresented = false
+    var isSearchingCommunityPaths = false
 
     var isMapPresented: Bool {
-        isMapForcePresented ||
+        isSearchingCommunityPaths ||
         mapCoordinator.isContentPresented ||
         [
             .userPathRecording,
@@ -77,7 +82,7 @@ final class BestBikePathModel {
             searchedCommunityPaths = nil
             return
         }
-        
+
         let origin = PathLocation(from: originMapItem)
         let destination = PathLocation(from: destinationMapItem)
 
@@ -91,178 +96,40 @@ final class BestBikePathModel {
         self.mapCoordinator = mapCoordinator
     }
 
-    func presentUserPathDetail(_ userPath: UserPath) {
-        Task {
-            var mapCoordinator = mapCoordinator
-            try await mapCoordinator.displayPath(from: userPath.path)
-            withAnimation {
-                self.mapCoordinator = mapCoordinator
-            }
+    func presentUserPathDetail(_ userPath: UserPath) async throws {
+        var mapCoordinator = mapCoordinator
+        mapCoordinator.reset()
+        mapCoordinator.mapCameraPosition = .automatic
+        try await mapCoordinator.displayPath(from: userPath.path)
+        withAnimation(isMapPresented ? .default : nil) {
+            self.mapCoordinator = mapCoordinator
         }
         presentedSheetItem = .userPathDetail(userPath: userPath)
     }
 
-    func presentCommunityPathDetail(_ communityPath: CommunityPath) {
-        Task {
-            var mapCoordinator = mapCoordinator
-            try await mapCoordinator.displayPath(from: communityPath.path)
-            withAnimation {
-                self.mapCoordinator = mapCoordinator
-            }
+    func presentCommunityPathDetail(_ communityPath: CommunityPath) async throws {
+        var mapCoordinator = mapCoordinator
+        mapCoordinator.reset()
+        mapCoordinator.mapCameraPosition = .automatic
+        try await mapCoordinator.displayPath(from: communityPath.path)
+        withAnimation(isMapPresented ? .default : nil) {
+            self.mapCoordinator = mapCoordinator
         }
         presentedSheetItem = .communityPathDetail(communityPath: communityPath)
     }
 
 
-
-
-
-
-
-
-
-    func cleanMap() {
-        routes.removeAll()
-        mapItems.removeAll()
-        communityResultPaths = nil
-    }
-
-    var routes: [(route: MKRoute, path: UserPathModel?)] = []
-
-    var mapItems: [MKMapItem] = []
-
-
-//    var user: User? = .some(.init(username: "", password: "", pathEntries: [])) {
-//        didSet {
-//            if let user {
-//                var descriptor = FetchDescriptor<BikePathEntry>.init()
-//                self.userPaths = (try? modelSource.mainContext.fetch(descriptor)) ?? []
-//            } else {
-//                self.userPaths.removeAll()
-//            }
-//        }
-//    }
-
-
-    var userPaths: [UserPathModel] = [.makeLecCanCom()]
-
-    var userSelectedPath: UserPathModel?
-
-    func displayUserPath(_ path: UserPathModel) {
-        let locations = path.path.streets.map { CLLocation(latitude: $0.latitude, longitude: $0.longitude) }
-        mapCoordinator.mapCameraPosition = .region(boundingRegion(for: locations, margin: 1.2)!)
-        Task {
-            var mapItems: [MKMapItem] = []
-            for location in locations {
-                if let mapItem = try? await MKReverseGeocodingRequest(location: location)?.mapItems.first {
-                    mapItems.append(mapItem)
-                }
-            }
-            var trip: [MKRoute] = []
-            for (source, destination) in zip(mapItems, mapItems.dropFirst()) {
-                if let route = await getDirections(source: source, destination: destination) {
-                    trip.append(route)
-                }
-            }
-            withAnimation {
-                self.mapItems = mapItems
-                routes = trip.map { ($0, nil) }
-            }
-        }
-    }
-
-    var communityResultPaths: [UserPathModel]?
-
     static var locationManager: LocationManager = .shared
 
-    func openRecordingView() {
-        if [.authorizedAlways, .authorizedWhenInUse].contains(Self.locationManager.authorizationStatus) {
-            presentedSheetItem = .userPathRecording
-        } else {
+    func presentUserPathRecording() {
+        if ![.authorizedAlways, .authorizedWhenInUse].contains(locationManager.authorizationStatus) {
             presentedSheetItem = .locationAccess
+        } else if ![.authorized].contains(motionManager.authorizationStatus) {
+            presentedSheetItem = .motionAccess
+        } else {
+            presentedSheetItem = .userPathRecording
         }
     }
-
-    var recordLocations: [CLLocation] = []
-    func addCurrentLocation() {
-        guard let newLocation = Self.locationManager.location else { return }
-        recordLocations.append(newLocation)
-        Task {
-            var mapItems: [MKMapItem] = []
-            for location in recordLocations {
-                if let mapItem = try? await MKReverseGeocodingRequest(location: location)?.mapItems.first {
-                    mapItems.append(mapItem)
-                }
-            }
-            var trip: [MKRoute] = []
-            for (source, destination) in zip(mapItems, mapItems.dropFirst()) {
-                if let route = await getDirections(source: source, destination: destination) {
-                    trip.append(route)
-                }
-            }
-            withAnimation {
-                //self.mapItems = mapItems
-                self.mapItems = [mapItems.first, mapItems.last].compactMap { $0 }
-                routes = trip.map { ($0, nil) }
-            }
-        }
-    }
-
-    func searchCommunityResultPaths() {
-        communityResultPaths = [.makeLecCom(), .makeLecCanCom(), .makeLecOggCom(), .makeLecCantCom()]
-    }
-
-    func addManualPath(isPublic: Bool) {
-//        guard let user else { fatalError() }
-//        let hasHighways = routes.contains { $0.route.hasHighways }
-//        let streets = mapItems.map { item in
-//            StreetLocation(latitude: item.location.coordinate.latitude, longitude: item.location.coordinate.longitude)
-//        }
-//        let bikePath = BikePath(
-//            streets: streets,
-//            hasHighways: hasHighways
-//        )
-//        let pathEntry = BikePathEntry(
-//            user: user,
-//            date: .now,
-//            isPublic: isPublic,
-//            path: bikePath,
-//            performance: nil,
-//            mode: .manual
-//        )
-//
-//        modelSource.mainContext.insert(pathEntry)
-//        userPaths.insert(pathEntry, at: 0)
-    }
-
-//    func checkUser(username: String) -> Bool {
-//        // Build a fetch descriptor to find a User with a matching username
-//        let predicate = #Predicate<User> { $0.username == username }
-//        var descriptor = FetchDescriptor<User>(predicate: predicate)
-//        descriptor.fetchLimit = 1
-//        return try! modelContext.fetch(descriptor).count > 0
-//    }
-
-//    func loginUser(username: String, password: String) -> Bool {
-//        let predicate = #Predicate<User> { $0.username == username && $0.password == password }
-//        var descriptor = FetchDescriptor<User>(predicate: predicate)
-//        descriptor.fetchLimit = 1
-//        if let user = try! modelContext.fetch(descriptor).first {
-//            self.user = user
-//            presentedSheetItem = .communityPathSearch
-//            return true
-//        } else {
-//            return false
-//        }
-//    }
-
-//    func registerUser(username: String, password: String) {
-//        let user = User(username: username, password: password, pathEntries: [])
-//
-//        modelContext.insert(user)
-//        self.user = user
-//        presentedSheetItem = .communityPathSearch
-//    }
 }
 
 private extension BestBikePathModel {

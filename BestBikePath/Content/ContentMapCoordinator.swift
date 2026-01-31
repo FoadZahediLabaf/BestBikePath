@@ -15,6 +15,8 @@ struct ContentMapCoordinator {
 
     var cachedPathRoutes: [Path.ID :[MKRoute]] = [:]
 
+    var monitoredLocations: [CLLocation] = []
+
     var isContentPresented: Bool {
         !(mapItems.isEmpty && highlightedRoutes.isEmpty && subtleRoutes.isEmpty)
     }
@@ -26,7 +28,7 @@ struct ContentMapCoordinator {
     mutating func resetCameraPosition() {
         mapCameraPosition = .userLocation(fallback: .automatic)
     }
-    
+
     mutating func addMapItem(from localSearchRequest: MKLocalSearch.Request) async throws {
         let search = MKLocalSearch(request: localSearchRequest)
         let response = try await search.start()
@@ -69,7 +71,27 @@ struct ContentMapCoordinator {
     mutating func setHighlightedRoutesFromMapItems() async throws {
         highlightedRoutes = try await makeRoutes(from: mapItems)
     }
-    
+
+    mutating func setHighlightedRoutesFromMonitoredLocations() async throws {
+        guard
+            let startLocation = monitoredLocations.first,
+            let endLocation = monitoredLocations.last
+        else {
+            return
+        }
+        let internalLocations = monitoredLocations.dropFirst().dropLast()
+
+        let startMapItem = await PathLocation(from: startLocation.coordinate).mapItemGeocoded
+        let endMapItem = await PathLocation(from: endLocation.coordinate).mapItemGeocoded
+        let internalMapItems = internalLocations.map { MKMapItem(location: $0, address: nil) }
+
+        let mapItems = [startMapItem] + internalMapItems + [endMapItem]
+
+        highlightedRoutes = try await makeRoutes(from: mapItems)
+        monitoredLocations = []
+        self.mapItems = [startMapItem, endMapItem]
+    }
+
     mutating func makePathFromHighlightedRoutes() -> Path {
         makePath(from: highlightedRoutes)
     }

@@ -1,13 +1,7 @@
-//
-//  ContentView.swift
-//  BestBikePath
-//
-//  Created by Lorenzo Fiamingo on 05/11/25.
-//
-
 import MapKit
 import SwiftUI
 import SwiftData
+import AsyncButton
 
 struct ContentView: View {
 
@@ -23,8 +17,8 @@ struct ContentView: View {
                         ScrollView(.horizontal) {
                             HStack {
                                 ForEach(currentUserPaths) { userPath in
-                                    Button {
-                                        appModel.presentUserPathDetail(userPath)
+                                    AsyncButton {
+                                        try await appModel.presentUserPathDetail(userPath)
                                     } label: {
                                         PathMap(userPath.path)
                                             .allowsHitTesting(false)
@@ -80,7 +74,7 @@ struct ContentView: View {
             if appModel.userSource.currentUser != nil {
                 HStack {
                     Button("Record Path", systemImage: "record.circle") {
-                        appModel.openRecordingView()
+                        appModel.presentUserPathRecording()
                     }
                     .tint(.red)
 
@@ -100,7 +94,7 @@ struct ContentView: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .defaultScrollAnchor(.center)
-        .animation(.default, value: appModel.userPaths)
+        .animation(.default, value: appModel.currentUserPaths)
         .animation(.default, value: appModel.userSource.currentUser)
     }
 
@@ -115,8 +109,11 @@ struct ContentView: View {
                 .opacity(appModel.isMapPresented ? 1 : 0)
                 .animation(.default, value: appModel.isMapPresented)
                 .onChange(of: appModel.presentedSheetItem) {
-                    appModel.mapCoordinator.reset()
+                    if ![.communityPathDetail, .userPathDetail].contains(appModel.presentedSheetItem.role) {
+                        appModel.mapCoordinator.reset()
+                    }
                     appModel.searchedCommunityPaths = nil
+                    appModel.isSearchingCommunityPaths = false
                 }
         }
         .navigationTitle("Best Bike Paths")
@@ -164,22 +161,28 @@ struct ContentView: View {
                 }
             case .locationAccess:
                 NavigationStack {
-                    LocationAccessView()
+                    LocationAccessView(nextAction: appModel.presentUserPathRecording)
+                        .toolbarTitleDisplayMode(.inlineLarge)
+                }
+                .presentationDetents([.large])
+            case .motionAccess:
+                NavigationStack {
+                    MotionAccessView(nextAction: appModel.presentUserPathRecording)
                         .toolbarTitleDisplayMode(.inlineLarge)
                 }
                 .presentationDetents([.large])
             case .userPathInsertion:
                 NavigationStack {
-                    AddBikePathView()
+                    UserPathInsertionView()
                 }
                 .presentationDetents([.medium, .large])
                 .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 .interactiveDismissDisabled()
             case .userPathRecording:
                 NavigationStack {
-                    RecordBikePathView()
+                    UserPathRecordingView()
                 }
-                .presentationDetents([.height(240), .fraction(0.8)])
+                .presentationDetents([.height(240), .fraction(0.8), .large])
                 .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.8)))
                 .interactiveDismissDisabled()
             case .userPathDetail:
@@ -191,11 +194,9 @@ struct ContentView: View {
                     .presentationDetents([.medium, .large])
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
-            default:
-                EmptyView()
             }
-
         }
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .animation(.default, value: appModel.userSource.currentUser == nil)
     }
 

@@ -6,6 +6,7 @@ struct ContentSheetItem: Identifiable, Hashable {
         case userAuthentication
         case userAccount
         case locationAccess
+        case motionAccess
         case userPathRecording
         case userPathInsertion
         case userPathDetail
@@ -51,6 +52,10 @@ extension ContentSheetItem {
 
     static var locationAccess: ContentSheetItem {
         ContentSheetItem(role: .locationAccess)
+    }
+
+    static var motionAccess: ContentSheetItem {
+        ContentSheetItem(role: .motionAccess)
     }
 
     static var userPathRecording: ContentSheetItem {

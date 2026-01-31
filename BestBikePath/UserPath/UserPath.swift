@@ -1,4 +1,5 @@
 import Foundation
+import WeatherKit
 
 struct UserPath: Identifiable, Hashable, Codable {
 
@@ -16,6 +17,8 @@ struct UserPath: Identifiable, Hashable, Codable {
 
     struct Performance: Hashable, Codable {
 
+        var time: Measurement<UnitDuration>
+
         var distance: Measurement<UnitLength>
 
         var averageSpeed: Measurement<UnitSpeed>
@@ -26,6 +29,8 @@ struct UserPath: Identifiable, Hashable, Codable {
     var performance: Performance?
 
     struct Weather: Hashable, Codable {
+        
+        var condition: WeatherCondition
 
         var temperature: Measurement<UnitTemperature>
 

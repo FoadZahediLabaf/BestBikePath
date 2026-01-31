@@ -74,8 +74,24 @@ struct UserPathDetailView: View {
         }
     }
 
+    var hasHighways: Bool {
+        appModel.mapCoordinator.highlightedRoutes.contains { $0.hasHighways }
+    }
+
     var body: some View {
         List {
+            if hasHighways {
+                Section {
+                    ContentUnavailableView {
+                        Label("Highway Detected", systemImage: "exclamationmark.triangle")
+                            .symbolRenderingMode(.multicolor)
+                    } description: {
+                        Text("This route includes a highway, which may be unsafe for cyclists.")
+                    }
+                    .imageScale(.small)
+                }
+            }
+
             if isUserPath {
                 Section {
                     rateSlider
@@ -96,6 +112,9 @@ struct UserPathDetailView: View {
             if isUserPath {
                 if let performance = userPath.performance {
                     Section("Performance") {
+                        let duration: Duration = .seconds(performance.time.converted(to: .seconds).value)
+                        let needsHours: Bool = duration.components.seconds >= 3600
+                        LabeledContent("Total time", value: duration, format: .time(pattern: needsHours ? .hourMinuteSecond : .minuteSecond))
                         LabeledContent("Covered Distance", value: performance.distance.formatted())
                         LabeledContent("Average Speed", value: performance.averageSpeed.formatted())
                         LabeledContent("Peak Speed", value: performance.peakSpeed.formatted())
@@ -158,10 +177,16 @@ struct UserPathDetailView: View {
             }
 
             Section {
-                Button("Record New Path", systemImage: "record.circle") {
-                    appModel.openRecordingView()
+                Button {
+                    appModel.presentUserPathRecording()
+                } label: {
+                    Label {
+                        Text("Record New Path")
+                    } icon: {
+                        Image(systemName: "record.circle")
+                            .foregroundStyle(.red)
+                    }
                 }
-                .tint(.red)
             }
 
             if isUserPath {
@@ -174,7 +199,7 @@ struct UserPathDetailView: View {
                 .foregroundStyle(.red)
             }
         }
-        .animation(.default, value: appModel.mapItems)
+        .animation(.default, value: appModel.mapCoordinator.mapItems)
         .scrollContentBackground(.hidden)
         .toolbarTitleDisplayMode(.inline)
         .navigationTitle("Bike Path")
@@ -222,7 +247,7 @@ struct UserPathDetailView: View {
                         await appModel.syncCurrentUserPaths()
                     }
 
-                    appModel.cleanMap()
+                    appModel.mapCoordinator.reset()
                     appModel.presentedSheetItem = .communityPathSearch
                 } label: { operations in
                     if operations.contains(where: \.isLoading) {
@@ -241,7 +266,7 @@ struct UserPathDetailView: View {
         ToolbarItem(placement: .cancellationAction) {
             Button(role: .cancel) {
                 Task { @MainActor in
-                    appModel.cleanMap()
+                    appModel.mapCoordinator.reset()
                     appModel.presentedSheetItem = .communityPathSearch
                 }
             }

@@ -1,3 +1,5 @@
+import Foundation
+
 enum PathStatus: Int, Codable {
     case impassable = 1
     case poor = 2
@@ -23,5 +25,24 @@ extension PathStatus {
         default:
                 .impassable
         }
+    }
+
+    init(obstaclesCount: Int, distance: Measurement<UnitLength>) {
+        let obstacelPerKm = Double(obstaclesCount) / distance.converted(to: .kilometers).value
+
+            self = switch obstacelPerKm {
+            case ..<1:
+                    .excellent
+            case 1..<3:
+                    .good
+            case 3..<5:
+                    .fair
+            case 7..<9:
+                    .poor
+            case 9...:
+                    .impassable
+            default:
+                    .impassable
+            }
     }
 }

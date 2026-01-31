@@ -1,15 +1,8 @@
-//
-//  AddBikePathView.swift
-//  BestBikePath
-//
-//  Created by Lorenzo Fiamingo on 06/11/25.
-//
-
 import AsyncButton
 import SwiftUI
 import MapKit
 
-struct AddBikePathView: View {
+struct UserPathInsertionView: View {
 
     @Environment(BestBikePathModel.self) private var appModel
 
@@ -75,7 +68,7 @@ struct AddBikePathView: View {
             }
         }
         .environment(\.editMode, .constant(.active))
-        .animation(.default, value: appModel.mapItems)
+        .animation(.default, value: appModel.mapCoordinator.mapItems)
         .animation(.default, value: isSearching)
         .scrollContentBackground(.hidden)
         .searchable(text: $searchText, isPresented: $isSearching, prompt: searchPrompt)
@@ -106,7 +99,7 @@ struct AddBikePathView: View {
             ToolbarItem(placement: .cancellationAction) {
                 Button(role: .cancel) {
                     Task { @MainActor in
-                        appModel.cleanMap()
+                        appModel.mapCoordinator.reset()
                         appModel.presentedSheetItem = .communityPathSearch
                     }
                 }
@@ -201,7 +194,7 @@ struct AddBikePathView: View {
         appModel.mapCoordinator = mapCoordinator
         isSearching = false
         searchText = ""
-        appModel.mapCoordinator.resetCameraPosition()
+        appModel.mapCoordinator.mapCameraPosition = .automatic
     }
 
     var saveButton: some View {
@@ -236,7 +229,7 @@ struct AddBikePathView: View {
         )
         try await appModel.userPathSource.saveUserPath(userPath)
         await appModel.syncCurrentUserPaths()
-        appModel.cleanMap()
+        appModel.mapCoordinator.reset()
         appModel.presentedSheetItem = .communityPathSearch
     }
 
@@ -254,17 +247,7 @@ struct AddBikePathView: View {
 }
 
 #Preview {
-    AddBikePathView()
-}
-
-private struct UnauthenticatedCurrentUserError: LocalizedError {
-    var errorDescription: String? {
-        "This feature is only available for authenticated users."
-    }
-
-    var failureReason: String? {
-        "The current user is not authenticated"
-    }
+    UserPathInsertionView()
 }
 
 private class LocalSearchCompleterDelegate: NSObject, MKLocalSearchCompleterDelegate {

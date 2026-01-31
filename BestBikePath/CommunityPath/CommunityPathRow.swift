@@ -2,6 +2,8 @@ import SwiftUI
 
 struct CommunityPathRow: View {
 
+    @Environment(BestBikePathModel.self) private var appModel
+
     let path: CommunityPath
 
     var statusValue: Double {
@@ -34,6 +36,11 @@ struct CommunityPathRow: View {
         }
     }
 
+    var hasHighway: Bool {
+        let routes = appModel.mapCoordinator.cachedPathRoutes[path.path.id] ?? []
+        return routes.contains(where: \.hasHighways)
+    }
+
     var body: some View {
         Label {
             VStack {
@@ -64,16 +71,23 @@ struct CommunityPathRow: View {
                 .foregroundStyle(.secondary)
             }
         } icon: {
-            PathMap(path.path, margin: 1.2)
-                .cornerRadius(16)
-                .allowsHitTesting(false)
-        }
-        .onAppear(perform: makeTitle)
-    }
+            VStack {
+                if hasHighway {
+                    HStack {
+                        Text("Highway Detected")
+                            .foregroundStyle(.black)
+                        
+                        Image(systemName: "exclamationmark.triangle")
+                            .symbolRenderingMode(.multicolor)
+                    }
+                    .font(.caption.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                }
 
-    func makeTitle() {
-        Task { @MainActor in
-
+                PathMap(path.path, margin: 1.2)
+                    .allowsHitTesting(false)
+                    .cornerRadius(16)
+            }
         }
     }
 }

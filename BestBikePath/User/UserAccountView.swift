@@ -86,7 +86,7 @@ struct UserAccountView: View {
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button(role: .cancel) {
-                    appModel.cleanMap()
+                    appModel.mapCoordinator.reset()
                     appModel.presentedSheetItem = .communityPathSearch
                 }
             }

@@ -10,8 +10,6 @@ struct CommunityPathSearch: View {
 
     @State private var searchText: String = ""
 
-    @State private var isSearching: Bool = false
-
     @State private var selectedDetent: PresentationDetent = .medium
 
     var searchBarIsHidden: Bool {
@@ -47,7 +45,7 @@ struct CommunityPathSearch: View {
                                 .frame(maxWidth: .infinity)
                                 .listRowBackground(Color.clear)
                         }
-                    } else if isSearching && !searchText.isEmpty {
+                    } else if appModel.isSearchingCommunityPaths && !searchText.isEmpty {
                         searchingCompletionsView
                     } else {
                         ForEach(appModel.mapCoordinator.mapItems, id: \.description) { item in
@@ -67,13 +65,13 @@ struct CommunityPathSearch: View {
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity)
                     .listRowBackground(Color.clear)
-                    .animation(.default, value: appModel.isMapForcePresented)
+                    .animation(.default, value: appModel.isSearchingCommunityPaths)
                 }
                 .environment(\.editMode, .constant(.active))
-                .animation(.default, value: appModel.mapItems)
+                .animation(.default, value: appModel.mapCoordinator.mapItems)
                 .animation(.default, value: appModel.searchedCommunityPaths)
                 .scrollContentBackground(.hidden)
-                .searchable(text: $searchText, isPresented: $isSearching, prompt: searchPrompt, isHidden: searchBarIsHidden)
+                .searchable(text: $searchText, isPresented: $appModel.isSearchingCommunityPaths, prompt: searchPrompt, isHidden: searchBarIsHidden)
                 .onSubmit(of: .search) {
                     Task {
                         try await addLocation(naturalLanguageQuery: searchText, region: appModel.mapCoordinator.coordinateRegion)
@@ -84,14 +82,14 @@ struct CommunityPathSearch: View {
             .onChange(of: searchText) {
                 suggestLocations()
             }
-            .onChange(of: isSearching) {
+            .onChange(of: appModel.isSearchingCommunityPaths) {
                 searchingCompletions = []
-                withAnimation {
-                    appModel.isMapForcePresented = isSearching
-                }
                 if appModel.searchedCommunityPaths?.isEmpty == true {
                     appModel.searchedCommunityPaths = nil
                     appModel.mapCoordinator.reset()
+                }
+                if !appModel.isSearchingCommunityPaths {
+                    selectedDetent = .medium
                 }
             }
             .toolbarTitleDisplayMode(.inline)
@@ -99,15 +97,12 @@ struct CommunityPathSearch: View {
             .toolbar {
                 toolbarContent
             }
-            .animation(.default, value: appModel.communityResultPaths)
+            .animation(.default, value: appModel.searchedCommunityPaths)
         }
         .presentationDetents([.medium, .large])
         .onChange(of: appModel.selectedCommunityPath) {
             appModel.mapCoordinator.selectCachedPathRoutes(id: appModel.selectedCommunityPath?.path.id)
-        }
-        .onChange(of: isSearching) {
-            appModel.communityResultPaths = nil
-            appModel.routes = []
+            appModel.mapCoordinator.mapCameraPosition = .automatic
         }
         .presentationBackground(.thinMaterial)
         .interactiveDismissDisabled()
@@ -123,7 +118,7 @@ struct CommunityPathSearch: View {
 
     @ViewBuilder
     var placeholder: some View {
-        if appModel.mapCoordinator.mapItems.isEmpty && !appModel.isMapForcePresented && searchText.isEmpty {
+        if appModel.mapCoordinator.mapItems.isEmpty && !appModel.isSearchingCommunityPaths && searchText.isEmpty {
             Section {
                 ContentUnavailableView {
                     Label("Community Bike Paths", systemImage: "person.3")
@@ -186,9 +181,15 @@ struct CommunityPathSearch: View {
                 .disabled(appModel.mapCoordinator.mapItems.count < 2)
                 .animation(.default, value: appModel.mapCoordinator.mapItems.count)
             } else if appModel.searchedCommunityPaths?.isEmpty == false {
-                Button("Confirm", systemImage: "checkmark") {
+                AsyncButton(options: .automatic) {
                     guard let selectedCommunityPath = appModel.selectedCommunityPath else { return }
-                    appModel.presentCommunityPathDetail(selectedCommunityPath)
+                    try await appModel.presentCommunityPathDetail(selectedCommunityPath)
+                } label: { operations in
+                    if operations.contains(where: \.isLoading) {
+                        ProgressView()
+                    } else {
+                        Label("Confirm", systemImage: "checkmark")
+                    }
                 }
                 .fontWeight(.semibold)
                 .buttonStyle(.glassProminent)
@@ -214,7 +215,7 @@ struct CommunityPathSearch: View {
         }
         try await mapCoordinator.addMapItem(from: MKLocalSearch.Request(completion: localSearchCompletion))
         appModel.mapCoordinator = mapCoordinator
-        isSearching = false
+        appModel.isSearchingCommunityPaths = false
         searchText = ""
         appModel.mapCoordinator.mapCameraPosition = .automatic
 
@@ -227,9 +228,9 @@ struct CommunityPathSearch: View {
         }
         try await mapCoordinator.addMapItem(from: MKLocalSearch.Request(naturalLanguageQuery: naturalLanguageQuery, region: region))
         appModel.mapCoordinator = mapCoordinator
-        isSearching = false
+        appModel.isSearchingCommunityPaths = false
         searchText = ""
-        appModel.mapCoordinator.resetCameraPosition()
+        appModel.mapCoordinator.mapCameraPosition = .automatic
     }
 
     @State private var completer = MKLocalSearchCompleter()
@@ -246,7 +247,7 @@ struct CommunityPathSearch: View {
 }
 
 #Preview {
-    AddBikePathView()
+    UserPathInsertionView()
 }
 
 

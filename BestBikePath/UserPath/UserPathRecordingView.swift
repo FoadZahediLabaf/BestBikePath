@@ -1,5 +1,5 @@
 //
-//  RecordBikePathView.swift
+//  UserPathRecordingView.swift
 //  BestBikePath
 //
 //  Created by Lorenzo Fiamingo on 06/11/25.
@@ -8,14 +8,17 @@
 import MapKit
 import SwiftUI
 import Combine
+import AsyncButton
+import WeatherKit
+import CoreMotion
 
-struct RecordBikePathView: View {
+struct UserPathRecordingView: View {
 
     @Environment(BestBikePathModel.self) private var appModel
 
-    let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+    @State private var timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
-    @State private var duration: Duration = .seconds(60*5)
+    @State private var duration: Duration = .seconds(0)
 
     @State private var isStarted: Bool = false
 
@@ -27,17 +30,20 @@ struct RecordBikePathView: View {
 
     @State private var isPublic = true
 
-    @State var distance = Measurement<UnitLength>(value: 0, unit: .meters)
+    @State private var obstacleCount = 0
 
-    @State var averageSpeed = Measurement<UnitSpeed>(value: 0, unit: .kilometersPerHour)
+    @State private var performance = UserPath.Performance(
+        time: Measurement<UnitDuration>(value: 0, unit: .seconds),
+        distance: Measurement<UnitLength>(value: 0, unit: .meters),
+        averageSpeed: Measurement<UnitSpeed>(value: 0, unit: .kilometersPerHour),
+        peakSpeed: Measurement<UnitSpeed>(value: 0, unit: .kilometersPerHour)
+    )
 
-    @State var peakSpeed = Measurement<UnitSpeed>(value: 0, unit: .kilometersPerHour)
+    @State var currentSpeed = Measurement<UnitSpeed>(value: 0, unit: .kilometersPerHour)
 
-    let temperature = Measurement<UnitTemperature>(value: 38, unit: .celsius)
+    @State private var weather: UserPath.Weather?
 
-    let humidity = Measurement<UnitPercent>(value: 38, unit: .percent)
-
-    let windSpeed = Measurement<UnitSpeed>(value: 14, unit: .metersPerSecond)
+    @State private var weatherSerice = WeatherService()
 
     let buttonFontPointSize: CGFloat = 40
 
@@ -47,6 +53,60 @@ struct RecordBikePathView: View {
 
     var isTimerLarge: Bool {
         confirmingObstacles.isEmpty && (isRecording || !isStarted)
+    }
+
+    @State private var locationMonitoringTask: Task<Void, Never>?
+
+    @State private var isCycling: Bool = false
+    @State private var activityMonitoringTask: Task<Void, Never>?
+
+    @State private var obstacleMonitoringTask: Task<Void, Never>?
+
+    var pathStatus: PathStatus {
+        PathStatus(obstaclesCount: obstacleCount, distance: performance.distance)
+    }
+
+    var pathStatusText: Text {
+        switch pathStatus {
+        case .impassable:
+            Text("Impassable")
+        case .poor:
+            Text("Poor")
+        case .fair:
+            Text("Fair")
+        case .good:
+            Text("Good")
+        case .excellent:
+            Text("Excellent")
+        }
+    }
+
+    var weatherCard: some View {
+        VStack {
+            if let weather {
+                LabeledContent("Condition", value: weather.condition.description)
+                Divider()
+                LabeledContent("Temperature", value: weather.temperature.formatted())
+                Divider()
+                LabeledContent("Humidity", value: weather.humidity.formatted())
+                Divider()
+                LabeledContent("Wind Speed", value: weather.windSpeed.formatted())
+            }
+        }
+        .overlay(alignment: .bottomTrailing) {
+
+        }
+        .task {
+            guard let location = appModel.locationManager.manager.location else { return }
+            if let currentWeather = try? await weatherSerice.weather(for: location).currentWeather {
+                self.weather = UserPath.Weather(
+                    condition: currentWeather.condition,
+                    temperature: currentWeather.temperature,
+                    humidity: Measurement<UnitPercent>(value: currentWeather.humidity, unit: .percent),
+                    windSpeed: currentWeather.wind.speed
+                )
+            }
+        }
     }
 
     var body: some View {
@@ -63,40 +123,54 @@ struct RecordBikePathView: View {
                         .font(.largeTitle.pointSize(isTimerLarge ? 64 : 24))
                         .frame(maxWidth: .infinity)
                         .padding(.horizontal)
-                        .onTapGesture {
-                            let d = appModel.routes.map(\.route.distance).reduce(0, +)
-                            distance = Measurement<UnitLength>(value: d, unit: .meters)
-                            averageSpeed = Measurement<UnitSpeed>(value: 68, unit: .kilometersPerHour)
-                            peakSpeed = Measurement<UnitSpeed>(value: 103, unit: .kilometersPerHour)
-                            appModel.addCurrentLocation()
-                        }
-                        .onAppear {
-                            BestBikePathModel.locationManager.startUpdatingLocation()
+                        .onChange(of: isStarted, initial: true) {
+                            if isStarted {
+                                appModel.mapCoordinator.monitoredLocations.removeAll()
+                                locationMonitoringTask = Task {
+                                    for await locations in appModel.locationManager.locationsStream where isRecording {
+                                        appModel.mapCoordinator.monitoredLocations += locations.filter { $0.horizontalAccuracy < 20 }
+                                        updatePerformanceMetrics()
+                                    }
+                                }
+                                activityMonitoringTask = Task {
+                                    for await activity in appModel.motionManager.motionActivityStream {
+                                        let wasCycling = isCycling
+                                        isCycling = activity?.cycling == true
+                                        if isCycling != wasCycling {
+                                            isRecording = isCycling
+                                        }
+                                    }
+                                }
+                                obstacleMonitoringTask = Task {
+                                    for await detection in appModel.motionManager.obstacleDetectionStream {
+                                        confirmingObstacles.append(detection)
+                                    }
+                                }
+                            }
                         }
 
                     if confirmingObstacles.isEmpty {
                         Group {
                             if isStarted {
                                 VStack {
-                                    LabeledContent("Covered Distance", value: distance.formatted())
+                                    LabeledContent("Covered Distance", value: performance.distance.formatted())
+                                    if isRecording {
+                                        Divider()
+                                        LabeledContent("Current Speed", value: currentSpeed.formatted())
+                                    }
                                     Divider()
-                                    LabeledContent("Average Speed", value: averageSpeed.formatted())
+                                    LabeledContent("Average Speed", value: performance.averageSpeed.formatted())
                                     Divider()
-                                    LabeledContent("Peak Speed", value: peakSpeed.formatted())
+                                    LabeledContent("Peak Speed", value: performance.peakSpeed.formatted())
                                 }
+                                .animation(.default, value: isRecording)
                             }
 
-                            VStack {
-                                LabeledContent("Temperature", value: temperature.formatted())
-                                Divider()
-                                LabeledContent("Humidity", value: humidity.formatted())
-                                Divider()
-                                LabeledContent("Wind Speed", value: windSpeed.formatted())
-                            }
+                            weatherCard
 
                             if isCompleted {
                                 VStack {
-                                    LabeledContent("Path Status", value: "Good")
+                                    LabeledContent("Path Status") { pathStatusText }
                                     Divider()
                                     Toggle("Share Publicly", isOn: $isPublic)
                                 }
@@ -118,6 +192,7 @@ struct RecordBikePathView: View {
                             ControlGroup {
                                 Button("Confirm", systemImage: "checkmark") {
                                     confirmingObstacles = confirmingObstacles.filter { $0 != obstacle }
+                                    obstacleCount += 1
                                 }
                                 .buttonStyle(AutomaticPerformingButtonStyle())
 
@@ -136,7 +211,14 @@ struct RecordBikePathView: View {
                         .background(.background.secondary, in: .containerRelative)
                         .transition(.blurReplace)
                     }
-
+                }
+                .scenePadding()
+            }
+            .defaultScrollAnchor(.center)
+            .scrollBounceBehavior(.basedOnSize)
+            .customOpacityVisualEffect()
+            .safeAreaInset(edge: .bottom) {
+                VStack {
                     if isStarted && !isCompleted {
                         Button("Add obstacle") {
                             confirmingObstacles.append(UUID())
@@ -146,18 +228,10 @@ struct RecordBikePathView: View {
                         .buttonSizing(.flexible)
                         .fontWeight(.semibold)
                     }
-                }
-                .scenePadding()
-            }
-            .defaultScrollAnchor(.center)
-            .scrollBounceBehavior(.basedOnSize)
-            .customOpacityVisualEffect()
-            .safeAreaInset(edge: .bottom) {
-                VStack {
+
                     if isCompleted {
-                        Button {
-                            // Save to disk the trip
-                            appModel.presentedSheetItem = .communityPathSearch
+                        AsyncButton {
+                            try await saveUserPath()
                         } label: {
                             Label {
                                 Text("Save")
@@ -176,7 +250,16 @@ struct RecordBikePathView: View {
                     } else {
                         if isStarted && !isRecording {
                             Button {
-                                isCompleted = true
+                                Task {
+                                    isCompleted = true
+                                    locationMonitoringTask?.cancel()
+                                    activityMonitoringTask?.cancel()
+                                    obstacleMonitoringTask?.cancel()
+                                    var mapCoordinator = appModel.mapCoordinator
+                                    try await mapCoordinator.setHighlightedRoutesFromMonitoredLocations()
+                                    appModel.mapCoordinator = mapCoordinator
+                                    appModel.mapCoordinator.mapCameraPosition = .automatic
+                                }
                             } label: {
                                 Label {
                                     Text("Stop")
@@ -233,6 +316,44 @@ struct RecordBikePathView: View {
                 }
             }
     }
+
+    func updatePerformanceMetrics() {
+        let locations = appModel.mapCoordinator.monitoredLocations
+        guard !locations.isEmpty else { return }
+        let distance = locations.totalDistance()
+        let speeds = appModel.mapCoordinator.monitoredLocations.map(\.speed)
+        let currentSpeed = speeds.last!
+        let maxSpeed = speeds.max() ?? 0
+        let averageSpeed = speeds.reduce(0, +) / Double(speeds.count)
+
+        performance.distance = Measurement(value: distance, unit: .meters)
+        performance.peakSpeed = Measurement(value: maxSpeed, unit: .metersPerSecond)
+        performance.averageSpeed = Measurement(value: averageSpeed, unit: .metersPerSecond)
+        self.currentSpeed = Measurement(value: currentSpeed, unit: .metersPerSecond)
+    }
+
+    func saveUserPath() async throws {
+        performance.time = Measurement(value: Double(duration.components.seconds), unit: .seconds)
+        var mapCoordinator = self.appModel.mapCoordinator
+        let path = mapCoordinator.makePathFromHighlightedRoutes()
+        appModel.mapCoordinator = mapCoordinator
+        guard let currentUserID = appModel.userSource.currentUser?.id else {
+            throw UnauthenticatedCurrentUserError()
+        }
+        let userPath = UserPath(
+            id: UUID().uuidString,
+            userId: currentUserID,
+            date: .now,
+            isPublic: isPublic,
+            path: path,
+            status: pathStatus,
+            performance: performance
+        )
+        try await appModel.userPathSource.saveUserPath(userPath)
+        await appModel.syncCurrentUserPaths()
+        appModel.mapCoordinator.reset()
+        appModel.presentedSheetItem = .communityPathSearch
+    }
 }
 
 private extension View {
@@ -254,7 +375,7 @@ private extension View {
 
 #Preview {
     NavigationStack {
-        RecordBikePathView()
+        UserPathRecordingView()
     }
 }
 
@@ -294,4 +415,22 @@ struct AutomaticPerformingButtonStyle: PrimitiveButtonStyle {
 final class UnitPercent: Dimension, @unchecked Sendable {
     static let percent = UnitPercent(symbol: "%", converter: UnitConverterLinear(coefficient: 0.01))
     override class func baseUnit() -> UnitPercent { .percent }
+}
+
+private extension Array where Element == CLLocation {
+
+    func totalDistance() -> CLLocationDistance {
+        var total: CLLocationDistance = 0
+
+        // We iterate from the second element to the end
+        for i in 1..<self.count {
+            if i > 0 {
+                let previousLocation = self[i-1]
+                let currentLocation = self[i]
+                total += currentLocation.distance(from: previousLocation)
+            }
+        }
+
+        return total
+    }
 }

@@ -5,6 +5,7 @@ import CoreLocation
 
 struct LocationAccessView: View {
     var locationManager: LocationManager = BestBikePathModel.locationManager
+    var nextAction: () -> Void
     @Environment(\.dismiss) private var dismiss
     @Environment(\.openURL) private var openURL
 
@@ -104,7 +105,7 @@ struct LocationAccessView: View {
         }
         .onChange(of: locationManager.authorizationStatus) {
             if [.authorizedAlways, .authorizedWhenInUse].contains(locationManager.authorizationStatus) {
-                dismiss()
+                nextAction()
             }
         }
     }
@@ -143,65 +144,4 @@ private struct PermissionRow: View {
         }
         .padding(.vertical, 4)
     }
-}
-
-// MARK: - Location Permission Controller
-
-@MainActor
-@Observable
-final class LocationPermissionController: NSObject, CLLocationManagerDelegate {
-    var shouldShowSettingsAlert = false
-
-    private let manager = CLLocationManager()
-
-    func start() {
-        manager.delegate = self
-    }
-
-    func requestAlwaysLocation() {
-        let status = manager.authorizationStatus
-
-        switch status {
-        case .notDetermined:
-            // You can also requestWhenInUseAuthorization() first if you prefer.
-            manager.requestAlwaysAuthorization()
-
-        case .authorizedWhenInUse:
-            // Try to upgrade to "Always"
-            manager.requestAlwaysAuthorization()
-
-        case .denied, .restricted:
-            shouldShowSettingsAlert = true
-
-        case .authorizedAlways:
-            // Already good
-            break
-
-        @unknown default:
-            break
-        }
-    }
-
-    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
-        let status = manager.authorizationStatus
-        if status == .denied || status == .restricted {
-            shouldShowSettingsAlert = true
-        }
-    }
-
-    func openAppSettings() {
-        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
-        UIApplication.shared.open(url)
-    }
-}
-
-// MARK: - Preview
-
-#Preview {
-    Spacer()
-        .sheet(isPresented: .constant(true)) {
-            NavigationStack {
-                LocationAccessView()
-            }
-        }
 }

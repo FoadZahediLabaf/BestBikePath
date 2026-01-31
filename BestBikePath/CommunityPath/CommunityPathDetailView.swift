@@ -10,10 +10,25 @@ struct CommunityPathDetailView: View {
     @State private var mapItems: [MKMapItem] = []
 
     @State private var routeSteps: [MKRoute.Step] = []
-
+    
+    var hasHighways: Bool {
+        appModel.mapCoordinator.highlightedRoutes.contains { $0.hasHighways }
+    }
 
     var body: some View {
         List {
+            if hasHighways {
+                Section {
+                    ContentUnavailableView {
+                        Label("Highway Detected", systemImage: "exclamationmark.triangle")
+                            .symbolRenderingMode(.multicolor)
+                    } description: {
+                        Text("This route includes a highway, which may be unsafe for cyclists.")
+                    }
+                    .imageScale(.small)
+                }
+            }
+
             Section {
                 LabeledContent {
                     switch communityPath.status {
@@ -81,14 +96,20 @@ struct CommunityPathDetailView: View {
 
             if appModel.currentUser != nil {
                 Section {
-                    Button("Record New Path", systemImage: "record.circle") {
-                        appModel.openRecordingView()
+                    Button {
+                        appModel.presentUserPathRecording()
+                    } label: {
+                        Label {
+                            Text("Record New Path")
+                        } icon: {
+                            Image(systemName: "record.circle")
+                                .foregroundStyle(.red)
+                        }
                     }
-                    .tint(.red)
                 }
             }
         }
-        .animation(.default, value: appModel.mapItems)
+        .animation(.default, value: appModel.mapCoordinator.mapItems)
         .scrollContentBackground(.hidden)
         .toolbarTitleDisplayMode(.inline)
         .navigationTitle("Bike Path")
@@ -96,7 +117,7 @@ struct CommunityPathDetailView: View {
             ToolbarItem(placement: .cancellationAction) {
                 Button(role: .cancel) {
                     Task { @MainActor in
-                        appModel.cleanMap()
+                        appModel.mapCoordinator.reset()
                         appModel.presentedSheetItem = .communityPathSearch
                     }
                 }

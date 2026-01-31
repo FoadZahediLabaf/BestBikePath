@@ -35,6 +35,7 @@ struct ContentMap: View {
         .onMapCameraChange {
             appModel.mapCoordinator.coordinateRegion = $0.region
         }
+        .mapStyle(appModel.contentMapStyle.mapStyle)
         .mapControls {
             if [.authorizedAlways, .authorizedWhenInUse].contains(locationManager.authorizationStatus) {
                 MapUserLocationButton()

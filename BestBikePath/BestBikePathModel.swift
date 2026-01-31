@@ -1,10 +1,3 @@
-//
-//  BestBikePathModel.swift
-//  BestBikePath
-//
-//  Created by Lorenzo Fiamingo on 06/11/25.
-//
-
 import MapKit
 import SwiftUI
 import SwiftData
@@ -34,6 +27,8 @@ final class BestBikePathModel {
     var currentUserPaths: [UserPath]?
 
     var searchedCommunityPaths: [CommunityPath]?
+
+    var contentMapStyle: ContentMapStyle = .standard
 
     var mapCoordinator = ContentMapCoordinator()
 

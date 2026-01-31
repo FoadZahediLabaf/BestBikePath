@@ -8,6 +8,7 @@
 import AsyncButton
 import SwiftUI
 import SwiftData
+import MapKit
 
 struct UserAccountView: View {
 
@@ -21,6 +22,7 @@ struct UserAccountView: View {
     @State private var isSignOutConfirmationShown: Bool = false
 
     var body: some View {
+        @Bindable var appModel = appModel
         List {
             Section {
                 Label(user.displayName, systemImage: "person")
@@ -29,6 +31,14 @@ struct UserAccountView: View {
 
                 Label(user.email, systemImage: "envelope")
                     .foregroundStyle(.primary)
+            }
+
+            Section {
+                Picker("Map Style", selection: $appModel.contentMapStyle) {
+                    ForEach(ContentMapStyle.allCases, id: \.self) { mapStyle in
+                        mapStyle.title
+                    }
+                }
             }
 
             Section {

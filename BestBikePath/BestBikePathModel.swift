@@ -47,6 +47,8 @@ final class BestBikePathModel {
         ].contains(presentedSheetItem.role)
     }
 
+    var userPathRecordingPresentationDetent: PresentationDetent = .fraction(0.8)
+
     init() {
         currentUserStreamTask = Task {
             for await currentUser in userSource.currentUserStream {

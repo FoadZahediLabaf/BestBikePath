@@ -45,6 +45,8 @@ struct UserPathRecordingView: View {
 
     @State private var weatherSerice = WeatherService()
 
+    @State private var isCancelConfirmationShown = false
+
     let buttonFontPointSize: CGFloat = 40
 
     var needsHours: Bool {
@@ -61,6 +63,8 @@ struct UserPathRecordingView: View {
     @State private var activityMonitoringTask: Task<Void, Never>?
 
     @State private var obstacleMonitoringTask: Task<Void, Never>?
+
+    @State private var sensoryFeedbackTrigger = UUID()
 
     var pathStatus: PathStatus {
         PathStatus(obstaclesCount: obstacleCount, distance: performance.distance)
@@ -180,11 +184,13 @@ struct UserPathRecordingView: View {
                         .background(.background)
                         .cornerRadius(32)
                         .transition(.blurReplace)
+
+                        Spacer()
                     }
 
                     ForEach(confirmingObstacles, id: \.self) { obstacle in
                         VStack {
-                            Label("An obstacle was detected", systemImage: "alert")
+                            Text("An obstacle was detected")
                                 .font(.title2)
                                 .fontWeight(.semibold)
                                 .padding()
@@ -214,12 +220,12 @@ struct UserPathRecordingView: View {
                 }
                 .scenePadding()
             }
-            .defaultScrollAnchor(.center)
+            .defaultScrollAnchor(.top)
             .scrollBounceBehavior(.basedOnSize)
             .customOpacityVisualEffect()
             .safeAreaInset(edge: .bottom) {
                 VStack {
-                    if isStarted && !isCompleted {
+                    if isStarted && !isCompleted && isRecording {
                         Button("Add obstacle") {
                             confirmingObstacles.append(UUID())
                         }
@@ -227,6 +233,12 @@ struct UserPathRecordingView: View {
                         .controlSize(.extraLarge)
                         .buttonSizing(.flexible)
                         .fontWeight(.semibold)
+                        .onChange(of: confirmingObstacles.count) { oldCount, newCount in
+                            if newCount > oldCount {
+                                sensoryFeedbackTrigger = UUID()
+                            }
+                        }
+                        .sensoryFeedback(.warning, trigger: sensoryFeedbackTrigger)
                     }
 
                     if isCompleted {
@@ -312,7 +324,19 @@ struct UserPathRecordingView: View {
             .animation(.default, value: confirmingObstacles)
             .toolbar {
                 Button(role: .cancel) {
-                    appModel.presentedSheetItem = .communityPathSearch
+                    if isStarted {
+                        isCancelConfirmationShown = true
+                    } else {
+                        appModel.presentedSheetItem = .communityPathSearch
+                    }
+                }
+                .confirmationDialog("Delete Current Recording", isPresented: $isCancelConfirmationShown, titleVisibility: .visible) {
+                    Button("Delete", role: .destructive) {
+                        appModel.presentedSheetItem = .communityPathSearch
+                    }
+                    Button("Cancel", role: .cancel) {}
+                } message: {
+                    Text("You’ll loose all your progress.")
                 }
             }
             .onAppear {
@@ -321,6 +345,8 @@ struct UserPathRecordingView: View {
                 }
             }
     }
+
+
 
     func updatePerformanceMetrics() {
         let locations = appModel.mapCoordinator.monitoredLocations
@@ -331,10 +357,10 @@ struct UserPathRecordingView: View {
         let maxSpeed = speeds.max() ?? 0
         let averageSpeed = speeds.reduce(0, +) / Double(speeds.count)
 
-        performance.distance = Measurement(value: distance, unit: .meters)
-        performance.peakSpeed = Measurement(value: maxSpeed, unit: .metersPerSecond)
-        performance.averageSpeed = Measurement(value: averageSpeed, unit: .metersPerSecond)
-        self.currentSpeed = Measurement(value: currentSpeed, unit: .metersPerSecond)
+        performance.distance = Measurement(value: max(0, distance), unit: .meters)
+        performance.peakSpeed = Measurement(value: max(0, maxSpeed), unit: .metersPerSecond)
+        performance.averageSpeed = Measurement(value: max(0, averageSpeed), unit: .metersPerSecond)
+        self.currentSpeed = Measurement(value: max(0, currentSpeed), unit: .metersPerSecond)
     }
 
     func saveUserPath() async throws {

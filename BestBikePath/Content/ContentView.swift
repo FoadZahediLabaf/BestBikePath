@@ -195,7 +195,7 @@ struct ContentView: View {
                 NavigationStack {
                     UserPathRecordingView()
                 }
-                .presentationDetents([.height(240), .fraction(0.8), .large])
+                .presentationDetents([.height(240), .fraction(0.8), .large], selection: $appModel.userPathRecordingPresentationDetent)
                 .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.8)))
                 .interactiveDismissDisabled()
             case .userPathDetail:

@@ -302,6 +302,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BestBikePath/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BBP;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Best Bike Path uses your location to track your route.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Best Bike Path uses your location to track your route.";
@@ -340,6 +342,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = BestBikePath/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = BBP;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Best Bike Path uses your location to track your route.";
 				INFOPLIST_KEY_NSLocationAlwaysUsageDescription = "";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Best Bike Path uses your location to track your route.";

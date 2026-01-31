@@ -2,6 +2,7 @@ import * as admin from "firebase-admin";
 import { COLLECTIONS } from "./collections";
 import { HttpsError } from "firebase-functions/v2/https";
 import * as turf from "@turf/turf";
+import * as geofire from "geofire-common";
 
 export interface PathLocation {
   latitude: number;
@@ -14,6 +15,7 @@ export interface Path {
 }
 
 export interface PathMetadata {
+  startGeohash: string;
   startLatitude: number;
   startLongitude: number;
   endLatitude: number;
@@ -60,7 +62,7 @@ export function distance(c1: PathLocation, c2: PathLocation): number {
  * @param {PathLocation[]} pathB - The second path.
  * @return {boolean} True if similar, false otherwise.
  */
-export function areSimilar(
+export function arePathsSimilar(
   pathA: PathLocation[],
   pathB: PathLocation[]
 ): boolean {
@@ -106,23 +108,50 @@ export async function findMatchingPath(
 
   const start = locations[0];
   const end = locations[locations.length - 1];
-  const range = 0.002; // approx 200m
+  const range = 200; // 200m
 
-  // Query by start location proximity to narrow down candidates
-  const snapshot = await admin.firestore().collection(COLLECTIONS.PATHS)
-    .where("startLatitude", ">=", start.latitude - range)
-    .where("startLatitude", "<=", start.latitude + range)
-    .get();
+  // https://firebase.google.com/docs/firestore/solutions/geoqueries
+  const center: [number, number] = [start.latitude, start.longitude];
+  // Each item in 'bounds' represents a startAt/endAt pair. We have to issue
+  // a separate query for each pair. There can be up to 9 pairs of bounds
+  // depending on overlap, but in most cases there are 4.
+  const bounds = geofire.geohashQueryBounds(center, range);
 
-  for (const doc of snapshot.docs) {
+  const promises = [];
+  for (const b of bounds) {
+    const q = admin.firestore().collection(COLLECTIONS.PATHS)
+      .orderBy("startGeohash")
+      .startAt(b[0])
+      .endAt(b[1]);
+    promises.push(q.get());
+  }
+
+  // Collect all the query results together into a single list
+  const snapshots = await Promise.all(promises);
+
+  const docs = snapshots.flatMap(snap => snap.docs);
+
+  for (const doc of docs) {
     const path = { ...doc.data(), id: doc.id } as Path & PathMetadata;
 
-    // Filter by start/end longitude and end latitude strictly in memory
-    if (Math.abs(path.startLongitude - start.longitude) > range) continue;
-    if (Math.abs(path.endLatitude - end.latitude) > range) continue;
-    if (Math.abs(path.endLongitude - end.longitude) > range) continue;
+    // Filter by start location distance (to remove geohash false positives)
+    const startDistanceInKm = geofire.distanceBetween(
+      [path.startLatitude, path.startLongitude],
+      center
+    );
+    const startDistanceInM = startDistanceInKm * 1000;
+    if (startDistanceInM > range) continue;
 
-    if (areSimilar(locations, path.locations)) {
+    // Filter by end location proximity
+    const endDistanceInKm = geofire.distanceBetween(
+      [path.endLatitude, path.endLongitude],
+      [end.latitude, end.longitude]
+    );
+    const endDistanceInM = endDistanceInKm * 1000;
+    if (endDistanceInM > range) continue;
+
+    // Finally, check path similarity
+    if (arePathsSimilar(locations, path.locations)) {
       return path.id;
     }
   }
@@ -144,8 +173,11 @@ export async function savePath(path: Path): Promise<void> {
   const start = path.locations[0];
   const end = path.locations[path.locations.length - 1];
 
+  const hash = geofire.geohashForLocation([start.latitude, start.longitude]);
+
   const pathData: Omit<Path, "id"> & PathMetadata = {
     locations: path.locations,
+    startGeohash: hash,
     startLatitude: start.latitude,
     startLongitude: start.longitude,
     endLatitude: end.latitude,

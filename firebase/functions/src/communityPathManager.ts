@@ -53,6 +53,10 @@ export async function getCommunityPaths(
     });
   }
 
+
+  // Sort paths based on status (descending)
+  communityPaths.sort((a, b) => b.status - a.status);
+
   return communityPaths;
 }
 

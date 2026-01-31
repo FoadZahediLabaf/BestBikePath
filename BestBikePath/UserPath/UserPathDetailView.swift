@@ -96,7 +96,7 @@ struct UserPathDetailView: View {
                 Section {
                     rateSlider
 
-                    Toggle("Share Pubblicly", isOn: $userPath.isPublic)
+                    Toggle("Share Publicly", isOn: $userPath.isPublic)
                 }
             } else {
                 Section {

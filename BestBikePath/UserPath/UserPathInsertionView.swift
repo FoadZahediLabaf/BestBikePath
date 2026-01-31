@@ -126,7 +126,7 @@ struct UserPathInsertionView: View {
             Section {
                 statusSlider
 
-                Toggle("Share Pubblicly", isOn: $isPublic)
+                Toggle("Share Publicly", isOn: $isPublic)
             }
         }
 

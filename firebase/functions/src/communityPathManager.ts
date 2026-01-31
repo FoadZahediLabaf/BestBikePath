@@ -33,24 +33,12 @@ export async function getCommunityPaths(
       .where("pathId", "==", path.id)
       .get();
 
-    let totalStatus = 0;
-    let count = 0;
+    const userPaths = userPathsSnapshot.docs.map((userPathDoc) => ({
+      ...userPathDoc.data(),
+      id: userPathDoc.id,
+    } as Omit<UserPath, "path"> & { pathId: string }));
 
-    userPathsSnapshot.forEach((userPathDoc) => {
-      const userPath = {
-        ...userPathDoc.data(),
-        id: userPathDoc.id,
-      } as Omit<UserPath, "path"> & { pathId: string };
-
-      if (userPath.status) {
-        totalStatus += userPath.status;
-        count++;
-      }
-    });
-
-    // Simple average for now
-    const avgStatus = count > 0 ?
-      Math.round(totalStatus / count) : 0;
+    const status = calculateCommunityPathStatus(userPaths);
 
     communityPaths.push({
       id: path.id,
@@ -58,9 +46,66 @@ export async function getCommunityPaths(
         id: path.id,
         locations: path.locations,
       },
-      status: avgStatus,
+      status: status,
     });
   }
 
   return communityPaths;
+}
+
+/**
+ * Calculates the aggregate status of a path based on user reports.
+ * Uses a voting system weighted by freshness.
+ * @param {any[]} userPaths - List of user paths/reviews
+ * @return {number} The calculated status (1-5) or 0 if no data
+ */
+export function calculateCommunityPathStatus(
+  userPaths: (Omit<UserPath, "path"> & { pathId: string })[]
+): number {
+  // Filter valid statuses and timestamps
+  const validReports = userPaths
+    .filter((up) => up.status && up.date)
+    .map((up) => ({
+      status: up.status,
+      date: up.date.toDate(),
+    }));
+
+  if (validReports.length === 0) return 0;
+
+  // Find the most recent date
+  const latestDate = validReports.reduce((max, current) =>
+    current.date > max ? current.date : max, validReports[0].date);
+
+  // Filter reports within the freshness window (1 year)
+  const FRESHNESS_WINDOW_MS = 365 * 24 * 60 * 60 * 1000;
+  const recentReports = validReports.filter((r) =>
+    (latestDate.getTime() - r.date.getTime()) <= FRESHNESS_WINDOW_MS
+  );
+
+  // Count votes
+  const voteCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  let maxVotes = 0;
+
+  for (const report of recentReports) {
+    voteCounts[report.status] = (voteCounts[report.status] || 0) + 1;
+    if (voteCounts[report.status] > maxVotes) {
+      maxVotes = voteCounts[report.status];
+    }
+  }
+
+  // Find winners (statuses with maxVotes)
+  const winners: number[] = [];
+  for (let s = 1; s <= 5; s++) {
+    if (voteCounts[s] === maxVotes) {
+      winners.push(s);
+    }
+  }
+
+  // If single winner, return it. If tie, average them.
+  if (winners.length === 1) {
+    return winners[0];
+  }
+
+  const sum = winners.reduce((a, b) => a + b, 0);
+  return Math.round(sum / winners.length);
 }

@@ -7,7 +7,7 @@ import {
   PathMetadata,
   PathPerformance,
   PathWeather,
-  findMatchingPath,
+  getSimilarPath,
   savePath,
 } from "./pathManager";
 
@@ -49,7 +49,7 @@ export async function saveUserPath(userPath: UserPath): Promise<void> {
   }
 
   // Deduplication / Path Creation
-  let pathId = await findMatchingPath(locations);
+  let pathId = (await getSimilarPath(locations))?.id;
   if (!pathId) {
     await savePath(userPath.path);
     pathId = userPath.path.id;

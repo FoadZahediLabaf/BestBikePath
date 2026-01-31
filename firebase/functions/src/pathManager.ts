@@ -15,11 +15,12 @@ export interface Path {
 }
 
 export interface PathMetadata {
-  startGeohash: string;
-  startLatitude: number;
-  startLongitude: number;
-  endLatitude: number;
-  endLongitude: number;
+  originGeohash: string;
+  originLatitude: number;
+  originLongitude: number;
+  destinationGeohash: string;
+  destinationLatitude: number;
+  destinationLongitude: number;
 }
 
 export interface PathPerformance {
@@ -97,30 +98,50 @@ export function arePathsSimilar(
 }
 
 /**
- * Finds a matching path in the database.
+ * Finds a similar path in the database.
  * @param {PathLocation[]} locations - The path locations to check.
  * @return {Promise<string | null>} The ID of the matching path, or null.
  */
-export async function findMatchingPath(
+export async function getSimilarPath(
   locations: PathLocation[]
-): Promise<string | null> {
+): Promise<(Path & PathMetadata) | null> {
   if (locations.length < 2) return null;
 
-  const start = locations[0];
-  const end = locations[locations.length - 1];
-  const range = 200; // 200m
+  const origin = locations[0];
+  const destination = locations[locations.length - 1];
+  const radiusInM = 200; // 200m
+
+  const filteredPaths = await getConnectingPaths(origin, destination, radiusInM);
+
+  for (const path of filteredPaths) {
+    if (arePathsSimilar(locations, path.locations)) {
+      return path;
+    }
+  }
+
+  return null;
+}
+
+export async function getConnectingPaths(
+  origin: PathLocation,
+  destination: PathLocation,
+  radiusInM: number
+): Promise<(Path & PathMetadata)[]> {
 
   // https://firebase.google.com/docs/firestore/solutions/geoqueries
-  const center: [number, number] = [start.latitude, start.longitude];
+
+  const originCenter: [number, number] = [origin.latitude, origin.longitude];
+  const destinationCenter: [number, number] = [destination.latitude, destination.longitude];
+
   // Each item in 'bounds' represents a startAt/endAt pair. We have to issue
   // a separate query for each pair. There can be up to 9 pairs of bounds
   // depending on overlap, but in most cases there are 4.
-  const bounds = geofire.geohashQueryBounds(center, range);
+  const bounds = geofire.geohashQueryBounds(originCenter, radiusInM);
 
   const promises = [];
   for (const b of bounds) {
     const q = admin.firestore().collection(COLLECTIONS.PATHS)
-      .orderBy("startGeohash")
+      .orderBy("originGeohash")
       .startAt(b[0])
       .endAt(b[1]);
     promises.push(q.get());
@@ -130,33 +151,30 @@ export async function findMatchingPath(
   const snapshots = await Promise.all(promises);
 
   const docs = snapshots.flatMap(snap => snap.docs);
-
+  const paths: (Path & PathMetadata)[] = [];
   for (const doc of docs) {
     const path = { ...doc.data(), id: doc.id } as Path & PathMetadata;
 
     // Filter by start location distance (to remove geohash false positives)
     const startDistanceInKm = geofire.distanceBetween(
-      [path.startLatitude, path.startLongitude],
-      center
+      [path.originLatitude, path.originLongitude],
+      originCenter
     );
     const startDistanceInM = startDistanceInKm * 1000;
-    if (startDistanceInM > range) continue;
+    if (startDistanceInM > radiusInM) continue;
 
     // Filter by end location proximity
     const endDistanceInKm = geofire.distanceBetween(
-      [path.endLatitude, path.endLongitude],
-      [end.latitude, end.longitude]
+      [path.destinationLatitude, path.destinationLongitude],
+      destinationCenter
     );
     const endDistanceInM = endDistanceInKm * 1000;
-    if (endDistanceInM > range) continue;
+    if (endDistanceInM > radiusInM) continue;
 
-    // Finally, check path similarity
-    if (arePathsSimilar(locations, path.locations)) {
-      return path.id;
-    }
+    paths.push(path);
   }
 
-  return null;
+  return paths;
 }
 
 /**
@@ -170,18 +188,20 @@ export async function savePath(path: Path): Promise<void> {
       "Cannot create a path with fewer than 2 coordinates");
   }
 
-  const start = path.locations[0];
-  const end = path.locations[path.locations.length - 1];
+  const origin = path.locations[0];
+  const destination = path.locations[path.locations.length - 1];
 
-  const hash = geofire.geohashForLocation([start.latitude, start.longitude]);
+  const originGeohash = geofire.geohashForLocation([origin.latitude, origin.longitude]);
+  const destinationGeohash = geofire.geohashForLocation([destination.latitude, destination.longitude]);
 
   const pathData: Omit<Path, "id"> & PathMetadata = {
     locations: path.locations,
-    startGeohash: hash,
-    startLatitude: start.latitude,
-    startLongitude: start.longitude,
-    endLatitude: end.latitude,
-    endLongitude: end.longitude,
+    originGeohash: originGeohash,
+    originLatitude: origin.latitude,
+    originLongitude: origin.longitude,
+    destinationGeohash: destinationGeohash,
+    destinationLatitude: destination.latitude,
+    destinationLongitude: destination.longitude,
   };
 
   await admin.firestore()

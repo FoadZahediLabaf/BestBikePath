@@ -1,6 +1,6 @@
 import * as admin from "firebase-admin";
 import { COLLECTIONS } from "./collections";
-import { Path, PathMetadata, PathLocation, distance } from "./pathManager";
+import { Path, PathLocation, getConnectingPaths } from "./pathManager";
 import { UserPath } from "./userPathManager";
 
 export interface CommunityPath {
@@ -19,66 +19,48 @@ export async function getCommunityPaths(
   origin: PathLocation,
   destination: PathLocation
 ): Promise<CommunityPath[]> {
-  const range = 0.05; // ~5km radius search? Or smaller?
-  // Let's use a reasonably large area for "nearby" paths
+  const radiusInM = 5000; // 5km radius search
 
-  const snapshot = await admin.firestore().collection(COLLECTIONS.PATHS)
-    .where("startLatitude", ">=", origin.latitude - range)
-    .where("startLatitude", "<=", origin.latitude + range)
-    .get();
+  const paths = await getConnectingPaths(origin, destination, radiusInM);
 
-  const results: CommunityPath[] = [];
+  const communityPaths: CommunityPath[] = [];
 
-  for (const doc of snapshot.docs) {
-    const path = { ...doc.data(), id: doc.id } as Path & PathMetadata;
+  for (const path of paths) {
 
-    // Filter by similarity to requested origin/dest loosely?
-    // Or just return all paths that start near origin and end near destination?
-    // Requirement says: "Query the Path collection for paths matching the
-    // origin and destination."
+    // Calculate status from UserPaths
+    const userPathsSnapshot = await admin.firestore()
+      .collection(COLLECTIONS.USER_PATHS)
+      .where("pathId", "==", path.id)
+      .get();
 
-    const startDist = distance(origin,
-      { latitude: path.startLatitude, longitude: path.startLongitude });
-    const endDist = distance(destination,
-      { latitude: path.endLatitude, longitude: path.endLongitude });
+    let totalStatus = 0;
+    let count = 0;
 
-    const PROXIMITY_THRESHOLD = 500; // meters
+    userPathsSnapshot.forEach((userPathDoc) => {
+      const userPath = {
+        ...userPathDoc.data(),
+        id: userPathDoc.id,
+      } as Omit<UserPath, "path"> & { pathId: string };
 
-    if (startDist < PROXIMITY_THRESHOLD && endDist < PROXIMITY_THRESHOLD) {
-      // Calculate status from UserPaths
-      const userPathsSnapshot = await admin.firestore()
-        .collection(COLLECTIONS.USER_PATHS)
-        .where("pathId", "==", path.id)
-        .get();
+      if (userPath.status) {
+        totalStatus += userPath.status;
+        count++;
+      }
+    });
 
-      let totalStatus = 0;
-      let count = 0;
+    // Simple average for now
+    const avgStatus = count > 0 ?
+      Math.round(totalStatus / count) : 0;
 
-      userPathsSnapshot.forEach((userPathDoc) => {
-        const userPath = {
-          ...userPathDoc.data(),
-          id: userPathDoc.id,
-        } as Omit<UserPath, "path"> & { pathId: string };
-        if (userPath.status) {
-          totalStatus += userPath.status;
-          count++;
-        }
-      });
-
-      // Simple average for now
-      const avgStatus = count > 0 ?
-        Math.round(totalStatus / count) : 0;
-
-      results.push({
+    communityPaths.push({
+      id: path.id,
+      path: {
         id: path.id,
-        path: {
-          id: path.id,
-          locations: path.locations,
-        },
-        status: avgStatus,
-      });
-    }
+        locations: path.locations,
+      },
+      status: avgStatus,
+    });
   }
 
-  return results;
+  return communityPaths;
 }

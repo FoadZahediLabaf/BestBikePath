@@ -10,6 +10,8 @@ import SwiftUI
 
 struct PathMap: View {
 
+    @Environment(BestBikePathModel.self) private var appModel
+
     @State private var routes: [MKRoute] = []
 
     private let path: Path
@@ -34,6 +36,7 @@ struct PathMap: View {
                     .stroke(Color.accent, style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .bevel))
             }
         }
+        .mapStyle(appModel.contentMapStyle.mapStyle)
         .task {
             routes = (try? await makeRoutes(from: path)) ?? []
         }

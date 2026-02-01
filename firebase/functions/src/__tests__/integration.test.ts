@@ -1,16 +1,11 @@
 
 import * as admin from "firebase-admin";
 
-// Initialize the test SDK
-// We need to point to the project ID.
-// The env vars for emulators are set by the `firebase emulators:exec` command.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const test = require("firebase-functions-test")({
   projectId: "bestbikepath-test",
 });
 
-// Import the exported functions
-// This will initialize admin app, picking up emulator env vars
 import * as myFunctions from "../index";
 import { COLLECTIONS } from "../constants";
 
@@ -38,8 +33,7 @@ describe("Integration Tests", () => {
     });
 
     it("should create a user successfully given valid verification code", async () => {
-      // 1. Setup Verification Code in Firestore
-      // We write directly to Firestore using admin SDK (connected to emulator)
+      // Setup Verification Code in Firestore
       await admin.firestore()
         .collection(COLLECTIONS.EMAIL_VERIFICATIONS)
         .doc(email)
@@ -48,8 +42,7 @@ describe("Integration Tests", () => {
           expiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + 100000),
         });
 
-      // 2. Call the function
-      // For v2 functions, use .run(request)
+      // Call the function
       const request = {
         data: {
           email,
@@ -62,7 +55,7 @@ describe("Integration Tests", () => {
       
       const token = await (myFunctions.createUser as any).run(request);
 
-      // 3. Verify Result
+      // Verify Result
       expect(typeof token).toBe("string");
 
       // Verify User in Auth
@@ -94,12 +87,6 @@ describe("Integration Tests", () => {
   });
 
   describe("Path Management Integration", () => {
-    // We can test saveUserPath and checks if it reflects in community paths?
-    // Community paths are read-only aggregation mostly, but `saveUserPath` saves to `paths` too implicitly?
-    // `saveUserPath` calls `userPathManager.saveUserPath`.
-    // If it finds a similar path, it links. If not, it creates new `path`.
-    
-    // We need a user for this.
     let uid: string;
     const userEmail = "path-tester@example.com";
 
@@ -160,29 +147,13 @@ describe("Integration Tests", () => {
 
     it("should retrieve community paths", async () => {
         // We know "user-path-1" exists at 10,10 from previous test
-        // But integration tests might run in parallel or random order?
-        // Jest runs describing blocks ensuring order? 
-        // No, standard Jest runs tests in parallel files, but within file it runs sequentially.
-        // However, we should be robust.
-        // Let's rely on the previous test having run OR setup data again.
-        // Since we didn't clear `paths` collection in beforeEach/All, it might persist if we don't clear it.
-        // We only cleared `auth` and `email_verifications`.
-        // The `paths` and `user_paths` from previous test should be there if sequential.
-        
-        // Setup request
         const request = {
             data: {
                 origin: { latitude: 10, longitude: 10 },
                 destination: { latitude: 10.001, longitude: 10.001 }
             },
-            auth: undefined // Public access allowed? getCommunityPaths doesn't check auth in implementation I saw?
-            // Let's check implementation behavior
+            auth: undefined
         };
-        
-        // getCommunityPaths logic:
-        // const { origin, destination } = request.data;
-        // if (!origin || !destination) throw ...
-        // return await communityPathManager.getCommunityPaths(origin, destination);
         
         const result = await (myFunctions.getCommunityPaths as any).run(request);
         
@@ -229,14 +200,12 @@ describe("Integration Tests", () => {
 
         await (myFunctions.deleteUserPath as any).run(request);
 
-        // 3. Verify User Path is gone
+        // Verify User Path is gone
         const upDocAfter = await admin.firestore().collection("user_paths").doc("user-path-1").get();
         expect(upDocAfter.exists).toBe(false);
 
-        // 4. Verify Linked Path is gone (Orphan cleanup)
+        // Verify Linked Path is gone (Orphan cleanup)
         // Since "user-path-1" was the only one pointing to "initial-path-id"
-        // Note: The previous test 'getCommunityPaths' doesn't create new paths, it reads.
-        // 'saveUserPath' created 'user-path-1' pointing to 'initial-path-id'.
         const pathDocAfter = await admin.firestore().collection("paths").doc(pathId).get();
         expect(pathDocAfter.exists).toBe(false);
     });

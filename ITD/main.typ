@@ -26,11 +26,15 @@
 = Introduction
 
 == Purpose
-In this document, we illustrate the implementation of the various software components previously discussed in the related Design Document for the Best Bike Paths application. The document also describes the adopted frameworks and programming languages, as well as the testing plan.
+This document describes the implementation and integration testing of the BestBikePath system. \
+The system has been developed in accordance with the requirements defined in the Requirement Analysis and Specification Document (RASD) and the architectural choices presented in the Design Document (DD). \
+The purpose of this document is to explain how those requirements and design decisions are reflected in the actual software implementation and how the different system components are integrated and verified. In particular, the document focuses on the interaction between the mobile application, the backend services, and the external components involved in the system execution. \
+The document presents the main implemented functionalities, the technologies adopted during development, and the integration testing activities carried out to validate component interactions. These tests aim to ensure that the system behaves consistently with the expected scenarios described in the RASD and that the architectural solutions defined in the DD are correctly realized. \
+No new requirements or design decisions are introduced in this document. All described activities are strictly derived from, and aligned with, the existing project documentation. \
+
 
 == Scope
-The main goad of this document is to describe how and which requirements have been implemented in the application, while also illustrating the different software tools that were use during the implementation process and the reasons for their adoptions. 
-The final section describes the test cases used during the testing phase, focusing on unit testing and the methodology adopted for integration testing.
+
 
 == Definitions, Acronyms, Abbreviations
 
@@ -345,28 +349,70 @@ All unit tests passed successfully, achieving a code coverage of over 90% across
 
 == System Testing
 
-System testing was performed to validate the integration between the iOS client and the Firebase backend, ensuring the "End-to-End" (E2E) flow satisfies the functional requirements.
+System testing was performed to validate the end-to-end integration between the iOS client and the Firebase Backend. The primary goal was to ensure that data flows correctly from the device to the cloud and back, satisfying the functional requirements defined in the Design Document.
 
-- User Authentication
-  - Sign In
-  - Account Creation
-- User Account
-  - Sign Out
-  - Account Deletion
-- User Path Insertion
-- User Path Recording
-  - Manual Object Insertion
-  - Automatic Object Detection
-  - Manual Pause/Resume
-  - Automatic Pause/Resume
-- User Path Detail
-  - Path Status Update
-  - Path Privacy Update
-  - Path Deletion
-  - Start User Path Recording
-- Community Path Search
-- Community Path Detail
-  - Start User Path Recording
+The testing strategy focused on four main functional areas: Authentication, Path Recording, Data Management, and Community Interaction.
+
+=== Main Test Cases
+
+*User Authentication*
+- *Sign Up:* Initiated the authentication flow with an unregistered email address.
+  - _Outcome:_ A new user document is created in Firebase, and the app redirects to the Home Screen.
+- *Sign In:* Initiated the flow with an existing registered email.
+  - _Outcome:_ The user is successfully authenticated, retrieving their specific settings and history.
+- *Sign Out:* Triggered the sign-out action from the account page.
+  - _Outcome:_ The local session is cleared, and the user is redirected to the Welcome Screen.
+- *Account Deletion:* Selected the permanent delete option from settings.
+  - _Outcome:_ The user's authentication record and personal data are removed from the backend; the app returns to the Welcome Screen.
+
+*Path Recording (Core Feature)*
+- *Manual Obstacle Insertion:* While recording, pressed the "Add Obstacle" button.
+  - _Outcome:_ A marker is placed on the map, and a visual notification confirms the insertion.
+- *Automatic Obstacle Detection:* Simulated a sudden device movement (shake) during recording.
+  - _Outcome:_ The accelerometer triggers the "Pothole/Obstacle" logic, automatically logging an event and displaying a confirmation notification.
+- *Manual Pause/Resume:* Toggled the pause button during an active ride.
+  - _Outcome:_ The timer and GPS tracking stop immediately and resume only upon user input.
+- *Activity Recognition (Auto-Pause):* Simulated a stop in cycling movement.
+  - _Outcome:_ The application detects the lack of motion and automatically pauses the recording to preserve data accuracy.
+
+*User Path Management*
+- *Path Updates:* Modified the privacy status (Public/Private) and path condition status of an existing entry.
+  - _Outcome:_ Changes are persisted in the database. Upon reloading the app on a different device, the updated status is visible.
+- *Path Deletion:* Removed a path from the history.
+  - _Outcome:_ The entry disappears immediately from the list and is no longer queryable from the backend.
+- *Start Recording:* Started a recording from an existing path detail view.
+  - _Outcome:_ The recording view launches, overlaying the previous path (in a subtle color) on the map to guide the user.
+
+*Community & Search*
+- *Search Functionality:* Entered specific start and destination points in the community search bar.
+  - _Outcome:_ The map populates with public paths matching the criteria uploaded by other users.
+- *Community Path Interaction:* Selected a public path from search results.
+  - _Outcome:_ The detail view opens. If authenticated, the user can start a new recording using this public path as a reference track.
+
+=== Complex Integration Scenarios
+
+To verify the business logic regarding data aggregation and privacy, we performed specific step-by-step scenarios.
+
+*Scenario A: Privacy Consistency Check*
+This test verifies that the "Public/Private" toggle effectively controls data visibility in the community search.
+
++ *Setup:* We created a new path from _Bergamo_ to _Milan_ setting the toggle to *Public*.
++ *Verification 1:* We performed a community search for "Bergamo-Milan". The path appeared correctly in the results.
++ *Action:* We opened the path details in the User History, changed the toggle to *Private*, and saved.
++ *Verification 2:* We repeated the community search for "Bergamo-Milan".
++ *Outcome:* The path was no longer visible in the results, confirming the privacy filter works immediately.
+
+*Scenario B: Crowd-Sourcing Logic (Status Aggregation)*
+This test validates how the system aggregates conflicting reports on the same route to determine the overall path status.
+
++ *Setup:* We created 3 distinct recordings for the exact same route (same origin/destination).
+  - Recording 1 status: "Impassable"
+  - Recording 2 status: "Excellent"
+  - Recording 3 status: "Excellent"
++ *Verification 1:* Searching for this route displayed the status as *Excellent* (Majority rule/Weighted average favors the two positive reports).
++ *Action:* We deleted one of the "Excellent" recordings.
++ *Verification 2:* We repeated the search.
++ *Outcome:* The status updated to *Fair*. This confirms the backend correctly recalculates the average condition (merging "Impassable" and one "Excellent") in real-time.
 
 
 === Main Test Cases | Test Case | Description | Expected Outcome | Result | | :--- | :--- | :--- | :--- | | User Onboarding | New user signs up via the iOS app and initializes their profile. | User record created in Firebase Auth and Firestore User collection. | Pass | | Path Recording | Recording a bike path with CoreMotion/GPS and saving it. | Path polyline and sensor data correctly stored and visible in "My Paths". | Pass | | Community Discovery | Searching for paths near the current location using the map. | Relevant paths retrieved via Geohashing and rendered correctly on MapKit. | Pass | | Feedback Loop | Rating a community path and checking for status updates. | The communityPathManager updates the global status based on the new vote. | Pass |

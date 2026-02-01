@@ -340,11 +340,9 @@ This evolution will make it significantly easier to extend support to Android by
 *TypeScript* \
 The backend is implemented in TypeScript, which is used to write the functions that communicate with the mobile application. \
 These functions manage user and bike path data and handle requests coming from the client. \
-Using TypeScript helped keep the backend code clean and organized during development, and the structure of the exchanged data was easier to control compared to JavaScript. \
+Using TypeScript helped keep the Backend code clean and organized during development, and the structure of the exchanged data was easier to control compared to JavaScript. \
 Furthermore, it allowed us to catch several errors at compile time. \
 An additional build step was required compared to plain JavaScript, but this did not affect the overall development flow. \
-
-
 
 = Source Code Structure
 The project is organized into two primary directories, which are structured to function as two separate Git repositories in a production environment: the *iOS Client* (`Implementation/swift-bbp-client`) and the *Firebase Backend* (`Implementation/firebase-bbp-backend`). This separation ensures a clean decoupling of concerns, where the mobile app handles the user interface and sensor data, while the cloud infrastructure manages data persistence and heavy geo-spatial calculations.
@@ -844,7 +842,7 @@ To distribute BBP on iOS, we utilize Apple's *TestFlight* platform. Depending on
 == Option 1: Public Link
 If the build has already been approved by Apple, you can join the testing group immediately via the following link:
 
-#link("https://testflight.apple.com/join/AT7aHqTg")[https://testflight.apple.com/join/AT7aHqTg]
+*#link("https://testflight.apple.com/join/AT7aHqTg")[https://testflight.apple.com/join/AT7aHqTg]*
 
 == Option 2: Internal Testing (Manual Addition)
 If the public link is not yet active, we will need to add you to our internal development team manually. Please follow these steps:

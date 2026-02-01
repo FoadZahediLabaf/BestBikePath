@@ -20,6 +20,8 @@ module.exports = {
   ignorePatterns: [
     "/lib/**/*", // Ignore built files.
     "/generated/**/*", // Ignore generated files.
+    "/coverage/**/*",
+    "jest.config.js",
   ],
   plugins: [
     "@typescript-eslint",
@@ -32,4 +34,19 @@ module.exports = {
     "object-curly-spacing": ["error", "always"],
     "max-len": ["error", { "code": 80 }],
   },
+  overrides: [
+    {
+      files: ["**/*.spec.ts", "**/*.test.ts"],
+      env: {
+        jest: true,
+      },
+      rules: {
+        "require-jsdoc": "off",
+        "max-len": "off",
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-var-requires": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+      },
+    },
+  ],
 };

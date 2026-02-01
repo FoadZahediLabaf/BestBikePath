@@ -31,7 +31,12 @@ export async function getCommunityPaths(
     const userPathsSnapshot = await admin.firestore()
       .collection(COLLECTIONS.USER_PATHS)
       .where("pathId", "==", path.id)
+      .where("isPublic", "==", true)
       .get();
+
+    if (userPathsSnapshot.empty) {
+      continue;
+    }
 
     const userPaths = userPathsSnapshot.docs.map((userPathDoc) => ({
       ...userPathDoc.data(),

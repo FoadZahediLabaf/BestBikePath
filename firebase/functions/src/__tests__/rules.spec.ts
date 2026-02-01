@@ -54,7 +54,7 @@ describe("Firestore Security Rules", () => {
     it("should not allow user to read others' profile", async () => {
       const bobDb = db("bob");
       await bobDb.collection("users").doc("bob").set({ name: "Bob" }); // Setup
-      
+
       const aliceDb = db("alice");
       await assertFails(aliceDb.collection("users").doc("bob").get());
     });
@@ -82,51 +82,51 @@ describe("Firestore Security Rules", () => {
       // We'll write as 'alice' first.
       const aliceDb = db("alice");
       const docRef = await aliceDb.collection("user_paths").add({ userId: "alice" });
-      
+
       await assertSucceeds(docRef.get());
     });
-    
-    it("should allow others to read public paths", async () => {
-       // Using withSecurityRulesDisabled to setup data for specific test scenario
-       await testEnv.withSecurityRulesDisabled(async (context) => {
-          await context.firestore().collection("user_paths").doc("public_path").set({
-              userId: "alice",
-              isPublic: true
-          });
-       });
 
-       const bobDb = db("bob");
-       await assertSucceeds(bobDb.collection("user_paths").doc("public_path").get());
-       
-       const unauthDb = db();
-       // Unauthenticated read?
-       // My rules say: allow read: if isAuthenticated() && ...
-       // So unauth should fail.
-       await assertFails(unauthDb.collection("user_paths").doc("public_path").get());
+    it("should allow others to read public paths", async () => {
+      // Using withSecurityRulesDisabled to setup data for specific test scenario
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection("user_paths").doc("public_path").set({
+          userId: "alice",
+          isPublic: true,
+        });
+      });
+
+      const bobDb = db("bob");
+      await assertSucceeds(bobDb.collection("user_paths").doc("public_path").get());
+
+      const unauthDb = db();
+      // Unauthenticated read?
+      // My rules say: allow read: if isAuthenticated() && ...
+      // So unauth should fail.
+      await assertFails(unauthDb.collection("user_paths").doc("public_path").get());
     });
 
     it("should not allow others to read private paths", async () => {
-       await testEnv.withSecurityRulesDisabled(async (context) => {
-          await context.firestore().collection("user_paths").doc("private_path").set({
-              userId: "alice",
-              isPublic: false
-          });
-       });
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection("user_paths").doc("private_path").set({
+          userId: "alice",
+          isPublic: false,
+        });
+      });
 
-       const bobDb = db("bob");
-       await assertFails(bobDb.collection("user_paths").doc("private_path").get());
+      const bobDb = db("bob");
+      await assertFails(bobDb.collection("user_paths").doc("private_path").get());
     });
   });
 
   describe("Paths (Community) Collection", () => {
-     it("should allow read for authenticated users", async () => {
-        const aliceDb = db("alice");
-        await assertSucceeds(aliceDb.collection("paths").doc("any").get());
-     });
+    it("should allow read for authenticated users", async () => {
+      const aliceDb = db("alice");
+      await assertSucceeds(aliceDb.collection("paths").doc("any").get());
+    });
 
-     it("should deny write for users", async () => {
-        const aliceDb = db("alice");
-        await assertFails(aliceDb.collection("paths").doc("any").set({ foo: "bar" }));
-     });
+    it("should deny write for users", async () => {
+      const aliceDb = db("alice");
+      await assertFails(aliceDb.collection("paths").doc("any").set({ foo: "bar" }));
+    });
   });
 });

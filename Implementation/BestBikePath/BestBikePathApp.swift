@@ -1,0 +1,30 @@
+//
+//  BestBikePathApp.swift
+//  BestBikePath
+//
+//  Created by Lorenzo Fiamingo on 05/11/25.
+//
+
+import SwiftUI
+import SwiftData
+import FirebaseCore
+
+@main
+struct BestBikePathApp: App {
+
+    @State private var appModel = BestBikePathModel()
+
+    init() {
+        FirebaseApp.configure()
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            NavigationStack {
+                ContentView()
+            }
+        }
+        .modelContainer(appModel.modelSource.container)
+        .environment(appModel)
+    }
+}

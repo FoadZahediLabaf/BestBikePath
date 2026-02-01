@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper function to check if user is owner of the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    // Users can read and write their own profile
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // User Paths collection
+    // Users can read/write paths if they own them (userId matches auth.uid)
+    match /user_paths/{pathId} {
+      allow read: if isAuthenticated() && (resource.data.userId == request.auth.uid || resource.data.isPublic == true);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Community/Aggregated Paths (assuming 'paths' collection)
+    // Read-only for authenticated users? or public?
+    // Let's assume public read for now, write restricted to admin (which bypasses rules) or specific functions
+    match /paths/{pathId} {
+      allow read: if true;
+      allow write: if false; // Only manageable via Admin SDK (Cloud Functions)
+    }
+  }
+}

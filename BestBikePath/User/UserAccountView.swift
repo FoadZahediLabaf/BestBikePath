@@ -97,6 +97,8 @@ struct UserAccountView: View {
                     Button("Delete Account", systemImage: "xmark.rectangle.portrait.fill", role: .destructive) {
                         isDeleteAccountConfirmationShown = true
                     }
+                    .tint(.red)
+                    .foregroundStyle(.red)
                 }
             }
             .confirmationDialog("Delete account", isPresented: $isDeleteAccountConfirmationShown, titleVisibility: .visible) {

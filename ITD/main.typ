@@ -26,12 +26,11 @@
 = Introduction
 
 == Purpose
-This document describes the implementation and integration testing of the BestBikePath system. \
+This document describes the implementation and integration testing of the BestBikePaths system. \
 The system has been developed in accordance with the requirements defined in the Requirement Analysis and Specification Document (RASD) and the architectural choices presented in the Design Document (DD). \
 The purpose of this document is to explain how those requirements and design decisions are reflected in the actual software implementation and how the different system components are integrated and verified. In particular, the document focuses on the interaction between the mobile application, the backend services, and the external components involved in the system execution. \
 The document presents the main implemented functionalities, the technologies adopted during development, and the integration testing activities carried out to validate component interactions. These tests aim to ensure that the system behaves consistently with the expected scenarios described in the RASD and that the architectural solutions defined in the DD are correctly realized. \
-No new requirements or design decisions are introduced in this document. All described activities are strictly derived from, and aligned with, the existing project documentation. \
-
+No new requirements or design decisions are introduced in this document. 
 
 == Scope
 
@@ -118,16 +117,13 @@ The following reference materials were used for the preparation of this document
 = Requirement and Functions
 == Overview of Implemented Requirements
 
-The current version of the BestBikePath system implements a subset of the requirements defined in the Requirements Analysis and Specification Document. \
+The current version of the BestBikePaths system implements most of the requirements defined in the Requirements Analysis and Specification Document. \
 The implemented functionalities cover the core objectives of the application and allow users to interact with the system through the mobile client and the backend services. \
 
-The focus of the implementation has been on enabling users to manage personal bike paths and to access shared paths provided by the community. \
-For this reason, priority has been given to functionalities related to user management, path creation and storage, path visualization, and community path browsing. \
-
-This section describes the functionalities that are available in the system at the time of writing, while the remaining requirements are discussed separately, together with the motivations for their exclusion or partial implementation. \
+This section describes the functionalities that are available in the system at the time of writing, while the requirements are discussed separately
 
 === *User Management Functionalities* \
-The BestBikePath system includes user management functionalities that allow users to access the application and interact with the available services.
+The BestBikePaths system includes user management functionalities that allow users to access the application and interact with the available services.
 Users can create an account, authenticate themselves, and remove their account through the mobile application. \
 
 User-related operations are handled by the backend services and are exposed to the mobile client through dedicated interfaces. \
@@ -142,14 +138,14 @@ In the current implementation, path creation includes manual path insertion, whi
 Once a path is created by the user or the recording session ends, the corresponding data is sent to the backend services, where it is stored and associated with the user’s account. \
 The backend is responsible for managing the persistence of path data and for maintaining the link between paths and users. \
 
-This functionality has been implemented because it represents a fundamental requirement of the BestBikePath system. \
+This functionality has been implemented because it represents a fundamental requirement of the BestBikePaths system. \
 
 === *Path Visualization and Management* \
 
-The BestBikePath system allows users to visualize and manage the bike paths stored in their personal collection. \
+The BestBikePaths system allows users to visualize and manage the bike paths stored in their personal collection. \
 Through the mobile application, users can retrieve previously saved paths and display them on the map. \
 
-In addition to visualization, users can manage their stored paths by modifying specific attributes, such as the privacy level of a path. \
+In addition to visualization, users can manage their stored paths by modifying their associated privacy level. \
 These operations are supported by the backend services and ensure that each user can only access and modify paths that belong to their account. \
 
 Path visualization and management functionalities have been implemented to allow users to review and organize their personal paths, supporting one of the main use cases of the application. \
@@ -161,13 +157,13 @@ Community path browsing allows users to view paths that have been made available
 Through the mobile application, users can browse the available community paths and select a specific path in order to access its detailed information. \
 The path detail view provides additional data about the selected path and allows users to better understand the characteristics of the route. \
 
-These functionalities have been implemented to support the social and collaborative aspect of the BestBikePath system, as described in the requirements analysis. \
+These functionalities have been implemented to support the social aspect of the BestBikePath system, as described in the requirements analysis. \
 They allow users to benefit from paths created by other members of the community and represent an important extension of the personal path management features. \
 
 === *Permission Management* \
 When the system needs a capability permission for a feature, such as the user location to record a bike path, a sheet modal is shown.
 If the capability is available and the user never denied the authorization, and decides to give their permission, the system dialog to give permission is shown, and the user can allow the app to use the capability.
-If the capability is available and the user denied the authorization, but then decides to give their permission, they must open settings and change the access authorization status manually.
+If the capability is available and the user denied the authorization, but then decides to give their permission, they must navigate to the settings and change the access authorization status manually.
 If the capability is unavailable, the user can just close the modal and not use the app feature.
 
 == Implemented Requirements
@@ -287,7 +283,7 @@ _Implemented_ \
 
 = Development Frameworks
 The development of the BestBikePath system required the use of different technologies for the mobile client and for the Backend services. \
-The adopted frameworks and platforms follow the design decisions described in the Design Document and were selected mainly to simplify development and integration activities within the scope of the project. \
+The adopted frameworks and platforms follow the design decisions described in the Design Document and were selected mainly to simplify development and integration activities.. \
 
 During the implementation phase, additional frameworks (not initially outlined in the previous documents) were integrated to enhance the robustness of the core logic and ensure overall code stability.  \
 The choices described in this section reflect what was effectively used while developing and integrating the system components. \
@@ -302,11 +298,10 @@ The user interface was built using SwiftUI, Apple's declarative framework to bui
 A specialized Swift Package (installed via SPM) that extends standard button functionality to natively support asynchronous operations. It simplifies the UI lifecycle by automatically managing loading states and preventing redundant triggers during concurrent executions.
 
 *SwiftUI-Introspect*\
-A Swift Package used to access the underlying UIKit components of SwiftUI views. Specifically, it's here used to intercept the _UISheetPresentationController_ to implement advanced customizations for modal sheets—such as precise detent control and gestures that are central to the BBP app's user experience.
+A Swift Package used to access the underlying UIKit components of SwiftUI views. Specifically, it's here used to intercept the _UISheetPresentationController_ to implement advanced customizations for modal sheets such as precise detent control and gestures that are central to the BBP app's user experience.
 
 *Firebase iOS SDK*\
 The core suite used to bridge the mobile client with backend services. It facilitates secure user authentication via Firebase Auth and provides the communication layer for invoking Cloud Functions, ensuring seamless data flow between the iOS app and the serverless environment.
-
 
 *MapKit* \
 MapKit was integrated to handle all geospatial requirements. It provides the core mapping interface, handles user location tracking, and renders the polyline paths that represent bike paths. It also provide the Directions API, that can be used to retrieve detailed step-by-step navigation and route data based on start and end points.
@@ -373,7 +368,7 @@ The backend logic is centralized within the `functions/` directory, structured t
 - *src*: The TypeScript source code.
   - *index.ts*: The entry point where Cloud Functions (HTTPS and Triggers) are exported.
   - *managers*: Module-specific logic (e.g., `pathManager.ts`, `userManager.ts`) that isolates business logic from the Firebase transport layer in `index.ts`.
-  - *constants*: Shared constant value providing a single source-of-truth.
+  - *constants*: Shared constant values providing a single source-of-truth.
 - *\_\_tests\_\_*: A comprehensive test suite using Jest. It contains unit tests for the manager modules, using mocked environments for Firestore and Turf.js to ensure logic reliability.
 - *package.json*: Manages dependencies and defines scripts for linting, compiling, testing and deploying the functions.
 
@@ -412,7 +407,7 @@ To validate time-sensitive logic (e.g., filtering out community reports older th
 
 
 *Firestore Access* \
-To test Firestore Security Rules, we used `@firebase/rules-unit-testing` in order to to verify that our access control logic correctly allows or denies requests based on a user's authentication state. The frameworks permits to create a test environment that makes possible calling Firestore locally.
+To test Firestore Security Rules, we used `@firebase/rules-unit-testing` in order to to verify that our access control logic correctly allows or denies requests based on a user's authentication state. The framework permits the creation a test environment that makes it possible to call Firestore locally.
 
 === Unit Test Cases
 
@@ -420,7 +415,7 @@ To test Firestore Security Rules, we used `@firebase/rules-unit-testing` in orde
 *getCommunityPaths* \
 *UT1*: Should return community paths with calculated status \
 - *Precondition*: User paths exist with validity votes and associated community paths. \
-- *Action*: Request community paths for a specific region. \
+- *Action*: Request community paths. \
 - *Expected result*: Returns a list of paths with the correct aggregated status score. \
 - *Outcome*: _Passed_ \
 *UT2*: Should sort paths by status descending \
@@ -449,7 +444,7 @@ To test Firestore Security Rules, we used `@firebase/rules-unit-testing` in orde
 - *Action*: Calculate status. \
 - *Expected result*: Old reports are ignored in the calculation. \
 - *Outcome*: _Passed_ \
-*UT7*: Should average winners in case of a tie \
+*UT7*: Should return average winners in case of a tie \
 - *Precondition*: Reports result in a tie for the most frequent status. \
 - *Action*: Calculate status. \
 - *Expected result*: Returns the average of the tied winning statuses. \
@@ -676,7 +671,7 @@ To test Firestore Security Rules, we used `@firebase/rules-unit-testing` in orde
 - *Outcome*: _Passed_ \
 
 === *Outcome Considerations*\
-All unit tests passed successfully, achieving a code coverage of over 90% across core modules. This ensures that every non trivial logical branch (if/else) and error handler (catch) has been executed and verified.
+All unit tests passed successfully, achieving a code coverage of over 90% across core modules ensuring that every non trivial logical branch (if/else) and error handler (catch) has been executed and verified.
 
 #pagebreak()
 == Integration Testing
@@ -686,7 +681,7 @@ The purpose of the following integration tests is to verify that the backend sof
 
 === Mocking Strategy and Isolation 
 
-In order to isolate the test environment from the production environment, we leverage the `firebase-functions-test` package, which enables us to test Cloud Functions locally by simulating events within the Firebase Emulator Suite.
+In order to isolate the test environment from the production environment, we leverage the `firebase-functions-test` package, which allows local testing of Cloud Functions by simulating events within the Firebase Emulator Suite.
 
 === Integration Test Cases
 #heading(level: 4, numbering: none,  outlined: false,  "User Management")
@@ -747,13 +742,13 @@ The testing strategy focused on four main functional areas: Authentication, Path
 *ST2*: Initiated the flow with an existing registered email \
 - *Precondition*: App is in unauthenticated state with an existing user account. \
 - *Action*: Initiate the sign in flow with the registered email. \
-- *Expected result*: The user is successfully authenticated, retrieving their specific settings and history. \
+- *Expected result*: The user is successfully authenticated, retrieving their history. \
 - *Outcome*: _Passed_ \
 *Sign Out* \
 *ST3*: Triggered the sign-out action from the account page \
 - *Precondition*: User is authenticated and on the account page. \
 - *Action*: Trigger the sign out action. \
-- *Expected result*: The local session is cleared, and the user is redirected to the Welcome Screen. \
+- *Expected result*: The local session is cleared, and the user is redirected to the Home Page. \
 - *Outcome*: _Passed_ \
 *Account Deletion* \
 *ST4*: Selected the permanent delete option from settings \
@@ -793,7 +788,7 @@ The testing strategy focused on four main functional areas: Authentication, Path
 *ST9*: Modified the privacy status and path condition status of an existing entry \
 - *Precondition*: User checks an existing path entry in their history. \
 - *Action*: Modify the privacy status (Public/Private) and path condition status. \
-- *Expected result*: Changes are persisted in the database. Upon reloading the app on a different device, the updated status is visible. \
+- *Expected result*: Changes are persisted in the database. Upon reloading the app, the updated status is visible. \
 - *Outcome*: _Passed_ \
 *Path Deletion* \
 *ST10*: Removed a path from the history \
@@ -827,7 +822,7 @@ To verify the business logic regarding data aggregation and privacy, we performe
 
 *Privacy Consistency Check* \
 *ST14*: Verify that the "Public/Private" toggle controls data visibility \
-- *Precondition*: A public path exists from Bergamo to Milan. \
+- *Precondition*: A single community path exists from Bergamo to Milan, connected to a single public user path. \
 - *Action*: In User History, change the path toggle to *Private* and save. Verify community search for "Bergamo-Milan" no longer shows the path. \
 - *Expected result*: The path appears in search initially, but is no longer visible after being set to Private, confirming the privacy filter works. \
 - *Outcome*: _Passed_ \

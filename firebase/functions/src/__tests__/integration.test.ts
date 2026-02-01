@@ -191,5 +191,54 @@ describe("Integration Tests", () => {
         const path = result.find((p: any) => p.id === "initial-path-id" || p.path.id === "initial-path-id");
         expect(path).toBeDefined();
     });
+
+    it("should update user path privacy", async () => {
+        const request = {
+            data: {
+                id: "user-path-1",
+                isPublic: false
+            },
+            auth: {
+                uid,
+                token: { uid, email: userEmail, email_verified: true }
+            }
+        };
+
+        await (myFunctions.updateUserPathPrivacy as any).run(request);
+
+        const doc = await admin.firestore().collection("user_paths").doc("user-path-1").get();
+        expect(doc.data()?.isPublic).toBe(false);
+    });
+
+    it("should delete user path and orphan path", async () => {
+        // 1. Verify paths exist
+        const upDocBefore = await admin.firestore().collection("user_paths").doc("user-path-1").get();
+        expect(upDocBefore.exists).toBe(true);
+        const pathId = upDocBefore.data()?.pathId;
+        
+        // 2. Delete User Path
+        const request = {
+            data: {
+                id: "user-path-1"
+            },
+            auth: {
+                uid,
+                token: { uid, email: userEmail, email_verified: true }
+            }
+        };
+
+        await (myFunctions.deleteUserPath as any).run(request);
+
+        // 3. Verify User Path is gone
+        const upDocAfter = await admin.firestore().collection("user_paths").doc("user-path-1").get();
+        expect(upDocAfter.exists).toBe(false);
+
+        // 4. Verify Linked Path is gone (Orphan cleanup)
+        // Since "user-path-1" was the only one pointing to "initial-path-id"
+        // Note: The previous test 'getCommunityPaths' doesn't create new paths, it reads.
+        // 'saveUserPath' created 'user-path-1' pointing to 'initial-path-id'.
+        const pathDocAfter = await admin.firestore().collection("paths").doc(pathId).get();
+        expect(pathDocAfter.exists).toBe(false);
+    });
   });
 });

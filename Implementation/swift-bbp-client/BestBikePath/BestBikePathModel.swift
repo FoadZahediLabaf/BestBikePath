@@ -20,11 +20,7 @@ final class BestBikePathModel {
 
     var currentUserStreamTask: Task<Void, Never>?
 
-    var presentedSheetItem: ContentSheetItem = .communityPathSearch {
-        didSet {
-            print("JFK", presentedSheetItem)
-        }
-    }
+    var presentedSheetItem: ContentSheetItem = .communityPathSearch
 
     var currentUser: User?
 

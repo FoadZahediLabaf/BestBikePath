@@ -18,6 +18,8 @@ struct UserPathDetailView: View {
 
     @State private var isCancelConfirmationShown = false
 
+    @State private var isDeleting = false
+
     var rawStatusBinding: Binding<Double> {
         Binding {
             Double(userPath.status.rawValue)
@@ -193,13 +195,30 @@ struct UserPathDetailView: View {
             }
 
             if isUserPath {
-                Button(role: .destructive) {
-                    isCancelConfirmationShown = true
+                HStack {
+                    if isDeleting {
+                        Button(role: .destructive, action: {}) {
+                            Label {
+                                Text("Delete")
+                            } icon: {
+                                ProgressView()
+                            }
+                        }
+                        .tint(.red)
+                        .foregroundStyle(.red)
+                        .disabled(true)
+                    } else {
+                        Button(role: .destructive) {
+                            isCancelConfirmationShown = true
+                        }
+                        .tint(.red)
+                        .foregroundStyle(.red)
+                    }
                 }
-                .tint(.red)
-                .foregroundStyle(.red)
                 .confirmationDialog("Delete Path", isPresented: $isCancelConfirmationShown, titleVisibility: .visible) {
                     AsyncButton("Delete", role: .destructive) {
+                        isDeleting = true
+                        defer { isDeleting = false }
                         try await deletePath()
                     }
                     Button("Cancel", role: .cancel) {

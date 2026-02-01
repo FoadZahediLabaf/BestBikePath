@@ -46,7 +46,7 @@ struct ContentView: View {
                     ContentUnavailableView {
                         Label("No Bike Paths Yet", systemImage: "figure.outdoor.cycle")
                     } description: {
-                        Text("You haven’t recorded or saved any bike paths yet. Start tracking your first ride or explore routes shared by the community.")
+                        Text("Insert a new path or start tracking your first ride.")
                     }
                 } else if appModel.userSource.currentUser == nil {
                     ContentUnavailableView {
@@ -147,6 +147,7 @@ struct ContentView: View {
             case .communityPathSearch:
                 CommunityPathSearch()
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .interactiveDismissDisabled()
             case .communityPathDetail:
                 if let communityPath = item.communityPath {
                     NavigationStack {
@@ -155,22 +156,25 @@ struct ContentView: View {
                     }
                     .presentationDetents([.medium, .large])
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .interactiveDismissDisabled()
                 }
             case .userAuthentication:
                 NavigationStack {
                     UserAuthenticationView()
-                        .toolbarTitleDisplayMode(.inlineLarge)
+                        .toolbarTitleDisplayMode(.large)
                 }
-                .presentationDetents([.medium, .large])
-                .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                .presentationDetents([.large])
+                .interactiveDismissDisabled()
+                //.presentationBackgroundInteraction(.enabled(upThrough: .medium))
             case .userAccount:
                 if let user = item.user {
                     NavigationStack {
                         UserAccountView(user: user)
-                            .toolbarTitleDisplayMode(.inlineLarge)
+                            .toolbarTitleDisplayMode(.large)
                     }
-                    .presentationDetents([.medium, .large])
-                    .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .presentationDetents([.large])
+                    .interactiveDismissDisabled()
+                    // .presentationBackgroundInteraction(.enabled(upThrough: .medium))
                 }
             case .locationAccess:
                 NavigationStack {
@@ -178,12 +182,14 @@ struct ContentView: View {
                         .toolbarTitleDisplayMode(.inlineLarge)
                 }
                 .presentationDetents([.large])
+                .interactiveDismissDisabled()
             case .motionAccess:
                 NavigationStack {
                     MotionAccessView(nextAction: appModel.presentUserPathRecording)
                         .toolbarTitleDisplayMode(.inlineLarge)
                 }
                 .presentationDetents([.large])
+                .interactiveDismissDisabled()
             case .userPathInsertion:
                 NavigationStack {
                     UserPathInsertionView()
@@ -206,6 +212,7 @@ struct ContentView: View {
                     }
                     .presentationDetents([.medium, .large])
                     .presentationBackgroundInteraction(.enabled(upThrough: .medium))
+                    .interactiveDismissDisabled()
                 }
             }
         }

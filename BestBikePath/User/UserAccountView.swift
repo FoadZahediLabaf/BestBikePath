@@ -21,6 +21,8 @@ struct UserAccountView: View {
     @State private var isDeleteAccountConfirmationShown: Bool = false
     @State private var isSignOutConfirmationShown: Bool = false
 
+    @State private var isDeleting = false
+
     var body: some View {
         @Bindable var appModel = appModel
         List {
@@ -31,7 +33,7 @@ struct UserAccountView: View {
 
                 Label(user.email, systemImage: "envelope")
                     .foregroundStyle(.primary)
-            }
+            } header: { Spacer() }
 
             Section {
                 Picker("Map Style", selection: $appModel.contentMapStyle) {
@@ -80,12 +82,27 @@ struct UserAccountView: View {
                     Text("You’ll need to sign in again to access your account.")
                 }
 
-                Button("Delete Account", systemImage: "xmark.rectangle.portrait.fill", role: .destructive) {
-                    isDeleteAccountConfirmationShown = true
+                if isDeleting {
+                    Button(role: .destructive, action: {}) {
+                        Label {
+                            Text("Delete")
+                        } icon: {
+                            ProgressView()
+                        }
+                    }
+                    .tint(.red)
+                    .foregroundStyle(.red)
+                    .disabled(true)
+                } else {
+                    Button("Delete Account", systemImage: "xmark.rectangle.portrait.fill", role: .destructive) {
+                        isDeleteAccountConfirmationShown = true
+                    }
                 }
             }
             .confirmationDialog("Delete account", isPresented: $isDeleteAccountConfirmationShown, titleVisibility: .visible) {
                 AsyncButton("Delete Account", role: .destructive) {
+                    isDeleting = true
+                    defer { isDeleting = false }
                     try await appModel.userSource.deleteUser(email: user.email)
                     appModel.presentedSheetItem = .communityPathSearch
                 }

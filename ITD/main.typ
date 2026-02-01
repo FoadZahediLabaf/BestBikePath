@@ -396,9 +396,15 @@ The project relies on two main package managers:
 
 = Testing
 
-This section outlines the verification strategies employed to ensure the application's reliability, from individual logic components to the complete end-to-end user flow.
+This section outlines the verification strategies employed to ensure the application's reliability, from individual logic components to the complete end-to-end user flow. \
+Testing activities were performed to verify the correct behavior of the BestBikePath system with respect to the implemented requirements. \
 
-== Backend Business Logic Unit Testing
+All tests described in this section were executed on the implemented version of the system. \
+
+
+== Unit Testing
+
+=== Backend Business Logic
 
 The backend business logic, implemented via Firebase Cloud Functions, was validated using the Jest framework. The primary objective was to verify the "Managers" in isolation, ensuring that geospatial algorithms and data processing rules remain accurate regardless of external infrastructure status.
 
@@ -415,22 +421,277 @@ The hierarchical nature of Firestore queries (e.g., `collection().where().get()`
 To validate time-sensitive logic (e.g., filtering out community reports older than a year), the Timestamp object was mocked to simulate specific points in time, ensuring the filtering logic behaves as expected.
 
 
-== Backend Database Access Unit Testing
+*Firestore Access* \
+To test Firestore Security Rules, we used `@firebase/rules-unit-testing` in order to to verify that our access control logic correctly allows or denies requests based on a user's authentication state. The frameworks permits to create a test environment that makes possible calling Firestore locally.
 
-To test Firestore DB access, 
+=== Unit Test Cases
 
-=== Key Test Cases
+#heading(level: 4, numbering: none,  outlined: false,  "Community Path Manager")
+*getCommunityPaths* \
+*UT1*: Should return community paths with calculated status \
+- *Precondition*: User paths exist with validity votes and associated community paths. \
+- *Action*: Request community paths for a specific region. \
+- *Expected result*: Returns a list of paths with the correct aggregated status score. \
+- *Outcome*: _Passed_ \
+*UT2*: Should sort paths by status descending \
+- *Precondition*: Multiple community paths exist with different calculated status scores (e.g., 5 and 3). \
+- *Action*: Request community paths. \
+- *Expected result*: The returned list is ordered with the highest status paths first. \
+- *Outcome*: _Passed_ \
+*UT3*: Should exclude paths with no public reports \
+- *Precondition*: A path exists but has no associated public user reports. \
+- *Action*: Request community paths. \
+- *Expected result*: The path without public reports is excluded from the result. \
+- *Outcome*: _Passed_ \
+*calculateCommunityPathStatus* \
+*UT4*: Should return 0 if no valid reports \
+- *Precondition*: An empty list of reports is provided. \
+- *Action*: Calculate status. \
+- *Expected result*: Returns a status of 0. \
+- *Outcome*: _Passed_ \
+*UT5*: Should aggregate votes correctly \
+- *Precondition*: A mix of positive and negative votes exists for a path. \
+- *Action*: Calculate status. \
+- *Expected result*: Returns the correct aggregated score (e.g., average of majority). \
+- *Outcome*: _Passed_ \
+*UT6*: Should ignore old reports \
+- *Precondition*: Reports list contains both recent reports and reports older than the validity threshold. \
+- *Action*: Calculate status. \
+- *Expected result*: Old reports are ignored in the calculation. \
+- *Outcome*: _Passed_ \
+*UT7*: Should average winners in case of a tie \
+- *Precondition*: Reports result in a tie for the most frequent status. \
+- *Action*: Calculate status. \
+- *Expected result*: Returns the average of the tied winning statuses. \
+- *Outcome*: _Passed_ \
 
-*T1*: Community Status Calculation \
-Verified that the system correctly aggregates user votes into a weighted average while successfully ignoring expired or invalid reports.
+#heading(level: 4, numbering: none,  outlined: false,  "Path Manager")
+*distance* \
+*UT8*: Should calculate distance correctly \
+- *Precondition*: Two geographic coordinates are provided. \
+- *Action*: Calculate the distance between them. \
+- *Expected result*: Returns the correct distance in meters. \
+- *Outcome*: _Passed_ \
+*arePathsSimilar* \
+*UT9*: Should return true for identical paths \
+- *Precondition*: Two identical paths (same coordinates) are provided. \
+- *Action*: Check for similarity. \
+- *Expected result*: Returns true. \
+- *Outcome*: _Passed_ \
+*UT10*: Should return false for very different paths \
+- *Precondition*: Two spatially distinct paths are provided. \
+- *Action*: Check for similarity. \
+- *Expected result*: Returns false. \
+- *Outcome*: _Passed_ \
+*savePath* \
+*UT11*: Should save path to firestore \
+- *Precondition*: A valid path object with sufficient points is provided. \
+- *Action*: Save the path. \
+- *Expected result*: The path is successfully written to the 'paths' Firestore collection. \
+- *Outcome*: _Passed_ \
+*UT12*: Should throw error for path with < 2 points \
+- *Precondition*: A path with only one point is provided. \
+- *Action*: Attempt to save the path. \
+- *Expected result*: An error is thrown indicating insufficient points. \
+- *Outcome*: _Passed_ \
+*getSimilarPath* \
+*UT13*: Should return null if no similar path found \
+- *Precondition*: No existing path in the database matches the input path's geometry. \
+- *Action*: Search for a similar path. \
+- *Expected result*: Returns null. \
+- *Outcome*: _Passed_ \
+*UT14*: Should return path if similar path found \
+- *Precondition*: A path exists in the database that is geometrically similar to the input. \
+- *Action*: Search for a similar path. \
+- *Expected result*: Returns the matching existing path object. \
+- *Outcome*: _Passed_ \
 
-*T2*: Path Similarity Algorithm \
-Validated the GeoJSON processing logic to ensure that routes are identified as "similar" even when minor GPS drifts occur, while distinct paths are correctly rejected.
+#heading(level: 4, numbering: none,  outlined: false,  "User Path Manager")
+*saveUserPath* \
+*UT15*: Should save user path and link to existing path if found \
+- *Precondition*: A similar community path already exists for the user's path. \
+- *Action*: Save the user path. \
+- *Expected result*: The user path is saved with a reference (`pathId`) to the existing community path. \
+- *Outcome*: _Passed_ \
+*UT16*: Should create new path if no similar path found \
+- *Precondition*: No similar community path exists. \
+- *Action*: Save the user path. \
+- *Expected result*: A new community path is created, and the user path is saved linking to it. \
+- *Outcome*: _Passed_ \
+*getUserPaths* \
+*UT17*: Should return user paths \
+- *Precondition*: User has saved paths in the database. \
+- *Action*: Retrieve paths for the user. \
+- *Expected result*: Returns a list of the user's paths. \
+- *Outcome*: _Passed_ \
+*updateUserPathStatus* \
+*UT18*: Should update status if owner \
+- *Precondition*: The requesting user is the owner of the path. \
+- *Action*: Update the path status. \
+- *Expected result*: The status update is successfully applied. \
+- *Outcome*: _Passed_ \
+*UT19*: Should throw error if not owner \
+- *Precondition*: The requesting user is not the owner of the path. \
+- *Action*: Attempt to update the path status. \
+- *Expected result*: An error is thrown denying the update. \
+- *Outcome*: _Passed_ \
+*deleteUserPath* \
+*UT20*: Should delete user path and cleanup orphan path \
+- *Precondition*: A user path exists and is the only reference to a community path. \
+- *Action*: Delete the user path. \
+- *Expected result*: The user path is deleted, and the orphaned community path is also removed. \
+- *Outcome*: _Passed_ \
 
-AGGIUNGERE ALTRE
+#heading(level: 4, numbering: none,  outlined: false,  "User Manager")
+*createUser* \
+*UT21*: Should create a user and return a custom token when email is verified \
+- *Precondition*: A valid email verification code exists for the user. \
+- *Action*: Create a new user account. \
+- *Expected result*: User is created in Auth and a custom session token is returned. \
+- *Outcome*: _Passed_ \
+*UT22*: Should throw error if email is not verified \
+- *Precondition*: No valid email verification code exists. \
+- *Action*: Attempt to create a user account. \
+- *Expected result*: Creation fails with an error. \
+- *Outcome*: _Passed_ \
+*checkUserExists* \
+*UT23*: Should return true if user exists \
+- *Precondition*: A user with the given email exists in Auth. \
+- *Action*: Check if user exists. \
+- *Expected result*: Returns true. \
+- *Outcome*: _Passed_ \
+*UT24*: Should return false if user does not exist \
+- *Precondition*: No user with the given email exists. \
+- *Action*: Check if user exists. \
+- *Expected result*: Returns false. \
+- *Outcome*: _Passed_ \
+*checkEmailVerificationCode* \
+*UT25*: Should return false if code is expired \
+- *Precondition*: The verification code in the database has passed its expiration time. \
+- *Action*: Validate the code. \
+- *Expected result*: Returns false. \
+- *Outcome*: _Passed_ \
+*UT26*: Should return true if code is valid and not expired \
+- *Precondition*: The verification code is correct and within the validity period. \
+- *Action*: Validate the code. \
+- *Expected result*: Returns true. \
+- *Outcome*: _Passed_ \
+*sendEmailVerificationCode* \
+*UT27*: Should send an email and save code to firestore \
+- *Precondition*: A valid email address is provided. \
+- *Action*: Request verification code. \
+- *Expected result*: An email is sent via nodemailer and the code is stored in Firestore. \
+- *Outcome*: _Passed_ \
+*signIn* \
+*UT28*: Should return custom token on successful sign in \
+- *Precondition*: Valid credentials are provided. \
+- *Action*: Sign in. \
+- *Expected result*: Returns a custom authentication token. \
+- *Outcome*: _Passed_ \
+*UT29*: Should throw HttpsError on failed sign in \
+- *Precondition*: Invalid credentials are provided. \
+- *Action*: Attempt to sign in. \
+- *Expected result*: Throws an HttpsError. \
+- *Outcome*: _Passed_ \
+*deleteUser* \
+*UT30*: Should delete user given an email \
+- *Precondition*: User exists in the system. \
+- *Action*: Delete the user. \
+- *Expected result*: The user account is removed from Firebase Auth. \
+- *Outcome*: _Passed_ \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Function Triggers")
+*createUser* \
+*UT31*: Should call userManager.createUser \
+- *Precondition*: The `createUser` callable function is triggered. \
+- *Action*: Execute the trigger. \
+- *Expected result*: Delegates execution to `userManager.createUser`. \
+- *Outcome*: _Passed_ \
+*getCommunityPaths* \
+*UT32*: Should call communityPathManager.getCommunityPaths \
+- *Precondition*: The `getCommunityPaths` callable function is triggered. \
+- *Action*: Execute the trigger. \
+- *Expected result*: Delegates execution to `communityPathManager.getCommunityPaths`. \
+- *Outcome*: _Passed_ \
+*saveUserPath* \
+*UT33*: Should call userPathManager.saveUserPath \
+- *Precondition*: The `saveUserPath` callable function is triggered by an authenticated user. \
+- *Action*: Execute the trigger. \
+- *Expected result*: Delegates execution to `userPathManager.saveUserPath`. \
+- *Outcome*: _Passed_ \
+*UT34*: Should throw if unauthenticated \
+- *Precondition*: The `saveUserPath` callable function is triggered without authentication. \
+- *Action*: Execute the trigger. \
+- *Expected result*: Throws an unauthenticated error. \
+- *Outcome*: _Passed_ \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Firestore Security Rules")
+*Users Collection* \
+*UT35*: Should allow user to write their own profile \
+- *Precondition*: Authenticated user writes to their own document. \
+- *Action*: Write to `users/{userId}`. \
+- *Expected result*: Write allowed. \
+- *Outcome*: _Passed_ \
+*UT36*: Should allow user to read their own profile \
+- *Precondition*: Authenticated user reads their own document. \
+- *Action*: Read `users/{userId}`. \
+- *Expected result*: Read allowed. \
+- *Outcome*: _Passed_ \
+*UT37*: Should not allow user to write others' profile \
+- *Precondition*: Authenticated user writes to another user's document. \
+- *Action*: Write to `users/{otherId}`. \
+- *Expected result*: Write denied. \
+- *Outcome*: _Passed_ \
+*UT38*: Should not allow user to read others' profile \
+- *Precondition*: Authenticated user reads another user's document. \
+- *Action*: Read `users/{otherId}`. \
+- *Expected result*: Read denied. \
+- *Outcome*: _Passed_ \
+*User Paths Collection* \
+*UT39*: Should allow owner to create path with matching userId \
+- *Precondition*: User creates a path where `userId` matches their Auth UID. \
+- *Action*: Create document in `user_paths`. \
+- *Expected result*: Create allowed. \
+- *Outcome*: _Passed_ \
+*UT40*: Should not allow owner to create path with mismatching userId \
+- *Precondition*: User creates a path where `userId` does not match their Auth UID. \
+- *Action*: Create document in `user_paths`. \
+- *Expected result*: Create denied. \
+- *Outcome*: _Passed_ \
+*UT41*: Should allow owner to read their path \
+- *Precondition*: User reads a path document they own. \
+- *Action*: Read document from `user_paths`. \
+- *Expected result*: Read allowed. \
+- *Outcome*: _Passed_ \
+*UT42*: Should allow others to read public paths \
+- *Precondition*: User reads a path marked `isPublic: true`. \
+- *Action*: Read document from `user_paths`. \
+- *Expected result*: Read allowed. \
+- *Outcome*: _Passed_ \
+*UT43*: Should not allow others to read private paths \
+- *Precondition*: User reads a path marked `isPublic: false` owned by someone else. \
+- *Action*: Read document from `user_paths`. \
+- *Expected result*: Read denied. \
+- *Outcome*: _Passed_ \
+*Paths (Community) Collection* \
+*UT44*: Should allow read for authenticated users \
+- *Precondition*: Authenticated user requests a community path. \
+- *Action*: Read `paths/{pathId}`. \
+- *Expected result*: Read allowed. \
+- *Outcome*: _Passed_ \
+*UT45*: Should deny write for users \
+- *Precondition*: Authenticated user attempts to modify a community path. \
+- *Action*: Write to `paths/{pathId}`. \
+- *Expected result*: Write denied. \
+- *Outcome*: _Passed_ \
 
 *Outcome*\
 All unit tests passed successfully, achieving a code coverage of over 90% across core modules. This ensures that every non trivial logical branch (if/else) and error handler (catch) has been executed and verified.
+
+
+== Integration Testing
+
+
 
 == System Testing
 

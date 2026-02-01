@@ -129,7 +129,7 @@ struct ContentView: View {
                     appModel.isSearchingCommunityPaths = false
                 }
         }
-        .navigationTitle("Best Bike Paths")
+        .navigationTitle("Best Bike Path")
         .toolbarTitleDisplayMode(.inlineLarge)
         .toolbar(content: {
             ToolbarItem(placement: .topBarTrailing) {

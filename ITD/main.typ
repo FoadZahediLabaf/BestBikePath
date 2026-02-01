@@ -297,7 +297,11 @@ _Implemented_ \
 _Implemented_ \
 
 = Development Frameworks
+The development of the BestBikePath system required the use of different technologies for the mobile client and for the Backend services. \
+The adopted frameworks and platforms follow the design decisions described in the Design Document and were selected mainly to simplify development and integration activities within the scope of the project. \
 
+During the implementation phase, additional frameworks (not initially outlined in the previous documents) were integrated to enhance the robustness of the core logic and ensure overall code stability.  \
+The choices described in this section reflect what was effectively used while developing and integrating the system components. \
 
 == Frameworks
 
@@ -337,14 +341,25 @@ A specialized framework within the Firebase ecosystem, integrated to perform pro
 *Turf.js* \
 A GeoJSON handling framework we adopted to enhance the robustness of path similarity algorithms
 
+*Nodemailer* \
+An email sending library for Node.js used for connecting to the app SMTP provider, SendGrid.
+
 == Programming Languages
 === Frontend
 *Swift* \
-Swift is a strongly typed language used for Apple platforms development, in this case, iOS. It's known for its performance, safety, and modern syntax.
+Swift is a strongly typed language mostly used for software development on  Apple platforms. It's known for its performance, safety, and modern syntax. \
+Working with Swift made it possible to directly use iOS frameworks and tools, simplifying the development of the interface. \
+However, this native approach initially tied the application strictly to the Apple ecosystem. While the UI must still be developed in Kotlin to meet Android's specific standards, the fact that Swift is now a multi-platform language changes the outlook for the future. \
+This evolution will make it significantly easier to extend support to Android by sharing core logic, allowing us to scale the project more efficiently while still retaining all the performance and safety advantages of a truly native application.
 
 === Backend
 *TypeScript* \
-The backend Cloud Functions are written in TypeScript, a superset of JavaScript that introduces static typing through optional type annotations. This allows many errors to be detected at compile time and provides clear information about the types of parameters each function accepts and the type of its returned value. The use of TypeScript  improves code readability, though it makes the code slightly more verbose and requires compilation to JavaScript before deployment.
+The backend is implemented in TypeScript, which is used to write the functions that communicate with the mobile application. \
+These functions manage user and bike path data and handle requests coming from the client. \
+Using TypeScript helped keep the backend code clean and organized during development, and the structure of the exchanged data was easier to control compared to JavaScript. \
+Furthermore, it allowed us to catch several errors at compile time. \
+An additional build step was required compared to plain JavaScript, but this did not affect the overall development flow. \
+
 
 = Source Code Structure
 The project is organized into two primary repositories: the *iOS Client* and the *Firebase Backend*. This separation ensures a clean decoupling of concerns, where the mobile app handles user interaction and sensor data, while the cloud infrastructure manages data persistence and heavy geospatial calculations.

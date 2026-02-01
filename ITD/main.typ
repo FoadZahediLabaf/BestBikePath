@@ -34,7 +34,7 @@ No new requirements or design decisions are introduced in this document.
 
 == Scope
 
-This document focuses exclusively on the implementation and integration testing activities carried out for the BestBikePaths system. \
+This document focuses exclusively on the implementation and integration testing activities carried out for the BestBikePath system. \
 The attention is mainly on the backend part of the application and on how it interacts with the mobile client during normal system execution. \
 
 Only the parts of the system that have been effectively developed are considered. For this reason, the document focuses on the functionalities that are currently available and on the technologies that have been used to implement them. The interaction between the mobile application and the backend services is a central aspect of our analysis, since several system functionalities depend on this communication. \

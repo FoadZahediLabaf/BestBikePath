@@ -2,20 +2,26 @@ module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   verbose: true,
-  testMatch: ['**/*.test.ts'],
+  testMatch: ['**/*.test.ts', '**/*.spec.ts'],
   collectCoverage: true,
   collectCoverageFrom: [
     'src/**/*.ts',
-    '!src/index.ts', // Usually triggers are hard to cover fully in unit tests without integration, but user asked for coverage. I will include everything for now or explicit excludes if needed.
+    '!src/index.ts',
     '!src/**/*.d.ts'
   ],
   coverageDirectory: 'coverage',
-  globals: {
-    'ts-jest': {
-      tsconfig: 'tsconfig.json'
-    }
+  transform: {
+    '^.+\\.tsx?$': ['ts-jest', {
+      tsconfig: 'tsconfig.json',
+      isolatedModules: true
+    }],
+    '^.+\\.jsx?$': ['ts-jest', {
+        tsconfig: 'tsconfig.json',
+        isolatedModules: true
+    }]
   },
   transformIgnorePatterns: [
-    "node_modules/(?!(@turf|geofire-common|kdbush)/)"
-  ]
+    "node_modules/(?!(@turf|geofire-common|kdbush|geokdbush|tinyqueue)/)"
+  ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node']
 };

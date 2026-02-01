@@ -4,6 +4,7 @@
     "test": "jest",
     "test:rules": "firebase emulators:exec --only firestore 'jest src/__tests__/rules.spec.ts --testMatch \"**/*.spec.ts\"'",
     "test:all": "npm test && npm run test:rules",
+    "test:integration": "firebase emulators:exec --only firestore,auth 'jest src/__tests__/integration.test.ts --forceExit'",
     "test:coverage": "jest --collect-coverage",
     "lint": "eslint --ext .js,.ts .",
     "build": "tsc",

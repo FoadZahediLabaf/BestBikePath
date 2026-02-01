@@ -699,70 +699,110 @@ System testing was performed to validate the end-to-end integration between the 
 
 The testing strategy focused on four main functional areas: Authentication, Path Recording, Data Management, and Community Interaction.
 
-=== Main Test Cases
+=== System Test Cases
 
-*User Authentication*
-- *Sign Up:* Initiated the authentication flow with an unregistered email address.
-  - _Outcome:_ A new user document is created in Firebase, and the app redirects to the Home Screen.
-- *Sign In:* Initiated the flow with an existing registered email.
-  - _Outcome:_ The user is successfully authenticated, retrieving their specific settings and history.
-- *Sign Out:* Triggered the sign-out action from the account page.
-  - _Outcome:_ The local session is cleared, and the user is redirected to the Welcome Screen.
-- *Account Deletion:* Selected the permanent delete option from settings.
-  - _Outcome:_ The user's authentication record and personal data are removed from the backend; the app returns to the Welcome Screen.
+#heading(level: 4, numbering: none,  outlined: false,  "User Authentication")
+*Sign Up* \
+*ST1*: Initiated the authentication flow with an unregistered email address \
+- *Precondition*: App is in unauthenticated state. \
+- *Action*: Initiate the authentication flow with an unregistered email address. \
+- *Expected result*: A new user document is created in Firebase, and the app redirects to the Home Screen. \
+- *Outcome*: _Passed_ \
+*Sign In* \
+*ST2*: Initiated the flow with an existing registered email \
+- *Precondition*: App is in unauthenticated state with an existing user account. \
+- *Action*: Initiate the sign-in flow with the registered email. \
+- *Expected result*: The user is successfully authenticated, retrieving their specific settings and history. \
+- *Outcome*: _Passed_ \
+*Sign Out* \
+*ST3*: Triggered the sign-out action from the account page \
+- *Precondition*: User is authenticated and on the account page. \
+- *Action*: Trigger the sign-out action. \
+- *Expected result*: The local session is cleared, and the user is redirected to the Welcome Screen. \
+- *Outcome*: _Passed_ \
+*Account Deletion* \
+*ST4*: Selected the permanent delete option from settings \
+- *Precondition*: User is authenticated and on the settings page. \
+- *Action*: Select the permanent delete option. \
+- *Expected result*: The user's authentication record and personal data are removed from the backend; the app returns to the Welcome Screen. \
+- *Outcome*: _Passed_ \
 
-*Path Recording (Core Feature)*
-- *Manual Obstacle Insertion:* While recording, pressed the "Add Obstacle" button.
-  - _Outcome:_ A marker is placed on the map, and a visual notification confirms the insertion.
-- *Automatic Obstacle Detection:* Simulated a sudden device movement (shake) during recording.
-  - _Outcome:_ The accelerometer triggers the "Pothole/Obstacle" logic, automatically logging an event and displaying a confirmation notification.
-- *Manual Pause/Resume:* Toggled the pause button during an active ride.
-  - _Outcome:_ The timer and GPS tracking stop immediately and resume only upon user input.
-- *Activity Recognition (Auto-Pause):* Simulated a stop in cycling movement.
-  - _Outcome:_ The application detects the lack of motion and automatically pauses the recording to preserve data accuracy.
+#heading(level: 4, numbering: none,  outlined: false,  "Path Recording")
+*Manual Obstacle Insertion* \
+*ST5*: While recording, pressed the "Add Obstacle" button \
+- *Precondition*: User is actively recording a path. \
+- *Action*: Press the "Add Obstacle" button. \
+- *Expected result*: A marker is placed on the map, and a visual notification confirms the insertion. \
+- *Outcome*: _Passed_ \
+*Automatic Obstacle Detection* \
+*ST6*: Simulated a sudden device movement (shake) during recording \
+- *Precondition*: User is actively recording a path; accelerometer is active. \
+- *Action*: Simulate a sudden device movement (shake). \
+- *Expected result*: The accelerometer triggers the "Pothole/Obstacle" logic, automatically logging an event and displaying a confirmation notification. \
+- *Outcome*: _Passed_ \
+*Manual Pause/Resume* \
+*ST7*: Toggled the pause button during an active ride \
+- *Precondition*: User is actively recording a ride. \
+- *Action*: Toggle the pause button. \
+- *Expected result*: The timer and GPS tracking stop immediately and resume only upon user input. \
+- *Outcome*: _Passed_ \
+*Activity Recognition (Auto-Pause)* \
+*ST8*: Simulated a stop in cycling movement \
+- *Precondition*: User is actively recording a ride. \
+- *Action*: Simulate a stop in movement. \
+- *Expected result*: The application detects the lack of motion and automatically pauses the recording to preserve data accuracy. \
+- *Outcome*: _Passed_ \
 
-*User Path Management*
-- *Path Updates:* Modified the privacy status (Public/Private) and path condition status of an existing entry.
-  - _Outcome:_ Changes are persisted in the database. Upon reloading the app on a different device, the updated status is visible.
-- *Path Deletion:* Removed a path from the history.
-  - _Outcome:_ The entry disappears immediately from the list and is no longer queryable from the backend.
-- *Start Recording:* Started a recording from an existing path detail view.
-  - _Outcome:_ The recording view launches, overlaying the previous path (in a subtle color) on the map to guide the user.
+#heading(level: 4, numbering: none,  outlined: false,  "User Path Management")
+*Path Updates* \
+*ST9*: Modified the privacy status and path condition status of an existing entry \
+- *Precondition*: User checks an existing path entry in their history. \
+- *Action*: Modify the privacy status (Public/Private) and path condition status. \
+- *Expected result*: Changes are persisted in the database. Upon reloading the app on a different device, the updated status is visible. \
+- *Outcome*: _Passed_ \
+*Path Deletion* \
+*ST10*: Removed a path from the history \
+- *Precondition*: User views a path in their history. \
+- *Action*: Remove the path. \
+- *Expected result*: The entry disappears immediately from the list and is no longer queryable from the backend. \
+- *Outcome*: _Passed_ \
+*Start Recording* \
+*ST11*: Started a recording from an existing path detail view \
+- *Precondition*: User opens an existing path detail view. \
+- *Action*: Start a recording. \
+- *Expected result*: The recording view launches, overlaying the previous path (in a subtle color) on the map to guide the user. \
+- *Outcome*: _Passed_ \
 
-*Community & Search*
-- *Search Functionality:* Entered specific start and destination points in the community search bar.
-  - _Outcome:_ The map populates with public paths matching the criteria uploaded by other users.
-- *Community Path Interaction:* Selected a public path from search results.
-  - _Outcome:_ The detail view opens. If authenticated, the user can start a new recording using this public path as a reference track.
+#heading(level: 4, numbering: none,  outlined: false,  "Community Path Search")
+*Search Functionality* \
+*ST12*: Entered specific start and destination points in the community search bar \
+- *Precondition*: User is on the community search screen. \
+- *Action*: Enter specific start and destination points. \
+- *Expected result*: The map populates with public paths matching the criteria uploaded by other users. \
+- *Outcome*: _Passed_ \
+*Community Path Interaction* \
+*ST13*: Selected a public path from search results \
+- *Precondition*: Search results are displayed. \
+- *Action*: Select a public path. \
+- *Expected result*: The detail view opens. If authenticated, the user can start a new recording using this public path as a reference track. \
+- *Outcome*: _Passed_ \
 
-=== Complex Integration Scenarios
-
+#heading(level: 4, numbering: none,  outlined: false,  "Scenarios")
 To verify the business logic regarding data aggregation and privacy, we performed specific step-by-step scenarios.
 
-*Scenario A: Privacy Consistency Check*
-This test verifies that the "Public/Private" toggle effectively controls data visibility in the community search.
+*Privacy Consistency Check* \
+*ST14*: Verify that the "Public/Private" toggle controls data visibility \
+- *Precondition*: A public path exists from Bergamo to Milan. \
+- *Action*: In User History, change the path toggle to *Private* and save. Verify community search for "Bergamo-Milan" no longer shows the path. \
+- *Expected result*: The path appears in search initially, but is no longer visible after being set to Private, confirming the privacy filter works. \
+- *Outcome*: _Passed_ \
 
-+ *Setup:* We created a new path from _Bergamo_ to _Milan_ setting the toggle to *Public*.
-+ *Verification 1:* We performed a community search for "Bergamo-Milan". The path appeared correctly in the results.
-+ *Action:* We opened the path details in the User History, changed the toggle to *Private*, and saved.
-+ *Verification 2:* We repeated the community search for "Bergamo-Milan".
-+ *Outcome:* The path was no longer visible in the results, confirming the privacy filter works immediately.
-
-*Scenario B: Crowd-Sourcing Logic (Status Aggregation)*
-This test validates how the system aggregates conflicting reports on the same route to determine the overall path status.
-
-+ *Setup:* We created 3 distinct recordings for the exact same route (same origin/destination).
-  - Recording 1 status: "Impassable"
-  - Recording 2 status: "Excellent"
-  - Recording 3 status: "Excellent"
-+ *Verification 1:* Searching for this route displayed the status as *Excellent* (Majority rule/Weighted average favors the two positive reports).
-+ *Action:* We deleted one of the "Excellent" recordings.
-+ *Verification 2:* We repeated the search.
-+ *Outcome:* The status updated to *Fair*. This confirms the backend correctly recalculates the average condition (merging "Impassable" and one "Excellent") in real-time.
-
-
-=== Main Test Cases | Test Case | Description | Expected Outcome | Result | | :--- | :--- | :--- | :--- | | User Onboarding | New user signs up via the iOS app and initializes their profile. | User record created in Firebase Auth and Firestore User collection. | Pass | | Path Recording | Recording a bike path with CoreMotion/GPS and saving it. | Path polyline and sensor data correctly stored and visible in "My Paths". | Pass | | Community Discovery | Searching for paths near the current location using the map. | Relevant paths retrieved via Geohashing and rendered correctly on MapKit. | Pass | | Feedback Loop | Rating a community path and checking for status updates. | The communityPathManager updates the global status based on the new vote. | Pass |
-
+*Crowd-Sourcing Logic* \
+*ST15*: Validates how the system aggregates conflicting reports \
+- *Precondition*: 3 distinct recordings exist for the same route (1 "Impassable", 2 "Excellent"). Search shows "Excellent". \
+- *Action*: Delete one "Excellent" recording. Repeat the search. \
+- *Expected result*: The status updates to *Fair* (average of "Impassable" and one "Excellent"), confirming real-time recalculation. \
+- *Outcome*: _Passed_ \
 
 = Installation Instructions
 
@@ -785,7 +825,6 @@ If the public link is not yet active, we will need to add you to our internal de
 - A valid Apple ID.
 
 = Available acceptance testing infrastructure
-THIS LIKE MANY OF BEFORE IS AI
 
 We provide two primary environments for executing acceptance tests. While both are suitable for functional verification, physical hardware is required for final sign-off on hardware-dependent features.
 
@@ -809,10 +848,10 @@ The iOS Simulator is part of the Xcode toolset. Note that this is a *simulator* 
   inset: 10pt,
   align: horizon,
   [*Feature*], [*Physical Device*], [*macOS Simulator*],
-  [Hardware Sensors], [Fully Supported], [Not Supported],
-  [Execution Speed], [Real-time], [Accelerated],
-  [App Store/IAP], [Full Testing], [Sandbox Only],
-  [Touch Gestures], [Multi-touch (10 fingers)], [Mouse/Pointer (Limited)]
+  [*Hardware Sensors*], [Fully Supported], [Not Supported],
+  [*Execution Speed*], [Real-time], [Accelerated],
+  [*App Store/IAP*], [Full Testing], [Sandbox Only],
+  [*Touch Gestures*], [Multi-touch], [Mouse/Pointer]
 )
 
 = Effort Spent

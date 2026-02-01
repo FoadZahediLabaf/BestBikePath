@@ -85,7 +85,7 @@ struct UserAccountView: View {
                 if isDeleting {
                     Button(role: .destructive, action: {}) {
                         Label {
-                            Text("Delete")
+                            Text("Delete Account")
                         } icon: {
                             ProgressView()
                         }
@@ -100,7 +100,7 @@ struct UserAccountView: View {
                 }
             }
             .confirmationDialog("Delete account", isPresented: $isDeleteAccountConfirmationShown, titleVisibility: .visible) {
-                AsyncButton("Delete Account", role: .destructive) {
+                AsyncButton("Delete", role: .destructive) {
                     isDeleting = true
                     defer { isDeleting = false }
                     try await appModel.userSource.deleteUser(email: user.email)

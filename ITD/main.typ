@@ -18,7 +18,7 @@
 )
 
 #toc
-#list-of-figures
+//#list-of-figures
 #list-of-tables
 
 #show: mainmatter.with()
@@ -57,8 +57,6 @@ The term bike path is also used to indicate the aggregated information derived f
 
 *Bike Trip*: A bike trip indicates a cycling session that may optionally be recorded by the application at the cyclist’s discretion. During the trip, data is collected from the device’s GPS and motion sensors and may be enriched with meteorological information.
 
-*Meteorological Data*: Meteorological data refers to information describing the atmospheric conditions during a bike trip, such as weather conditions, temperature, and wind speed.
-
 *Motion Sensors*: This term refers to the user’s device’s hardware components that allow for the collection of performance-related and qualitative data about the bike trip. 
 Specifically, the gyroscope of the device is responsible for measuring angular velocity and is used to identify obstacles along the path.
 The accelerometer is responsible for measuring the acceleration of the user during the trip and contributes both to obstacle detection and to the computation of the user’s velocity.
@@ -72,28 +70,22 @@ The accelerometer is responsible for measuring the acceleration of the user duri
 
 *API*: Application Programming Interface \
 *BBP*: Best Bike Paths \
-*DBMS*: DataBase Management System \
-*EU*: European Union \
-*GDPR*: General Data Protection Regulation \
 *GPS*: Global Positioning System \
 *HTTPS*: HyperText Transfer Protocol Secure \
-*ISO* : International Organization for Standardization \
-*IEC*: International Electrotechnical Commission \
-*IEEE*: Institute of Electrical and Electronics Engineers \
 *JSON*: JavaScript Object Notation\
-*JWT*: JSON Web Token \
-*KV*: Key-Value \
 *MVVM*: Model-View-ViewModel \
 *NPM*: Node Package Manager \
 *REST*: Representational State Transfer \
-*SQL*: Structured Query Language \
 *SPM*: Swift Package Manager \
 *SMTP*: Simple Mail Transfer Protocol \
 *Wi-Fi*: Wireless Fidelity \
 
 === Abbreviations
 
-*R*: Requirement
+*R*: Requirement\
+*UT*: Unit Test\
+*IT*: Integration Test\
+*ST*: System Test\
 
 == Version History
  
@@ -104,11 +96,8 @@ The accelerometer is responsible for measuring the acceleration of the user duri
 The following reference materials were used for the preparation of this document:
 - The Requirement Analysis and Specification Document.
 - The Design Document
-- The specification for the 2025/26 Requirement Engineering and Design Project for the Software Engineering II course.
+- The specification for the 2025/26 Implementation & Testing for the Software Engineering II course.
 - The WeBeep slides of the Software Engineering II course.
-- I&T assignment provided in WeBeep.
-- European Union, *General Data Protection Regulation (EU) 2016/679*, 2016.
-- #link("https://www.iso.org/standard/75405.html")[ISO/IEC, *ISO/IEC/IEEE 24748-8:2019 Systems and software engineering -- Life cycle management*, 2019].
 - #link("https://developer.apple.com/design/human-interface-guidelines")[Apple Inc., *Apple Human Interface Guidelines*, online documentation].
 - #link("https://m3.material.io")[Google LLC, *Material Design Guidelines*, online documentation].
 - #link("https://developer.apple.com/documentation/coremotion")[Apple Inc., *Core Motion Framework Documentation*, online documentation].
@@ -402,6 +391,7 @@ Testing activities were performed to verify the correct behavior of the BestBike
 All tests described in this section were executed on the implemented version of the system. \
 
 
+#pagebreak()
 == Unit Testing
 
 === Backend Business Logic
@@ -685,14 +675,59 @@ To test Firestore Security Rules, we used `@firebase/rules-unit-testing` in orde
 - *Expected result*: Write denied. \
 - *Outcome*: _Passed_ \
 
-*Outcome*\
+=== *Outcome Considerations*\
 All unit tests passed successfully, achieving a code coverage of over 90% across core modules. This ensures that every non trivial logical branch (if/else) and error handler (catch) has been executed and verified.
 
-
+#pagebreak()
 == Integration Testing
 
+=== Backend Integration Logic
+The purpose of the following integration tests is to verify that the backend software components of the application can interact correctly with each other and with the underlying services when executed in a partial but realistic system environment.
 
+=== Mocking Strategy and Isolation 
 
+In order to isolate the test environment from the production environment, we leverage the `firebase-functions-test` package, which enables us to test Cloud Functions locally by simulating events within the Firebase Emulator Suite.
+
+=== Integration Test Cases
+#heading(level: 4, numbering: none,  outlined: false,  "User Management")
+*createUser* \
+*IT1*: Should create a user successfully given valid verification code \
+- *Precondition*: A valid verification code exists in Firestore for the email. \
+- *Action*: Call `createUser` function with valid data. \
+- *Expected result*: User is created in Auth found by email, custom token is returned, and verification code is deleted from Firestore. \
+- *Outcome*: _Passed_ \
+*IT2*: Should fail if verification code is missing/invalid \
+- *Precondition*: Verification code is missing or incorrect. \
+- *Action*: Call `createUser` function. \
+- *Expected result*: The function throws an error and user is not created. \
+- *Outcome*: _Passed_ \
+#heading(level: 4, numbering: none,  outlined: false,  "Path Management")
+*saveUserPath* \
+*IT3*: Should save a new user path \
+- *Precondition*: Authenticated user provides valid path data. \
+- *Action*: Call `saveUserPath` function. \
+- *Expected result*: A new document is created in `user_paths` with correct data, and a corresponding linked document is created in `paths`. \
+- *Outcome*: _Passed_ \
+*getCommunityPaths* \
+*IT4*: Should retrieve community paths \
+- *Precondition*: Community paths exist in the queried region. \
+- *Action*: Call `getCommunityPaths` function. \
+- *Expected result*: Returns a list of paths including the previously created one, with correct structure. \
+- *Outcome*: _Passed_ \
+*updateUserPathPrivacy* \
+*IT5*: Should update user path privacy \
+- *Precondition*: User has an existing path. \
+- *Action*: Call `updateUserPathPrivacy` to change visibility. \
+- *Expected result*: The `isPublic` field in the `user_paths` document is updated to the new value. \
+- *Outcome*: _Passed_ \
+*deleteUserPath* \
+*IT6*: Should delete user path and orphan path \
+- *Precondition*: User has a path that is the sole reference to a community path. \
+- *Action*: Call `deleteUserPath`. \
+- *Expected result*: The document in `user_paths` is deleted, and the orphaned document in `paths` is also deleted. \
+- *Outcome*: _Passed_ \
+
+#pagebreak()
 == System Testing
 
 System testing was performed to validate the end-to-end integration between the iOS client and the Firebase Backend. The primary goal was to ensure that data flows correctly from the device to the cloud and back, satisfying the functional requirements defined in the Design Document.
@@ -711,20 +746,20 @@ The testing strategy focused on four main functional areas: Authentication, Path
 *Sign In* \
 *ST2*: Initiated the flow with an existing registered email \
 - *Precondition*: App is in unauthenticated state with an existing user account. \
-- *Action*: Initiate the sign-in flow with the registered email. \
+- *Action*: Initiate the sign in flow with the registered email. \
 - *Expected result*: The user is successfully authenticated, retrieving their specific settings and history. \
 - *Outcome*: _Passed_ \
 *Sign Out* \
 *ST3*: Triggered the sign-out action from the account page \
 - *Precondition*: User is authenticated and on the account page. \
-- *Action*: Trigger the sign-out action. \
+- *Action*: Trigger the sign out action. \
 - *Expected result*: The local session is cleared, and the user is redirected to the Welcome Screen. \
 - *Outcome*: _Passed_ \
 *Account Deletion* \
 *ST4*: Selected the permanent delete option from settings \
 - *Precondition*: User is authenticated and on the settings page. \
 - *Action*: Select the permanent delete option. \
-- *Expected result*: The user's authentication record and personal data are removed from the backend; the app returns to the Welcome Screen. \
+- *Expected result*: The user's authentication record and personal data are removed from the Backend and the app returns to the Welcome Screen. \
 - *Outcome*: _Passed_ \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Path Recording")
@@ -736,7 +771,7 @@ The testing strategy focused on four main functional areas: Authentication, Path
 - *Outcome*: _Passed_ \
 *Automatic Obstacle Detection* \
 *ST6*: Simulated a sudden device movement (shake) during recording \
-- *Precondition*: User is actively recording a path; accelerometer is active. \
+- *Precondition*: User is actively recording a path and accelerometer is active. \
 - *Action*: Simulate a sudden device movement (shake). \
 - *Expected result*: The accelerometer triggers the "Pothole/Obstacle" logic, automatically logging an event and displaying a confirmation notification. \
 - *Outcome*: _Passed_ \
@@ -764,7 +799,7 @@ The testing strategy focused on four main functional areas: Authentication, Path
 *ST10*: Removed a path from the history \
 - *Precondition*: User views a path in their history. \
 - *Action*: Remove the path. \
-- *Expected result*: The entry disappears immediately from the list and is no longer queryable from the backend. \
+- *Expected result*: The entry disappears immediately from the list and is no longer queryable from the Backend. \
 - *Outcome*: _Passed_ \
 *Start Recording* \
 *ST11*: Started a recording from an existing path detail view \
@@ -804,13 +839,17 @@ To verify the business logic regarding data aggregation and privacy, we performe
 - *Expected result*: The status updates to *Fair* (average of "Impassable" and one "Excellent"), confirming real-time recalculation. \
 - *Outcome*: _Passed_ \
 
+=== *Outcome Considerations*\
+All unit tests passed successfully. Thanks to some of these tests, we were able to catch some bugs: for example, thanks to *ST14*, we were able to find out that we were ignoring user privacy in community path browsing, resulting in some private paths appearing in public searches.
+
 = Installation Instructions
 
 To distribute BBP on iOS, we utilize Apple's *TestFlight* platform. Depending on the current status of the Apple review process, there are two ways to access the build:
 
 == Option 1: Public Link
 If the build has already been approved by Apple, you can join the testing group immediately via the following link:
-- #link("INSERT_LINK_HERE")[TestFlight Public Invitation]
+
+#link("https://testflight.apple.com/join/AT7aHqTg")[https://testflight.apple.com/join/AT7aHqTg]
 
 == Option 2: Internal Testing (Manual Addition)
 If the public link is not yet active, we will need to add you to our internal development team manually. Please follow these steps:
@@ -826,32 +865,30 @@ If the public link is not yet active, we will need to add you to our internal de
 
 = Available acceptance testing infrastructure
 
-We provide two primary environments for executing acceptance tests. While both are suitable for functional verification, physical hardware is required for final sign-off on hardware-dependent features.
+We provide two primary environments for executing acceptance tests. While both are suitable for functional verification, physical iOS Device is suggested.
 
-== 1. Physical iOS Devices
+== Physical iOS Devices
 The most reliable method for acceptance testing, ensuring the app behaves exactly as it will for the end user.
-- *Scope:* Full access to hardware APIs (Camera, FaceID, Sensors, Bluetooth).
-- *Network:* Testing under real-world conditions (5G, fluctuating Wi-Fi, airplane mode).
-- *Performance:* Accurate profiling of thermal throttling and battery consumption.
+- *Scope:* Full access to hardware APIs like Motion and Location Sensors and Feedback Generator (Vibration).
+- *Network:* Testing under real-world conditions.
 
-== 2. iOS Simulator (macOS)
+== iOS Simulator (macOS)
 The iOS Simulator is part of the Xcode toolset. Note that this is a *simulator* (mimicking software behavior) rather than an *emulator* (mimicking hardware).
-- *Environment:* Runs natively on macOS (Silicon/Intel), providing high performance for UI automation.
+- *Environment:* Runs natively on macOS.
 - *Constraints:*
-    - *Hardware:* No support for Camera, Motion Sensors (Accelerometer/Gyroscope), or Bluetooth.
-    - *Architecture:* Runs on `arm64` (Apple Silicon) or `x86_64` (Intel), which may hide memory-specific bugs present on physical ARM devices.
-    - *Push Notifications:* Limited simulation; requires manual payload injection via JSON drag-and-drop.
+    - *Hardware:* No support for Motion Sensors and Feedback Generator. Location can be simulated thanks to external apps like _Rocket Simulator_.
 
 === Comparison Summary
-#table(
-  columns: (1fr, 1fr, 1fr),
-  inset: 10pt,
-  align: horizon,
-  [*Feature*], [*Physical Device*], [*macOS Simulator*],
-  [*Hardware Sensors*], [Fully Supported], [Not Supported],
-  [*Execution Speed*], [Real-time], [Accelerated],
-  [*App Store/IAP*], [Full Testing], [Sandbox Only],
-  [*Touch Gestures*], [Multi-touch], [Mouse/Pointer]
+#figure(
+  table(
+    columns: (1fr, 1fr, 1fr),
+    inset: 10pt,
+    align: horizon,
+    [*Feature*], [*Physical Device*], [*macOS Simulator*],
+    [*Hardware Sensors*], [Fully Supported], [Simulated/Unsupported],
+    [*Touch Gestures*], [Multi-touch], [Mouse]
+  ),
+  caption: [Comparison between Physical Device and macOS Simulator]
 )
 
 = Effort Spent
@@ -860,12 +897,11 @@ The iOS Simulator is part of the Xcode toolset. Note that this is a *simulator* 
   table(
     columns: 4,
     table.header([], [*Foad Zahedi Labaf*], [*Lorenzo Fiamingo*], [*Alexander Gabriel Fox*]),
-    [*Section 1*], [], [], [],
-    [*Section 2*], [], [], [],
-    [*Section 3*], [], [], [],
-    [*Section 4*], [], [], [],
-    [*Section 5*], [], [], [],
-    [*Section 6*], [], [], [],
+    [*Section 1*], [1], [1], [3],
+    [*Section 2*], [2], [1], [3],
+    [*Section 3*], [3], [3], [2],
+    [*Section 4*], [1], [8], [2],
+    [*Section 5*], [9], [7], [4],
   ),
   caption: [The number of hours each group member has worked for this document]
 )
@@ -873,12 +909,9 @@ The iOS Simulator is part of the Xcode toolset. Note that this is a *simulator* 
 = References
 
 - *Typst* language and its online editor were used to build this document.
-- *PlantUML* was used to define and create diagrams.
-- *Draw.io* was used for the realization of architecture and deployment diagrams
-- *Alloy* was used for formal modeling and analysis.
 - *GitHub* was used for version control and to automate diagram generation.
 - *Google Docs* was used for collaborative writing.
 - *Xcode* and *SwiftUI* were used to create UI mockups.
-- *ChatGPT* and *Grammarly* were used for grammatical corrections.
+- *ChatGPT* and *Grammarly* were used to refine grammar, assist with code development, and automate error checking.
 
 #show: backmatter.with()

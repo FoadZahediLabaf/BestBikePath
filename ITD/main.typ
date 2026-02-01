@@ -35,6 +35,13 @@ No new requirements or design decisions are introduced in this document. All des
 
 == Scope
 
+This document focuses exclusively on the implementation and integration testing activities carried out for the BestBikePath system. \
+The attention is mainly on the backend part of the application and on how it interacts with the mobile client during normal system execution. \
+
+Only the parts of the system that have been effectively developed are considered. For this reason, the document focuses on the functionalities that are currently available and on the technologies that have been used to implement them. The interaction between the mobile application and the backend services is a central aspect of our analysis, since several system functionalities depend on this communication. \
+
+The testing activities described here concern the integration of different components, their interaction, and their internal implementation. \
+
 
 == Definitions, Acronyms, Abbreviations
 
@@ -135,27 +142,27 @@ _Implemented_ \
 #heading(level: 4, numbering: none,  outlined: false,  "Permission Management")
 
 *R5*: The system shall request the user’s permission to use a device capability. \
-_Not implemented_ \
+_Implemented_ \
 
 *R6*: The system shall properly handle user permission denial.\
-_Not implemented_ \
+_Implemented_ \
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
 *Start Recording* \
 *R7*: The system shall allow the authenticated user to start the automatic recording mode of a bike path. \
-_Not implemented_ \
+_Implemented_ \
 
 *R8*: The system shall use the GPS to track the user’s real-time position during the trip. \
-_Not implemented_ \
+_Implemented_ \
 
 *R9*: The system shall use the device’s sensors to collect information about obstacles along the path and the speed of the user. \
-_Not implemented_ \
+_Implemented_ \
 
 *R10*: The system shall display the current trip data (current duration time, map of the path, average speed, top speed, weather conditions, distance covered) while the user is biking. \
-_Not implemented_ \
+_Implemented_ \
 
 *R11*: The system shall prompt the user for confirmation of a detected obstacle while biking. \
-_Not implemented_ \
+_Implemented_ \
 
 *R12*: The system shall allow the authenticated user to insert an obstacle manually.
 _Not implemented_ \
@@ -231,12 +238,7 @@ _Implemented_ \
 _Not implemented_ \
 
 = Development Frameworks
-Adopted development frameworks (this section could either include simply references
-to sections in the DD where we find information about your choices and/or any new
-choice that you have made):
-a. Adopted programming languages and their advantages and disadvantages.
-b. Any middleware you have adopted and its advantages and disadvantages.
-c. Any API you did not include in the DD.
+
 
 == Frameworks
 

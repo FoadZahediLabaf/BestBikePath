@@ -361,26 +361,29 @@ Furthermore, it allowed us to catch several errors at compile time. \
 An additional build step was required compared to plain JavaScript, but this did not affect the overall development flow. \
 
 
+
 = Source Code Structure
-The project is organized into two primary repositories: the *iOS Client* and the *Firebase Backend*. This separation ensures a clean decoupling of concerns, where the mobile app handles user interaction and sensor data, while the cloud infrastructure manages data persistence and heavy geospatial calculations.
+The project is organized into two primary directories, which are structured to function as two separate Git repositories in a production environment: the *iOS Client* and the *Firebase Backend*. This separation ensures a clean decoupling of concerns, where the mobile app handles the user interface and sensor data, while the cloud infrastructure manages data persistence and heavy geospatial calculations.
 
 == iOS Client Structure
-The Xcode project is organized into logical modules that separate by feature data management, UI components, and hardware interactions. This structure facilitates modular development and clear separation of concerns.
+The Xcode project is organized into logical modules (containing data models, data managers, data sources, UI components) that are separated by feature. This structure facilitates modular development and clear separation of concerns. The main ones are:
 
-- *CapabilityAccess*: Manages the integration with hardware and system services. It includes `LocationManager`, `MotionManager`, and `WeatherManager`, acting as a bridge between Apple's native frameworks and the app's business logic.
+- *User*: Manages the user lifecycle, from identity models (`User`) to authentication and account management interfaces.
+- *UserPath*: Dedicated modules for path data structures and user-specific route history, ensuring that the geographic logic is decoupled from the UI.
 - *CommunityPath*: Handles all features related to shared routes. It includes the data sourcing logic (`CommunityPathSource`) and the UI components for searching and displaying community-contributed paths.
+- *CapabilityAccess*: Manages the integration with hardware and system services. It includes `LocationManager`, `MotionManager`, acting as a bridge between Apple's native frameworks and the app's business logic.
 - *Content*: The core UI container of the application. It hosts the `ContentMap`, the main `ContentView`, and the `Coordinator` pattern used to manage complex interactions between the map and the interface.
 - *Extension*: Contains Swift extensions used to augment existing types. Notable examples include custom error handling (`AnyLocalizedError`) and UI state extensions for asynchronous operations.
-- *Path & UserPath*: Dedicated modules for path data structures and user-specific route history, ensuring that the geographic logic is decoupled from the UI.
-- *User*: Manages the user lifecycle, from identity models (`User`) to authentication and account management interfaces.
-- *Modifiers & LocalSearch*: Specialized folders for custom SwiftUI view modifiers (like `SheetInsetting`) and location search auto-completion features.
+- *Modifiers, LocalSearch*: Specialized folders for custom SwiftUI view modifiers (like `SheetInsetting`) and location search auto-completion features.
+
+We defined for each feature specific protocols (such as UserSource, UserPathSource, and CommunityPathSource). This architectural choice allows for multiple implementations, enabling us to seamlessly switch between TestUserSource for testing and FirebaseUserSource for production through dependency injection.
 
 == Firebase Backend (Functions Environment)
 The backend logic is centralized within the `functions/` directory, structured to facilitate development, local emulation, and automated testing:
 
 - *src*: The TypeScript source code.
   - *index.ts*: The entry point where Cloud Functions (HTTPS and Triggers) are exported.
-  - *managers*: Module-specific logic (e.g., `pathManager.ts`, `userManager.ts`) that isolates business rules from the Firebase transport layer in `index.ts`.
+  - *managers*: Module-specific logic (e.g., `pathManager.ts`, `userManager.ts`) that isolates business logic from the Firebase transport layer in `index.ts`.
   - *constants*: Shared constant value providing a single source-of-truth.
 - *\_\_tests\_\_*: A comprehensive test suite using Jest. It contains unit tests for the manager modules, using mocked environments for Firestore and Turf.js to ensure logic reliability.
 - *package.json*: Manages dependencies and defines scripts for linting, compiling, testing and deploying the functions.
@@ -393,13 +396,14 @@ The project relies on two main package managers:
 
 = Testing
 
-This section outlines the verification strategies employed to ensure the application's reliability, ranging from individual logic components to the complete end-to-end user flow.
+This section outlines the verification strategies employed to ensure the application's reliability, from individual logic components to the complete end-to-end user flow.
 
 == Backend Business Logic Unit Testing
 
 The backend business logic, implemented via Firebase Cloud Functions, was validated using the Jest framework. The primary objective was to verify the "Managers" in isolation, ensuring that geospatial algorithms and data processing rules remain accurate regardless of external infrastructure status.
 
-=== Mocking Strategy and Isolation Due to the serverless nature of the backend, unit tests do not interact with live Firestore or Firebase Auth instances. Instead, a sophisticated mocking strategy was adopted to simulate the environment:
+=== Mocking Strategy and Isolation 
+Due to the serverless nature of the backend, unit tests do not interact with live Firestore or Firebase Auth instances. Instead, the following mocking strategy was adopted to simulate the environment:
 
 *Dependency Mocking* \
 By utilizing `jest.mock()`, complex external modules such as `firebase-admin` and `@turf/turf` were replaced with stub implementations that return predictable data.
@@ -511,7 +515,7 @@ If the build has already been approved by Apple, you can join the testing group 
 If the public link is not yet active, we will need to add you to our internal development team manually. Please follow these steps:
 
 + *Send your Apple ID email:* Provide us with the email address associated with your Apple account.
-+ *Accept the Invitation:* You will receive an email from Apple via App Store Connect. You must click the link inside that email to authorize your device. If you never logged into App Store Connect you will have to log and accept the terms.
++ *Accept the Invitation:* You will receive an email from Apple via App Store Connect. You must click the link inside that email to authorize your device. If you have never logged into App Store Connect you will have to log and accept the terms.
 + *Join the Group:* Once you have accepted the invite, we will add you to the "Internal Testers" group, and you will receive an email with a link to add BBP to your TestFlight dashboard.
 
 == Prerequisites

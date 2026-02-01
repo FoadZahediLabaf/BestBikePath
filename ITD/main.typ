@@ -127,15 +127,73 @@ The following reference materials were used for the preparation of this document
 8. *References*: Reference to documents or tools used for writing this document.
 
 = Requirement and Functions
-This section illustrates the implementation status of each requirement defined in the Requirements and Specifications Document. The requirements that are not implemented are related to the "automatic recording" function, which was excluded as indicated by the _I&T_ assignment.
+== Overview of Implemented Requirements
+
+The current version of the BestBikePath system implements a subset of the requirements defined in the Requirements Analysis and Specification Document. \
+The implemented functionalities cover the core objectives of the application and allow users to interact with the system through the mobile client and the backend services. \
+
+The focus of the implementation has been on enabling users to manage personal bike paths and to access shared paths provided by the community. \
+For this reason, priority has been given to functionalities related to user management, path creation and storage, path visualization, and community path browsing. \
+
+This section describes the functionalities that are available in the system at the time of writing, while the remaining requirements are discussed separately, together with the motivations for their exclusion or partial implementation. \
+
+=== *User Management Functionalities* \
+The BestBikePath system includes user management functionalities that allow users to access the application and interact with the available services.
+Users can create an account, authenticate themselves, and remove their account through the mobile application. \
+
+User-related operations are handled by the backend services and are exposed to the mobile client through dedicated interfaces. \
+This design choice allows the system to associate stored data, such as bike paths, with the correct user and to enforce basic access control rules. \
+
+User management functionalities have been implemented because they are required to support most of the use cases defined in the RASD, including personal path management and access to community-related features. \
+
+=== *Path Recording and Storage Functionalities* \
+The system allows users to create and store bike paths using the mobile application. \
+In the current implementation, path creation includes manual path insertion, which enables users to explicitly define a route and save it in the system, and automatic recording, which allows users to start recording sessions for the automatic collection of data related to the followed path. \
+
+Once a path is created by the user or the recording session ends, the corresponding data is sent to the backend services, where it is stored and associated with the user’s account. \
+The backend is responsible for managing the persistence of path data and for maintaining the link between paths and users. \
+
+This functionality has been implemented because it represents a fundamental requirement of the BestBikePath system. \
+
+=== *Path Visualization and Management* \
+
+The BestBikePath system allows users to visualize and manage the bike paths stored in their personal collection. \
+Through the mobile application, users can retrieve previously saved paths and display them on the map. \
+
+In addition to visualization, users can manage their stored paths by modifying specific attributes, such as the privacy level of a path. \
+These operations are supported by the backend services and ensure that each user can only access and modify paths that belong to their account. \
+
+Path visualization and management functionalities have been implemented to allow users to review and organize their personal paths, supporting one of the main use cases of the application. \
+
+=== *Community Path Browsing and Detail Functionalities* \
+The system also supports functionalities related to the exploration of bike paths shared by other users. \
+Community path browsing allows users to view paths that have been made available to the community and to optionally select one to follow during an automatic recording session. \
+
+Through the mobile application, users can browse the available community paths and select a specific path in order to access its detailed information. \
+The path detail view provides additional data about the selected path and allows users to better understand the characteristics of the route. \
+
+These functionalities have been implemented to support the social and collaborative aspect of the BestBikePath system, as described in the requirements analysis. \
+They allow users to benefit from paths created by other members of the community and represent an important extension of the personal path management features. \
+
+=== *Permission Management* \
+When the system needs a capability permission for a feature, such as the user location to record a bike path, a sheet modal is shown.
+If the capability is available and the user never denied the authorization, and decides to give their permission, the system dialog to give permission is shown, and the user can allow the app to use the capability.
+If the capability is available and the user denied the authorization, but then decides to give their permission, they must open settings and change the access authorization status manually.
+If the capability is unavailable, the user can just close the modal and not use the app feature.
+
+== Implemented Requirements
+
 #heading(level: 4, numbering: none,  outlined: false,  "Account Management")
 
 *R1*: The system shall allow an unauthenticated user to create an account. \
-_Implemented_ \
+_Implemented_ \  
+
 *R2:* The system shall allow an unauthenticated user to sign into the app. \
 _Implemented_ \
+
 *R3*: The system shall allow an authenticated user to sign out from the app. \
 _Implemented_ \
+
 *R4*: The system shall allow an authenticated user to delete their account.\
 _Implemented_ \
 
@@ -146,6 +204,7 @@ _Implemented_ \
 
 *R6*: The system shall properly handle user permission denial.\
 _Implemented_ \
+
 #heading(level: 4, numbering: none,  outlined: false,  "Automatic Bike Path Recording")
 
 *Start Recording* \
@@ -162,46 +221,46 @@ _Implemented_ \
 _Implemented_ \
 
 *R11*: The system shall prompt the user for confirmation of a detected obstacle while biking. \
-_Implemented_ \
+_Implemented In App (System Notifications Not Implemented)_ \
 
-*R12*: The system shall allow the authenticated user to insert an obstacle manually.
-_Not implemented_ \
+*R12*: The system shall allow the authenticated user to insert an obstacle manually. \
+_Implemented_ \
 
 *Stop Recording* \
 *R13*: The system shall allow the authenticated user to manually stop the automatic recording of a bike path. \ 
-_Not implemented_ \
+_Implemented_ \
 
 *R14*: The system shall stop collecting GPS data once the authenticated user selects “Stop Recording”. \
-_Not implemented_ \
+_Implemented_ \
 
 *R15*: The system shall stop collecting sensor data once the authenticated user selects “Stop Recording”. \
-_Not implemented_ \
+_Implemented_ \
 
 *R16*: The system shall compute the status for the recorded path based on the frequency of obstacles. \
-_Not implemented_ \
+_Implemented_ \
 
 *R17*: The system shall store the path and its associated status in the authenticated user’s personal history. \
-_Not implemented_ \
+_Implemented_ \
 
 *R18*: The system shall cancel the recording if the accuracy of the GPS data drops under a certain threshold (over 10 meters for more than 15 seconds). \
 _Not implemented_ \
 
 *Pause and Resume* \
 *R19*: The system shall automatically pause recording when the authenticated user stops biking. \
-_Not implemented_ \
+_Implemented_ \
 
 *R20*: The system shall automatically resume recording when the authenticated user starts biking. \
-_Not implemented_ \
+_Implemented_ \
 
 *R21*: The system shall allow the user to manually pause the recording. \
-_Not implemented_ \
+_Implemented_ \
 
 *R22*: The system shall allow the user to manually resume the recording. \
-_Not implemented_ \
+_Implemented_ \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Manual Bike Path Insertion")
 
-*R23:*The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops and defining privacy and a quality status. \
+*R23:* The system shall allow the authenticated user to manually create a path by inserting a starting point, destination, intermediary stops and defining privacy and a quality status. \
 _Implemented_ \
 
 #heading(level: 4, numbering: none,  outlined: false,  "Personal History Management")
@@ -235,7 +294,7 @@ _Implemented_ \
 _Implemented_ \
 
 *R32*: The system shall allow the user to select a path as the suggested route for a new automatic recording session.\
-_Not implemented_ \
+_Implemented_ \
 
 = Development Frameworks
 
@@ -331,10 +390,15 @@ The backend business logic, implemented via Firebase Cloud Functions, was valida
 By utilizing `jest.mock()`, complex external modules such as `firebase-admin` and `@turf/turf` were replaced with stub implementations that return predictable data.
 
 *Database Simulation* \
-The hierarchical nature of Firestore queries (e.g., `collection().where().get()`) was reconstructed using nested Jest mocks. This allows the suite to simulate various database states easily (such as empty results, multiple document returns, or execution errors).
+The hierarchical nature of Firestore queries (e.g., `collection().where().get()`) was reconstructed using nested Jest mocks. This allows the suite to simulate various database states easily (such as empty results, multiple document returns, or execution errors). 
 
 *Temporal Control* \
 To validate time-sensitive logic (e.g., filtering out community reports older than a year), the Timestamp object was mocked to simulate specific points in time, ensuring the filtering logic behaves as expected.
+
+
+== Backend Database Access Unit Testing
+
+To test Firestore DB access, 
 
 === Key Test Cases
 

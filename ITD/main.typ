@@ -34,7 +34,7 @@ No new requirements or design decisions are introduced in this document.
 
 == Scope
 
-This document focuses exclusively on the implementation and integration testing activities carried out for the BestBikePath system. \
+This document focuses exclusively on the implementation and integration testing activities carried out for the BestBikePaths system. \
 The attention is mainly on the backend part of the application and on how it interacts with the mobile client during normal system execution. \
 
 Only the parts of the system that have been effectively developed are considered. For this reason, the document focuses on the functionalities that are currently available and on the technologies that have been used to implement them. The interaction between the mobile application and the backend services is a central aspect of our analysis, since several system functionalities depend on this communication. \
@@ -157,7 +157,7 @@ Community path browsing allows users to view paths that have been made available
 Through the mobile application, users can browse the available community paths and select a specific path in order to access its detailed information. \
 The path detail view provides additional data about the selected path and allows users to better understand the characteristics of the route. \
 
-These functionalities have been implemented to support the social aspect of the BestBikePath system, as described in the requirements analysis. \
+These functionalities have been implemented to support the social aspect of the BestBikePaths system, as described in the requirements analysis. \
 They allow users to benefit from paths created by other members of the community and represent an important extension of the personal path management features. \
 
 === *Permission Management* \
@@ -282,7 +282,7 @@ _Implemented_ \
 _Implemented_ \
 
 = Development Frameworks
-The development of the BestBikePath system required the use of different technologies for the mobile client and for the Backend services. \
+The development of the BestBikePaths system required the use of different technologies for the mobile client and for the Backend services. \
 The adopted frameworks and platforms follow the design decisions described in the Design Document and were selected mainly to simplify development and integration activities.. \
 
 During the implementation phase, additional frameworks (not initially outlined in the previous documents) were integrated to enhance the robustness of the core logic and ensure overall code stability.  \
@@ -304,7 +304,7 @@ A Swift Package used to access the underlying UIKit components of SwiftUI views.
 The core suite used to bridge the mobile client with backend services. It facilitates secure user authentication via Firebase Auth and provides the communication layer for invoking Cloud Functions, ensuring seamless data flow between the iOS app and the serverless environment.
 
 *MapKit* \
-MapKit was integrated to handle all geospatial requirements. It provides the core mapping interface, handles user location tracking, and renders the polyline paths that represent bike paths. It also provide the Directions API, that can be used to retrieve detailed step-by-step navigation and route data based on start and end points.
+MapKit was integrated to handle all geo-spatial requirements. It provides the core mapping interface, handles user location tracking, and renders the polyline paths that represent bike paths. It also provide the Directions API, that can be used to retrieve detailed step-by-step navigation and route data based on start and end points.
 
 *WeatherKit* \
 WeatherKit was integrated to retrieve current weather data during user path recording.
@@ -347,12 +347,12 @@ An additional build step was required compared to plain JavaScript, but this did
 
 
 = Source Code Structure
-The project is organized into two primary directories, which are structured to function as two separate Git repositories in a production environment: the *iOS Client* and the *Firebase Backend*. This separation ensures a clean decoupling of concerns, where the mobile app handles the user interface and sensor data, while the cloud infrastructure manages data persistence and heavy geospatial calculations.
+The project is organized into two primary directories, which are structured to function as two separate Git repositories in a production environment: the *iOS Client* (`Implementation/swift-bbp-client`) and the *Firebase Backend* (`Implementation/firebase-bbp-backend`). This separation ensures a clean decoupling of concerns, where the mobile app handles the user interface and sensor data, while the cloud infrastructure manages data persistence and heavy geo-spatial calculations.
 
 == iOS Client Structure
 The Xcode project is organized into logical modules (containing data models, data managers, data sources, UI components) that are separated by feature. This structure facilitates modular development and clear separation of concerns. The main ones are:
 
-- *User*: Manages the user lifecycle, from identity models (`User`) to authentication and account management interfaces.
+- *User*: Manages the user life cycle, from identity models (`User`) to authentication and account management interfaces.
 - *UserPath*: Dedicated modules for path data structures and user-specific route history, ensuring that the geographic logic is decoupled from the UI.
 - *CommunityPath*: Handles all features related to shared routes. It includes the data sourcing logic (`CommunityPathSource`) and the UI components for searching and displaying community-contributed paths.
 - *CapabilityAccess*: Manages the integration with hardware and system services. It includes `LocationManager`, `MotionManager`, acting as a bridge between Apple's native frameworks and the app's business logic.
@@ -375,13 +375,13 @@ The backend logic is centralized within the `functions/` directory, structured t
 == Dependency Management
 The project relies on two main package managers:
 - *SPM (Swift Package Manager)*: Used for all iOS third-party libraries, integrated directly into Xcode.
-- *NPM (Node Package Manager)*: Used for the backend to manage TypeScript, Firebase Admin SDK, and geospatial libraries.
+- *NPM (Node Package Manager)*: Used for the backend to manage TypeScript, Firebase Admin SDK, and geo-spatial libraries.
 
 
 = Testing
 
 This section outlines the verification strategies employed to ensure the application's reliability, from individual logic components to the complete end-to-end user flow. \
-Testing activities were performed to verify the correct behavior of the BestBikePath system with respect to the implemented requirements. \
+Testing activities were performed to verify the correct behavior of the BestBikePaths system with respect to the implemented requirements. \
 
 All tests described in this section were executed on the implemented version of the system. \
 
@@ -391,7 +391,7 @@ All tests described in this section were executed on the implemented version of 
 
 === Backend Business Logic
 
-The backend business logic, implemented via Firebase Cloud Functions, was validated using the Jest framework. The primary objective was to verify the "Managers" in isolation, ensuring that geospatial algorithms and data processing rules remain accurate regardless of external infrastructure status.
+The backend business logic, implemented via Firebase Cloud Functions, was validated using the Jest framework. The primary objective was to verify the "Managers" in isolation, ensuring that geo-spatial algorithms and data processing rules remain accurate regardless of external infrastructure status.
 
 === Mocking Strategy and Isolation 
 Due to the serverless nature of the backend, unit tests do not interact with live Firestore or Firebase Auth instances. Instead, the following mocking strategy was adopted to simulate the environment:

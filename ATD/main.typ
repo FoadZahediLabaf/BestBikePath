@@ -107,26 +107,245 @@ The following reference materials were used for the preparation of this document
 
 
 = Project Identification
-The identification of the project you have analyzed (names of authors, link to the repository,
-main reference documents you have considered).
+This report details the acceptance testing and quality assessment performed on the "Best Bike Paths" (BBP) application. The analysis is based on the artifacts and documentation provided by the development team.
+
 == Authors
+The project was designed and implemented by:
+- *Alice Berta*
+- *Francesco Danese*
+
+== Repository
+The source code, along with deployment scripts and configuration files, is hosted at the following URL:
+#link("https://github.com/fradane/DaneseBerta")
+
+== Reference Documents
+The testing strategy and verification criteria were derived from the following deliverables:
+- *Requirements Analysis and Specification Document (RASD)* - Version 2.0
+- *Design Document (DD)* - Version 2.0
+- *Implementation and Test Document (ITD)* - Version 1.0
 
 
 = Installation Setup
-What you did to install the prototype as well as any problem you have
-faced in this phase, any incoherence you may have found when following the documentation
-accompanying the software.
+This section describes the procedure followed to deploy the testing environment. The installation was performed strictly adhering to the instructions provided in *Chapter 6* of the *ITD*.
+
+== Installation Procedure
+The system was set up in a hybrid environment to simulate a realistic usage scenario:
+- *Server-side*: The backend microservices were deployed using *Docker Compose* on a local machine, ensuring isolation and dependency management as recommended in ITD Section 6.1.
+- *Client-side*: The mobile application was compiled and installed on two distinct targets:
+  1. *iOS Simulator* for rapid functional testing.
+  2. *Physical Device* for real-world evaluation.
+
 
 = Acceptance Testing
-The acceptance test cases you have applied and the corresponding outcome: you can extract
-test cases by analyzing the RASD the other team has developed, the list of features that the
-team has actually developed, as well as any other case that you, as a user of the application,
-think is appropriate (please provide motivation for your choice).
+This chapter details the User Acceptance Testing (UAT) activities performed on the "Best Bike Paths" (BBP) application. The test suite was designed based on the Functional Requirements specified in the *RASD (v2.0)*, while strictly adhering to the implementation scope defined in the *ITD (v1.0)*.
+
+Consequently, features explicitly marked as "Not Implemented" in the ITD (such as Password Reset or Automatic Trip Recording) were excluded from this verification phase. The primary goal was to validate the software against the delivered specifications and ensure robustness in the implemented flows.
+
+== Test Environment & Preconditions
+Unless otherwise specified in the individual test cases, the following baseline environment is assumed:
+- *Client*: Mobile Application running on an iOS device (physical or simulated) via Flutter engine.
+- *Server*: Backend Microservices (Account, Trip, Path) deployed and running via Docker containers.
+- *Connectivity*: Active internet connection for external API access (OpenStreetMap, OpenMeteo).
+
 == Acceptance Test Cases
+
+#heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
+*Sign Up Process & Validation* \
+*AT1*: Should register a new user with valid data \
+- *Precondition*: App is installed and user is on the Sign Up screen. \
+- *Action*: Enter Name, Surname, unique Username, valid and unique Email, and valid Password. Click Confirm. \
+- *Expected result*: The account is created successfully. The system initiates the verification process (if applicable) or logs the user in. \
+- *Requirements verified*: R1, R2, R3 \
+- *Outcome*: _Passed_ \
+
+*AT2*: Should enforce valid email format \
+- *Precondition*: User is on the Sign Up screen. \
+- *Action*: Fill all fields correctly but enter an invalid email format (e.g., "user.name" without domain or "@"). Click Confirm. \
+- *Expected result*: The system displays an error message indicating the email format is invalid and blocks registration. \
+- *Requirements verified*: R2 \
+- *Outcome*: _Passed_ \
+
+*AT3*: Should reject duplicate usernames \
+- *Precondition*: A user is already registered with a certain username. \
+- *Action*: Attempt to sign up a new user using the same username. \
+- *Expected result*: The system displays an error and prevents account creation. \
+- *Requirements verified*: NOT TRACED \
+- *Outcome*: _Passed_ \
+- *Note*: This requirement is not traced but needed for R4. \
+
+*AT4*: Should reject duplicate email addresses \
+- *Precondition*: A user is already registered with a certain email. \
+- *Action*: Attempt to sign up a new user using the same email. \
+- *Expected result*: The system displays an error "Email already registered" and prevents account creation. \
+- *Requirements verified*: R2 \
+- *Outcome*: _Passed_ \
+
+*AT5*: Should validate password complexity \
+- *Precondition*: User is on the Sign Up screen. \
+- *Action*: Enter valid details but a password shorter than 8 characters. Click Confirm. \
+- *Expected result*: An error message "Password must be at least 8 characters" is displayed and registration is blocked. \
+- *Requirements verified*: R3 \
+- *Outcome*: _Passed_ \
+
+*AT6*: Should require email verification via code \
+- *Precondition*: User has just submitted valid sign-up details. \
+- *Action*: Wait for the verification prompt and attempt to enter a code. \
+- *Expected result*: The system requests a verification code before allowing login. \
+- *Requirements verified*: R2 \
+- *Outcome*: _N/A (Descoped)_ \
+- *Observation*: This functional flow is intentionally bypassed in the current release. The ITD states: "the email is auto-verified since it is a prototype". \
+- *Defect Note*: Despite the "auto-verified" claim in the ITD, the backend/database implementation does not actually set the user's status to verified. This inconsistency causes the login failure described in *AT7*, as the system still enforces a check for a verification that never happened.
+
+*Login & Session Management* \
+*AT7*: Should allow login with username \
+- *Precondition*: A registered and verified user exists with a known username. \
+- *Action*: Enter username and correct password. Click Login. \
+- *Expected result*: Login is successful and the user lands on the Home screen. \
+- *Requirements verified*: R4 \
+- *Outcome*: _Failed_ \
+- *Defect Description*:
+  1. *Blocking Issue*: The login is rejected by the server. Although the ITD states that the prototype auto-verifies emails, the database entry defaults email verification to `false` upon creation, and the Backend enforces verification check on sign in.
+  2. *Design Flaw*: There is an ambiguity in credential resolution. If a user registers with a username formatted as an email address (distinct from their actual email), the login query incorrectly targets the email field instead of the username field, causing authentication failure.
+- *Recommendation*: Ensure the sign-up handler sets email verification to `true` by default for the prototype, and implement a regex check during sign-up to prevent usernames from having email-like formats.
+
+*AT8*: Should allow login with email address \
+- *Precondition*: A registered user exists with a known email. \
+- *Action*: Enter email address and correct password. Click Login. \
+- *Expected result*: Login is successful, recognizing the email as a valid identifier. \
+- *Requirements verified*: R4 \
+- *Outcome*: _Failed_ \
+- *Defect Description*: The login is rejected by the server. Although the ITD states that the prototype auto-verifies emails, the database entry defaults email verification to `false` upon creation, and the Backend enforces verification check on sign in.
+- *Recommendation*: Ensure the sign-up handler sets email verification to `true` by default for the prototype.
+
+*AT9*: Should invalidate session on logout \
+- *Precondition*: User is currently logged in. \
+- *Action*: Click the Log Out button.\
+- *Expected result*: User is redirected to the Login screen and the previous session token is no longer valid. \
+- *Requirements verified*: R6 \
+- *Outcome*: _Passed_ \
+
+#heading(level: 4, numbering: none,  outlined: false,  "User Profile Management")
+*AT10*: Should display correct profile information \
+- *Precondition*: User is logged in. \
+- *Action*: Navigate to the Profile tab. \
+- *Expected result*: The displayed Username and Email match the registered account details. \
+- *Requirements verified*: R7 \
+- *Outcome*: _Passed_ \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Path Finding Service")
+*AT11*: Should allow guest users to search for paths \
+- *Precondition*: User is not logged in (Guest). \
+- *Action*: Specify a Start Point and a Destination. Click Search. \
+- *Expected result*: A list of compatible bike paths is displayed. \
+- *Requirements verified*: R10 \
+- *Outcome*: _Passed_ \
+
+*AT12*: Should rank paths by calculated score \
+- *Precondition*: A search is performed in an area with multiple possible routes. \
+- *Action*: Observe the results list. \
+- *Expected result*: Paths are ordered based on "Score" (combining distance and road status), not solely by shortest distance. \
+- *Requirements verified*: R11, R12, R27 \
+- *Outcome*: _Failed_ \
+- *Note*: The score calculation described in ITD differs from RDD Assignment specifications. \
+- *Defect Description*:
+  1. *Inconsistent Score Aggregation*: The scoring update mechanism exhibits non-deterministic behavior. In some test runs, the score updates correctly after a new trip is published; in other identical scenarios, the score remains static, failing to incorporate the new feedback.
+  2. *Random Data Unavailability*: The appearance of published paths in search results is erratic. Successfully published paths randomly fail to appear in subsequent searches.
+- *Observation*: The flakiness of these bugs makes reliable reproduction difficult, as the system behaves correctly in approximately 50% of the attempts. The failure should not be caused by the geographical precision of the search query. As demonstrated by the attached screenshots from our test sessions, using the exact same coordinates yields empty results in some attempts. This rules out geospatial matching tolerance (100m) as the root cause.
+
+#align(center)[
+  #stack(dir: ltr, spacing: 3%)[
+    #block(width: 20%)[
+      #figure(
+        image("ui/at12/trip-origin.png"),
+          caption: [\ Trip Origin]
+      )
+    ]
+  ][
+    #block(width: 20%)[
+      #figure(
+        image("ui/at12/trip-destination.png"),
+          caption: [\ Trip Destination]
+      ) 
+    ]
+  ][
+    #block(width: 20%)[
+      #figure(
+        image("ui/at12/search-origin.png"),
+          caption: [Search Origin]
+      )
+    ]
+  ][
+    #block(width: 20%)[
+      #figure(
+        image("ui/at12/search-destination.png"),
+          caption: [Search \ Destination]
+      )
+    ]
+  ][
+    #block(width: 20%)[
+      #figure(
+        image("ui/at12/search-result.png"),
+          caption: [Search Result]
+      )
+    ]
+  ]
+]
+
+*AT13*: Should display distance and score \
+- *Precondition*: A search is performed in an area with at least one possible route. \
+- *Action*: Observe the results list. \
+- *Expected result*: The UI shows the total distance and the calculated quality score. \
+- *Requirements verified*: R13 \
+- *Outcome*: _Passed_ \
+- *Note*: The score calculation described in ITD differs from RDD Assignment specifications. \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Trip Recording & Weather")
+*AT14*: Should manually create a trip \
+- *Precondition*: User is authenticated. \
+- *Action*: Create a new manual trip specifying travel points and start/end dates, average speed, and road status. \
+- *Expected result*: The trip is saved. The system show the trip in "My Trips" section. \
+- *Requirements verified*: R16, R20 \
+- *Outcome*: _Passed_ \
+- *Note*: The location coordinates are not specified by the user using street names, but tapping the location on the map. \
+
+*AT15*: Should fetch historical weather data for trips \
+- *Precondition*: A manual trip is created. \
+- *Action*: Open the details view of the saved trip from "My Trips". \
+- *Expected result*: Temperature, wind speed and weather condition are displayed alongside the trip statistics. \
+- *Requirements verified*: R21, R33, R34, R35 \
+- *Outcome*: _Passed_ \
+
+#heading(level: 4, numbering: none,  outlined: false,  "Trip Publishing")
+*AT16*: Should publish multiple trips simultaneously \
+- *Precondition*: User has one or more "Unpublished" trips in their history. \
+- *Action*: Select multiple trips (by long-pressing them) and click the "Publish" button. \
+- *Expected result*: The selected trips' status changes to "Published". \
+- *Requirements verified*: R26, R27 \
+- *Outcome*: _Passed_ \
 
 
 = Quality Assessment
-Any additional point you want to raise on the quality of documentation and code.
+
+This section outlines observations regarding the code quality, documentation consistency, and user experience (UX) derived from the testing session.
+
+== 1. Documentation vs. Implementation Mismatch
+The most critical issue found is a direct contradiction between the architectural decisions described in the ITD and the actual backend logic.
+- *The Issue*: The ITD states that email verification is skipped ("auto-verified") for this prototype. However, the database initialization logic sets the `emailVerification` flag to `false` by default, and the login handler enforces a check on this flag.
+- *Impact*: This creates an immediate *showstopper* for any new user, blocking access right after registration. The code should explicitly mirror the "prototype assumptions" documented in the deliverables.
+
+== 2. UX Friction Points
+While the visual interface is clean, two specific interaction patterns degrade usability:
+
+* Hidden Functionality (The "Long Press" Issue)* \
+  In the "My Trips" section, publishing a trip requires a long-press gesture on the list item. There is no visual cue (affordance), icon, or instruction indicating this possibility. Users rely on standard tap interactions; hiding core functionality behind an invisible gesture makes the feature undiscoverable without external help.
+
+*Manual Entry Inefficiency* \
+  The "Manual Trip" creation flow assumes the user is near the start point. Lacking a text-based search (Geocoding), the user is forced to manually drag and zoom the map to find a remote location. If a user wants to log a trip taken in a different city, the manual panning process becomes very slow.
+
+== 3. Overall Stability
+The application demonstrates a solid Proof of Concept (PoC) architecture. However, the *non-deterministic nature* of the Path Finding service (where paths randomly fail to appear in search results) suggests some error in the Backend that need addressing.
+
+*Conclusion*: The app has good potential. Fixing the discussed problems would significantly elevate the prototype from "technically functional" to "actually usable."
 
 = Effort Spent
 
@@ -134,11 +353,11 @@ Any additional point you want to raise on the quality of documentation and code.
   table(
     columns: 4,
     table.header([], [*Foad Zahedi Labaf*], [*Lorenzo Fiamingo*], [*Alexander Gabriel Fox*]),
-    [*Section 1*], [], [], [],
-    [*Section 2*], [], [], [],
-    [*Section 3*], [], [], [],
-    [*Section 4*], [], [], [],
-    [*Section 5*], [], [], [],
+    [*Section 1*], [], [1], [],
+    [*Section 2*], [], [1], [],
+    [*Section 3*], [], [2], [],
+    [*Section 4*], [], [10], [],
+    [*Section 5*], [], [4], [],
   ),
   caption: [The number of hours each group member has worked for this document]
 )

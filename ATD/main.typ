@@ -26,14 +26,13 @@
 = Introduction
 
 == Purpose
-This document describes the... \
-The purpose of this document is to...
+The purpose of this document is to verify the acceptability of the other group’s implementation of the BBP project through a series of acceptance tests.
+In particular, this document describes the acceptance testing activities performed on the project and reports the results of each test, with the aim of identifying potential bugs in the code and any inconsistencies with respect to the project description provided in the Requirements Analysis and Specification Document and the Design Document.
 
 == Scope
-This document focuses exclusively on ... \
-The testing activities described here concern the ... \
-
-
+The testing activities primarily focus on verifying the interaction between the frontend and backend services of the project (specifically the storage and retrieval of data from the database, authentication mechanisms, internal business logic, and the use of external libraries) in relation to the requirements implemented according to the _ITv1_ document.
+The tests are performed on the implemented application functions after following the installation instructions outlined in the _ITDv1_ document available in the corresponding GitHub repository.
+These testing activities do not include frontend user interface testing; however, some observations regarding potential interface improvements are included within the relevant test cases.
 == Definitions, Acronyms, Abbreviations
 
 === Definitions
@@ -100,14 +99,14 @@ The following reference materials were used for the preparation of this document
 1. *Introduction*: A brief overview of the contents of the document and its purpose.
 2. *Project Identification*: This section identifies the software project under analysis.
 3. *Installation Setup*: It describes the steps taken to install the prototype.
-4. *Acceptance Testing*: The executed test cases derived from the RASD requirements and actual implemented features.
+4. *Acceptance Testing*: The executed test cases derived from the RASD requirements and the implemented features.
 5. *Quality Assessment*: An evaluative section focusing on the overall quality of the project.
-6. *Effort spent*: Includes the amount of time dedicated by each member for the realization of each section of the document.
+6. *Effort spent*: Includes the amount of time dedicated by each member to the realization of each section of the document.
 7. *References*: Reference to documents or tools used for writing this document.
 
 
 = Project Identification
-This report details the acceptance testing and quality assessment performed on the "Best Bike Paths" (BBP) application. The analysis is based on the artifacts and documentation provided by the development team.
+This section details the acceptance testing and quality assessment performed on the BBP application. The analysis is based on the artifacts and documentation provided by the development team.
 
 == Authors
 The project was designed and implemented by:
@@ -115,7 +114,7 @@ The project was designed and implemented by:
 - *Francesco Danese*
 
 == Repository
-The source code, along with deployment scripts and configuration files, is hosted at the following URL:
+The source code, along with deployment scripts and configuration files, is hosted at the following URL: 
 #link("https://github.com/fradane/DaneseBerta")
 
 == Reference Documents
@@ -137,7 +136,7 @@ The system was set up in a hybrid environment to simulate a realistic usage scen
 
 
 = Acceptance Testing
-This chapter details the User Acceptance Testing (UAT) activities performed on the "Best Bike Paths" (BBP) application. The test suite was designed based on the Functional Requirements specified in the *RASD (v2.0)*, while strictly adhering to the implementation scope defined in the *ITD (v1.0)*.
+This chapter details the User Acceptance Testing (UAT) activities performed on the BBP application. The test suite was designed based on the Functional Requirements specified in the *RASD (v2.0)*, while strictly adhering to the implementation scope defined in the *ITD (v1.0)*.
 
 Consequently, features explicitly marked as "Not Implemented" in the ITD (such as Password Reset or Automatic Trip Recording) were excluded from this verification phase. The primary goal was to validate the software against the delivered specifications and ensure robustness in the implemented flows.
 
@@ -204,7 +203,7 @@ Unless otherwise specified in the individual test cases, the following baseline 
 - *Requirements verified*: R4 \
 - *Outcome*: _Failed_ \
 - *Defect Description*:
-  1. *Blocking Issue*: The login is rejected by the server. Although the ITD states that the prototype auto-verifies emails, the database entry defaults email verification to `false` upon creation, and the Backend enforces verification check on sign in.
+  1. *Blocking Issue*: The login is rejected by the server. Although the ITD states that the prototype auto-verifies emails, the database entry defaults email verification to `false` upon creation, and the Backend enforces verification check on sign-in.
   2. *Design Flaw*: There is an ambiguity in credential resolution. If a user registers with a username formatted as an email address (distinct from their actual email), the login query incorrectly targets the email field instead of the username field, causing authentication failure.
 - *Recommendation*: Ensure the sign-up handler sets email verification to `true` by default for the prototype, and implement a regex check during sign-up to prevent usernames from having email-like formats.
 
@@ -303,15 +302,15 @@ Unless otherwise specified in the individual test cases, the following baseline 
 *AT14*: Should manually create a trip \
 - *Precondition*: User is authenticated. \
 - *Action*: Create a new manual trip specifying travel points and start/end dates, average speed, and road status. \
-- *Expected result*: The trip is saved. The system show the trip in "My Trips" section. \
+- *Expected result*: The trip is saved. The system shows the trip in the "My Trips" section. \
 - *Requirements verified*: R16, R20 \
 - *Outcome*: _Passed_ \
-- *Note*: The location coordinates are not specified by the user using street names, but tapping the location on the map. \
+- *Note*: The location coordinates are not specified by the user using street names, but by tapping the location on the map. \
 
 *AT15*: Should fetch historical weather data for trips \
 - *Precondition*: A manual trip is created. \
 - *Action*: Open the details view of the saved trip from "My Trips". \
-- *Expected result*: Temperature, wind speed and weather condition are displayed alongside the trip statistics. \
+- *Expected result*: Temperature, wind speed, and weather condition are displayed alongside the trip statistics. \
 - *Requirements verified*: R21, R33, R34, R35 \
 - *Outcome*: _Passed_ \
 
@@ -343,7 +342,7 @@ While the visual interface is clean, two specific interaction patterns degrade u
   The "Manual Trip" creation flow assumes the user is near the start point. Lacking a text-based search (Geocoding), the user is forced to manually drag and zoom the map to find a remote location. If a user wants to log a trip taken in a different city, the manual panning process becomes very slow.
 
 == 3. Overall Stability
-The application demonstrates a solid Proof of Concept (PoC) architecture. However, the *non-deterministic nature* of the Path Finding service (where paths randomly fail to appear in search results) suggests some error in the Backend that need addressing.
+The application demonstrates a solid Proof of Concept (PoC) architecture. However, the *non-deterministic nature* of the Path Finding service (where paths randomly fail to appear in search results) suggests some error in the Backend that needs addressing.
 
 *Conclusion*: The app has good potential. Fixing the discussed problems would significantly elevate the prototype from "technically functional" to "actually usable."
 

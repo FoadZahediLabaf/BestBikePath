@@ -471,6 +471,28 @@ Short background execution appears functional, but longer background operation w
 - Expected result: The same error notification is consistently shown
 - Requirements verified: R3
 - Outcome:  _Passed_
+
+*AT34: Path search with identical start and destination*
+- Precondition: Map screen is open
+- Action: Select the same point as both start and destination and perform search
+- Expected result: No valid path is returned and the operation is rejected
+- Requirements verified: R8
+- Outcome: _Failed_
+- Defect Description:
+Invalid Handling of Degenerate Routes: The system does not correctly handle cases where the start and destination points are identical.
+- Observation:
+No explicit validation feedback or alternative behavior is provided, and the path search fails silently.
+
+*AT35: Retry path search after failure*
+- Precondition: A previous path search returned no valid results
+- Action: Press the retry option and repeat the path search
+- Expected result: Path search is reattempted and a valid path is returned
+- Requirements verified: R8
+- Outcome: _Failed_
+- Defect Description:
+Ineffective Path Search Retry: Re-attempting a failed path search does not change the outcome or trigger alternative computation logic.
+- Observation:
+The retry action consistently produces the same failure result, indicating missing retry or fallback handling.
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

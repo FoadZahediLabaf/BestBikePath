@@ -458,6 +458,19 @@ Short background execution appears functional, but longer background operation w
 - Requirements verified: R3
 - Outcome:  _Passed_
 
+*AT32: Signup with empty mandatory fields*
+- Precondition: Application is on the Sign up screen
+- Action: Attempt signup leaving one or more mandatory fields empty
+- Expected result: Signup is rejected and validation feedback is shown
+- Requirements verified: R4
+- Outcome:  _Passed_
+
+*AT33: Consistency of login error notifications*
+- Precondition: User account exists
+- Action: Perform multiple failed login attempts using different invalid credentials
+- Expected result: The same error notification is consistently shown
+- Requirements verified: R3
+- Outcome:  _Passed_
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

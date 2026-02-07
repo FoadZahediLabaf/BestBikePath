@@ -250,6 +250,20 @@ Authentication succeeds only when an email is provided. This indicates a mismatc
 - Requirements verified: R3
 - Outcome:  _Passed_
 
+*AT8: Username case sensitivity*
+- Precondition: User account exists
+- Action: Attempt login using username with different casing
+- Expected result: Authentication fails
+- Requirements verified: R3
+- Outcome:  _Passed_
+
+*AT9: Password length validation*
+- Precondition: User is on Sign up screen
+- Action: Enter a password shorter than 8 characters
+- Expected result: Signup is rejected with validation error
+- Requirements verified: R4
+- Outcome:  _Passed_
+
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

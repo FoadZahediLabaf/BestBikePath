@@ -207,6 +207,25 @@ Testing validated the main user flows and exposed several functional and stabili
 - Requirements verified: R1, R2
 - Outcome:  _Passed_
 
+*AT3: Navigation between authentication screens*
+- Precondition: Application is on the initial screen
+- Action: Navigate between Login, Sign up, and Search Path screens
+- Expected result: Navigation works correctly in both directions
+- Requirements verified: R2
+- Outcome:  _Passed_
+
+*AT4: Login with valid email and password*
+- Precondition: User account exists
+- Action: Enter correct email and password and attempt login
+- Expected result: User is authenticated and redirected to home screen
+- Requirements verified: R3
+- Outcome: _Failed_
+- Defect Description:
+Valid Credential Rejection: The authentication mechanism rejects valid email–password combinations and displays the same error notification used for invalid credentials.
+- Observation:
+The failure is consistently reproducible across multiple accounts and sessions. The issue does not depend on input format or credential correctness, suggesting a defect in authentication request handling or backend response processing.
+
+
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \

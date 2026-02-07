@@ -332,6 +332,23 @@ After invoking account deletion, the account remains usable and accessible. This
 - Requirements verified: R7
 - Outcome:  _Passed_
 
+*AT18: Path search computation* 
+- Precondition: Start and destination points are selected
+- Action: Perform path search
+- Expected result: A valid path is returned
+- Requirements verified: R8
+- Outcome: _Failed_
+- Defect Description:
+Route Generation Failure: The path search functionality fails to compute and return any valid route between selected start and destination points.
+- Observation:
+The failure occurs consistently regardless of the selected locations. This indicates an issue in the path computation component or its dependency on backend routing services.
+
+*AT19: Manual trip creation*
+- Precondition: User is logged in
+- Action: Create a trip manually with valid data
+- Expected result: Trip is saved successfully
+- Requirements verified: R9
+- Outcome:  _Passed_
 
 
 

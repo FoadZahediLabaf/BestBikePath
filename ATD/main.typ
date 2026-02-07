@@ -499,14 +499,14 @@ The retry action consistently produces the same failure result, indicating missi
 - Action: Open the map and manually select start and destination points
 - Expected result: Map remains usable through manual interaction
 - Requirements verified: R7
-- Outcome:  _Passed_
+- Outcome: _Passed_
 
 *AT37: Trip creation with excessive number of segments*
 - Precondition: User is logged in and creating a manual trip
 - Action: Add more than five path segments and attempt to save the trip
 - Expected result: Trip is saved correctly without application instability
 - Requirements verified: R9
--Outcome: _Failed_
+- Outcome: _Failed_
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

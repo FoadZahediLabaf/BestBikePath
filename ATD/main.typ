@@ -372,6 +372,20 @@ Application Instability Under Complex Trip Input: Creating a manual trip with mu
 - Observation:
 The crash occurs after exceeding a limited number of segments and is reproducible. This suggests inadequate handling of complex trip data or memory/state management issues.
 
+*AT22: View saved trips*
+- Precondition: User has saved trips
+- Action: Open My Trips screen
+- Expected result: All saved trips are displayed
+- Requirements verified: R10
+- Outcome:  _Passed_
+
+*AT23: View trip details*
+- Precondition: Saved trip exists
+- Action: Select a trip from My Trips
+- Expected result: Trip details are shown correctly
+- Requirements verified: R10
+- Outcome:  _Passed_
+
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

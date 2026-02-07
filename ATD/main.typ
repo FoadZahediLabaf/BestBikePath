@@ -325,6 +325,14 @@ After invoking account deletion, the account remains usable and accessible. This
 - Requirements verified: R7
 - Outcome:  _Passed_
 
+*AT17: Map visualization*
+- Precondition: Map screen is opened
+- Action: Observe map rendering
+- Expected result: Map loads correctly and is responsive
+- Requirements verified: R7
+- Outcome:  _Passed_
+
+
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")

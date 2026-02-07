@@ -289,6 +289,20 @@ Missing Authentication State Persistence: The application does not preserve the 
 - Observation:
 The user is always redirected to the login screen after restarting the application. This behavior suggests that authentication tokens or session data are not persisted locally.
 
+*AT13: Logout functionality*
+- Precondition: User is logged in
+- Action: Perform logout
+- Expected result: User is redirected to login screen
+- Requirements verified: R5
+- Outcome:  _Passed_
+
+*AT14: Login after logout*
+- Precondition: User has logged out
+- Action: Attempt login again with valid credentials
+- Expected result: User is authenticated successfully
+- Requirements verified: R5
+- Outcome: _Failed_
+
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \

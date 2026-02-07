@@ -443,6 +443,21 @@ Short background execution appears functional, but longer background operation w
 - Expected result: Application starts normally
 - Requirements verified: R14
 - Outcome:  _Passed_
+
+*AT30: Login with empty email field*
+- Precondition: Application is on the Login screen
+- Action: Leave the email field empty and enter a password, then press Login
+- Expected result: Login is rejected and an error notification is shown
+- Requirements verified: R3
+- Outcome:  _Passed_
+
+*AT31: Login with empty password field*
+- Precondition: Application is on the Login screen
+- Action: Enter a valid email and leave the password field empty, then press Login
+- Expected result: Login is rejected and an error notification is shown
+- Requirements verified: R3
+- Outcome:  _Passed_
+
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

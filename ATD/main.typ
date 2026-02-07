@@ -147,6 +147,23 @@ Unless otherwise specified in the individual test cases, the following baseline 
 - *Connectivity*: Active internet connection for external API access (OpenStreetMap, OpenMeteo).
 
 == Acceptance Test Cases
+=== Test Cases Overview
+This section describes the manual testing activities carried out on the BestBikePath mobile application. The goal of this phase was to check whether the system behaves as expected with respect to the requirements defined in the RASD and ITD. Testing also helped highlight functional limitations and partially implemented features in the current version of the app. \
+Testing was carried out manually on the iOS simulator running on macOS and physical device (iPhone). Each session began from a fresh app installation, with no stored user data. \
+The application was used exclusively through its graphical interface, following realistic user interactions. \
+=== Scope of Testing
+- Testing covered the following functional areas:
+- Application startup and overall stability \
+- Authentication and account management (login, signup, logout, account deletion) \
+- Session handling and permission management \
+- Map visualization and path search \
+- Manual trip creation and validation \
+- Trip storage and visualization \
+- Trip publishing and visibility management \
+- Profile-related features and user settings \
+- Error handling and crash behavior \
+- Whenever applicable, both registered and non-registered user flows were tested. \
+
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \

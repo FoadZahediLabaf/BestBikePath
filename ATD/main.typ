@@ -425,6 +425,24 @@ No automatic recording behavior is observed under any tested condition, indicati
 Non-persistent Automated Mode State: The automated mode toggle does not retain its state across user sessions or application restarts.
 - Observation:
 The toggle always resets to its default state, suggesting that its value is not stored or restored during application initialization.
+
+*AT28: Background execution*
+- Precondition: Application is running
+- Action: Send app to background and return
+- Expected result: Application continues functioning correctly
+- Requirements verified: R13
+- Outcome: _Partially Passed_
+- Defect Description:
+Limited Background Operation Support: The application does not provide reliable behavior when running in the background for extended periods.
+- Observation:
+Short background execution appears functional, but longer background operation was not consistently verifiable, indicating partial support rather than full compliance.
+
+*AT29: Error handling and crash recovery*
+- Precondition: Known crash scenario occurs
+- Action: Relaunch application after crash
+- Expected result: Application starts normally
+- Requirements verified: R14
+- Outcome:  _Passed_
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

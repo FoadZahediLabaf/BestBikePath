@@ -276,7 +276,19 @@ Authentication succeeds only when an email is provided. This indicates a mismatc
 - Action: Attempt signup using existing email or username
 - Expected result: Signup is rejected
 - Requirements verified: R4
-- Outcome:  _Passed_
+- Outcome:  _Passed_ 
+
+*AT12: Session persistence after app restart*
+- Precondition: User is logged in
+- Action: Close and reopen the application
+- Expected result: User remains logged in
+- Requirements verified: R5
+- Outcome: _Failed_
+- Defect Description:
+Missing Authentication State Persistence: The application does not preserve the authenticated session after being closed and reopened.
+- Observation:
+The user is always redirected to the login screen after restarting the application. This behavior suggests that authentication tokens or session data are not persisted locally.
+
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \

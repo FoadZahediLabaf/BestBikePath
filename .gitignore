@@ -13,7 +13,7 @@ tests/fuzz/corpus
 tests/fuzz/artifacts
 tests/fuzz/coverage
 tarpaulin-report.html
-
+integration-tests
 # Rust
 /target
 **/*.rs.bk

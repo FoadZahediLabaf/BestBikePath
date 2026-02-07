@@ -404,6 +404,27 @@ Irreversible Trip Publication: Once a trip is published, there is no available m
 - Observation:
 The limitation is consistent across all tested trips and appears to be a missing feature rather than an intermittent malfunction.
 
+*AT26: Automatic trip recording*
+- Precondition: Automated mode is enabled
+- Action: Move with application running
+- Expected result: Trip is recorded automatically
+- Requirements verified: R12
+- Outcome: _Failed_
+- Defect Description:
+Missing Automatic Trip Recording Functionality: Automatic trip recording does not start when the automated mode is enabled.
+- Observation:
+No automatic recording behavior is observed under any tested condition, indicating that the functionality is not implemented in the current build.
+
+*AT27: Automated mode toggle persistence*
+- Precondition: User toggles automated mode
+- Action: Restart application
+- Expected result: Toggle state is preserved
+- Requirements verified: R12
+- Outcome: _Failed_
+-  Defect Description:
+Non-persistent Automated Mode State: The automated mode toggle does not retain its state across user sessions or application restarts.
+- Observation:
+The toggle always resets to its default state, suggesting that its value is not stored or restored during application initialization.
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

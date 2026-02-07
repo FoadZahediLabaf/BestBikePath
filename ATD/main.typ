@@ -221,9 +221,9 @@ Testing validated the main user flows and exposed several functional and stabili
 - Requirements verified: R3
 - Outcome: _Failed_
 - Defect Description:
-Valid Credential Rejection: The authentication mechanism rejects valid email–password combinations and displays the same error notification used for invalid credentials.
+  Valid Credential Rejection: The authentication mechanism rejects valid email–password combinations and displays the same error notification used for invalid credentials.
 - Observation:
-The failure is consistently reproducible across multiple accounts and sessions. The issue does not depend on input format or credential correctness, suggesting a defect in authentication request handling or backend response processing.
+  The failure is consistently reproducible across multiple accounts and sessions. The issue does not depend on input format or credential correctness, suggesting a defect in authentication request handling or backend response processing.
 
 *AT5: Login with invalid credentials*
 - Precondition: User account exists
@@ -239,9 +239,9 @@ The failure is consistently reproducible across multiple accounts and sessions. 
 - Requirements verified: R3
 - Outcome: _Failed_
 - Defect Description:
-Unsupported Username-Based Authentication: The login interface accepts a username as input; however, authentication requests using a username are not processed successfully.
+  Unsupported Username-Based Authentication: The login interface accepts a username as input; however, authentication requests using a username are not processed successfully.
 - Observation:
-Authentication succeeds only when an email is provided. This indicates a mismatch between the user interface design and the supported backend authentication mechanism.
+  Authentication succeeds only when an email is provided. This indicates a mismatch between the user interface design and the supported backend authentication mechanism.
 
 *AT7: Email case insensitivity*
 - Precondition: User account exists
@@ -285,9 +285,9 @@ Authentication succeeds only when an email is provided. This indicates a mismatc
 - Requirements verified: R5
 - Outcome: _Failed_
 - Defect Description:
-Missing Authentication State Persistence: The application does not preserve the authenticated session after being closed and reopened.
+  Missing Authentication State Persistence: The application does not preserve the authenticated session after being closed and reopened.
 - Observation:
-The user is always redirected to the login screen after restarting the application. This behavior suggests that authentication tokens or session data are not persisted locally.
+  The user is always redirected to the login screen after restarting the application. This behavior suggests that authentication tokens or session data are not persisted locally.
 
 *AT13: Logout functionality*
 - Precondition: User is logged in
@@ -303,9 +303,9 @@ The user is always redirected to the login screen after restarting the applicati
 - Requirements verified: R5
 - Outcome: _Failed_
 - Defect Description:
-Broken Re-authentication Flow: After a successful logout, the system fails to authenticate the same user again using valid credentials.
+  Broken Re-authentication Flow: After a successful logout, the system fails to authenticate the same user again using valid credentials.
 -  Observation:
-The issue is reproducible immediately after logout and persists until the application is restarted, indicating improper cleanup or invalidation of authentication state.
+  The issue is reproducible immediately after logout and persists until the application is restarted, indicating improper cleanup or invalidation of authentication state.
 
 *AT15: Delete account*
 - Precondition: User is logged in
@@ -314,9 +314,9 @@ The issue is reproducible immediately after logout and persists until the applic
 - Requirements verified: R6
 - Outcome: _Failed_
 - Defect Description:
-Non-operational Account Deletion: The delete account option is available in the user interface but does not result in the removal of the user account.
+  Non-operational Account Deletion: The delete account option is available in the user interface but does not result in the removal of the user account.
 - Observation:
-After invoking account deletion, the account remains usable and accessible. This suggests that the feature is either not implemented or not connected to backend account management logic.
+  After invoking account deletion, the account remains usable and accessible. This suggests that the feature is either not implemented or not connected to backend account management logic.
 
 *AT16: Location permission request*
 - Precondition: User accesses map or search path
@@ -339,9 +339,9 @@ After invoking account deletion, the account remains usable and accessible. This
 - Requirements verified: R8
 - Outcome: _Failed_
 - Defect Description:
-Route Generation Failure: The path search functionality fails to compute and return any valid route between selected start and destination points.
+  Route Generation Failure: The path search functionality fails to compute and return any valid route between selected start and destination points.
 - Observation:
-The failure occurs consistently regardless of the selected locations. This indicates an issue in the path computation component or its dependency on backend routing services.
+  The failure occurs consistently regardless of the selected locations. This indicates an issue in the path computation component or its dependency on backend routing services.
 
 *AT19: Manual trip creation*
 - Precondition: User is logged in
@@ -357,9 +357,9 @@ The failure occurs consistently regardless of the selected locations. This indic
 - Requirements verified: R9
 - Outcome: _Partially Passed_
 - Defect Description:
-Incomplete Input Validation for Manual Trips: Some invalid or inconsistent trip data is accepted during manual trip creation.
+  Incomplete Input Validation for Manual Trips: Some invalid or inconsistent trip data is accepted during manual trip creation.
 - Observation:
-While basic validation exists, edge cases (such as inconsistent segment data) are not reliably detected, leading to unstable behavior rather than explicit validation errors.
+  While basic validation exists, edge cases (such as inconsistent segment data) are not reliably detected, leading to unstable behavior rather than explicit validation errors.
 
 *AT21: Stability with multiple trip segments*
 - Precondition: User is recording a manual trip
@@ -368,9 +368,9 @@ While basic validation exists, edge cases (such as inconsistent segment data) ar
 - Requirements verified: R9
 - Outcome: _Failed_
 - Defect Description:
-Application Instability Under Complex Trip Input: Creating a manual trip with multiple path segments leads to application crashes or forced navigation to the login screen.
+  Application Instability Under Complex Trip Input: Creating a manual trip with multiple path segments leads to application crashes or forced navigation to the login screen.
 - Observation:
-The crash occurs after exceeding a limited number of segments and is reproducible. This suggests inadequate handling of complex trip data or memory/state management issues.
+  The crash occurs after exceeding a limited number of segments and is reproducible. This suggests inadequate handling of complex trip data or memory/state management issues.
 
 *AT22: View saved trips*
 - Precondition: User has saved trips
@@ -400,9 +400,9 @@ The crash occurs after exceeding a limited number of segments and is reproducibl
 - Requirements verified: R11
 - Outcome: _Failed_
 - Defect Description:
-Irreversible Trip Publication: Once a trip is published, there is no available mechanism to revert its visibility to private.
+  Irreversible Trip Publication: Once a trip is published, there is no available mechanism to revert its visibility to private.
 - Observation:
-The limitation is consistent across all tested trips and appears to be a missing feature rather than an intermittent malfunction.
+  The limitation is consistent across all tested trips and appears to be a missing feature rather than an intermittent malfunction.
 
 *AT26: Automatic trip recording*
 - Precondition: Automated mode is enabled
@@ -411,9 +411,9 @@ The limitation is consistent across all tested trips and appears to be a missing
 - Requirements verified: R12
 - Outcome: _Failed_
 - Defect Description:
-Missing Automatic Trip Recording Functionality: Automatic trip recording does not start when the automated mode is enabled.
+  Missing Automatic Trip Recording Functionality: Automatic trip recording does not start when the automated mode is enabled.
 - Observation:
-No automatic recording behavior is observed under any tested condition, indicating that the functionality is not implemented in the current build.
+  No automatic recording behavior is observed under any tested condition, indicating that the functionality is not implemented in the current build.
 
 *AT27: Automated mode toggle persistence*
 - Precondition: User toggles automated mode
@@ -422,9 +422,9 @@ No automatic recording behavior is observed under any tested condition, indicati
 - Requirements verified: R12
 - Outcome: _Failed_
 -  Defect Description:
-Non-persistent Automated Mode State: The automated mode toggle does not retain its state across user sessions or application restarts.
+  Non-persistent Automated Mode State: The automated mode toggle does not retain its state across user sessions or application restarts.
 - Observation:
-The toggle always resets to its default state, suggesting that its value is not stored or restored during application initialization.
+  The toggle always resets to its default state, suggesting that its value is not stored or restored during application initialization.
 
 *AT28: Background execution*
 - Precondition: Application is running
@@ -433,9 +433,9 @@ The toggle always resets to its default state, suggesting that its value is not 
 - Requirements verified: R13
 - Outcome: _Partially Passed_
 - Defect Description:
-Limited Background Operation Support: The application does not provide reliable behavior when running in the background for extended periods.
+  Limited Background Operation Support: The application does not provide reliable behavior when running in the background for extended periods.
 - Observation:
-Short background execution appears functional, but longer background operation was not consistently verifiable, indicating partial support rather than full compliance.
+  Short background execution appears functional, but longer background operation was not consistently verifiable, indicating partial support rather than full compliance.
 
 *AT29: Error handling and crash recovery*
 - Precondition: Known crash scenario occurs
@@ -479,9 +479,9 @@ Short background execution appears functional, but longer background operation w
 - Requirements verified: R8
 - Outcome: _Failed_
 - Defect Description:
-Invalid Handling of Degenerate Routes: The system does not correctly handle cases where the start and destination points are identical.
+  Invalid Handling of Degenerate Routes: The system does not correctly handle cases where the start and destination points are identical.
 - Observation:
-No explicit validation feedback or alternative behavior is provided, and the path search fails silently.
+  No explicit validation feedback or alternative behavior is provided, and the path search fails silently.
 
 *AT35: Retry path search after failure*
 - Precondition: A previous path search returned no valid results
@@ -490,9 +490,9 @@ No explicit validation feedback or alternative behavior is provided, and the pat
 - Requirements verified: R8
 - Outcome: _Failed_
 - Defect Description:
-Ineffective Path Search Retry: Re-attempting a failed path search does not change the outcome or trigger alternative computation logic.
+  Ineffective Path Search Retry: Re-attempting a failed path search does not change the outcome or trigger alternative computation logic.
 - Observation:
-The retry action consistently produces the same failure result, indicating missing retry or fallback handling.
+  The retry action consistently produces the same failure result, indicating missing retry or fallback handling.
 
 *AT36: Map usability without location permission*
 - Precondition: Location permission is denied
@@ -522,9 +522,9 @@ The retry action consistently produces the same failure result, indicating missi
 - Requirements verified: R7
 - Outcome: _Failed_
 - Defect Description:
-Permission State Not Preserved Across Restarts: Previously granted permissions are requested again after the application is restarted.
+    Permission State Not Preserved Across Restarts: Previously granted permissions are requested again after the application is restarted.
 - Observation:
-The repeated permission requests suggest that permission state is not cached or persisted locally between sessions.
+    The repeated permission requests suggest that permission state is not cached or persisted locally between sessions.
 
 *AT40: Published trip persistence after application restart*
 - Precondition: A trip has been published

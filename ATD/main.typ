@@ -232,6 +232,23 @@ The failure is consistently reproducible across multiple accounts and sessions. 
 - Requirements verified: R3
 - Outcome:  _Passed_
 
+*AT6: Login using username instead of email*
+- Precondition: User account exists
+- Action: Enter username instead of email during login
+- Expected result: User can authenticate successfully
+- Requirements verified: R3
+- Outcome: _Failed_
+- Defect Description:
+Unsupported Username-Based Authentication: The login interface accepts a username as input; however, authentication requests using a username are not processed successfully.
+- Observation:
+Authentication succeeds only when an email is provided. This indicates a mismatch between the user interface design and the supported backend authentication mechanism.
+
+*AT7: Email case insensitivity*
+- Precondition: User account exists
+- Action: Login using the same email with different letter casing
+- Expected result: Authentication succeeds
+- Requirements verified: R3
+- Outcome:  _Passed_
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \

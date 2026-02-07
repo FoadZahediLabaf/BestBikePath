@@ -525,6 +525,14 @@ The retry action consistently produces the same failure result, indicating missi
 Permission State Not Preserved Across Restarts: Previously granted permissions are requested again after the application is restarted.
 - Observation:
 The repeated permission requests suggest that permission state is not cached or persisted locally between sessions.
+
+*AT40: Published trip persistence after application restart*
+- Precondition: A trip has been published
+- Action: Close and reopen the application, then access My Trips
+- Expected result: The trip remains published
+- Requirements verified: R11
+- Outcome:  _Passed_
+
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

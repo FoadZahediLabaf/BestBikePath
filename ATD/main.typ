@@ -507,6 +507,24 @@ The retry action consistently produces the same failure result, indicating missi
 - Expected result: Trip is saved correctly without application instability
 - Requirements verified: R9
 - Outcome: _Failed_
+
+*AT38: Application recovery after crash*
+- Precondition: Application crashes during a previous operation
+- Action: Relaunch the application
+- Expected result: Application starts normally and reaches the initial screen
+- Requirements verified: R14
+- Outcome:  _Passed_
+
+*AT39: Permission persistence after application restart*
+- Precondition: Location permission has been granted
+- Action: Close and reopen the application
+- Expected result: Permission state is preserved and not requested again
+- Requirements verified: R7
+- Outcome: _Failed_
+- Defect Description:
+Permission State Not Preserved Across Restarts: Previously granted permissions are requested again after the application is restarted.
+- Observation:
+The repeated permission requests suggest that permission state is not cached or persisted locally between sessions.
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

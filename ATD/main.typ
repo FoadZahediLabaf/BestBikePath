@@ -307,6 +307,23 @@ Broken Re-authentication Flow: After a successful logout, the system fails to au
 -  Observation:
 The issue is reproducible immediately after logout and persists until the application is restarted, indicating improper cleanup or invalidation of authentication state.
 
+*AT15: Delete account*
+- Precondition: User is logged in
+- Action: Select delete account option
+- Expected result: Account is removed and cannot be used again
+- Requirements verified: R6
+- Outcome: _Failed_
+- Defect Description:
+Non-operational Account Deletion: The delete account option is available in the user interface but does not result in the removal of the user account.
+- Observation:
+After invoking account deletion, the account remains usable and accessible. This suggests that the feature is either not implemented or not connected to backend account management logic.
+
+*AT16: Location permission request*
+- Precondition: User accesses map or search path
+- Action: Deny and allow location permission
+- Expected result: Permission request is shown correctly
+- Requirements verified: R7
+- Outcome:  _Passed_
 
 
 

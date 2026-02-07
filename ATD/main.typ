@@ -163,6 +163,49 @@ The application was used exclusively through its graphical interface, following 
 - Profile-related features and user settings \
 - Error handling and crash behavior \
 - Whenever applicable, both registered and non-registered user flows were tested. \
+=== Test cases 
+*Authentication and Account Management* \
+Authentication tests focused on access control and credential handling. Password rules are enforced correctly. Email comparison is case-insensitive, while usernames remain case-sensitive. Account creation works as expected, and duplicate identifiers are correctly rejected. \
+Login currently works only via email, even though the interface suggests support for usernames. Session persistence across app restarts is not supported. Login after logout is unstable. Account deletion is visible in the UI but does not function in the tested build. These issues were recorded as failed or partially implemented. \
+
+*Permissions and Location Handling* \
+Location permissions are requested correctly when needed. The app remains usable even if permission is denied. Manual interaction with the map is still allowed, including setting start and destination points. \
+Changes to the simulator’s GPS position are not reflected in real time inside the app. This was not treated as a failure, since simulator GPS behavior is platform-dependent and not explicitly required. \
+
+*Map and Path Search Functionality* \
+Map rendering works correctly. Basic navigation and marker placement are responsive. Path search can be triggered, but no valid routes are returned in the tested scenarios, even with manually selected points. This was classified as a failure, as route computation is a core system feature. \
+Advanced map features, such as zooming and search, are limited or non-functional and were documented accordingly. \
+
+*Trip Recording and Management* \
+Manual trip recording was tested using metadata such as time, speed, status, and path segments. Trip creation and visualization in the My Trips section work under normal conditions. \
+Stability issues appear when trips include multiple segments. Adding several points often causes crashes or forces a logout. In some cases, trips fail to save without clear feedback. Automatic trip recording was not observed and is considered not implemented. \
+
+*Trip Visualization, Publishing, and Weather Data* \
+Saved trips appear correctly in the trip list, and detail views are accessible. Publishing via long-press interaction works. Published trips cannot be reverted to private status, which was noted as a limitation. \
+Weather data is shown for some trips but not consistently. Since this depends on external services, partial availability was considered acceptable. \
+
+*Stability and Error Handling* \
+The application starts reliably and handles most interactions without crashing. However, several reproducible crashes were observed, mainly during complex trip recording. Error messages are present but often lack detail. All unstable behaviors were documented in the corresponding test cases. \
+
+*Limitations of Testing* \
+Testing was manual and focused on functional behavior. Performance and security were not evaluated. Simulator-specific behaviors were considered only when relevant to application logic. Missing or incomplete features were documented as such. \
+
+*Conclusion* \
+Testing validated the main user flows and exposed several functional and stability issues. Core features like registration, manual trip creation, and trip visualization work correctly. Other areas, especially path computation, session persistence, and automated recording, are incomplete or non-functional. All findings were documented to ensure traceability and transparency. \
+
+*AT1: Application startup*
+- Precondition: Application is installed on the device or simulator
+- Action: Launch the application
+- Expected result: The application opens correctly without crashing
+- Requirements verified: R1
+- Outcome: _Passed_
+
+*AT2: Initial screen availability*
+- Precondition: Application is running
+- Action: Observe the first screen after startup
+- Expected result: Login, Sign up, and Search Path options are visible
+- Requirements verified: R1, R2
+- Outcome:  _Passed_
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")

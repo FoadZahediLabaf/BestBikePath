@@ -302,6 +302,12 @@ The user is always redirected to the login screen after restarting the applicati
 - Expected result: User is authenticated successfully
 - Requirements verified: R5
 - Outcome: _Failed_
+- Defect Description:
+Broken Re-authentication Flow: After a successful logout, the system fails to authenticate the same user again using valid credentials.
+-  Observation:
+The issue is reproducible immediately after logout and persists until the application is restarted, indicating improper cleanup or invalidation of authentication state.
+
+
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")

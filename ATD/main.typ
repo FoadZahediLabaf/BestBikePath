@@ -361,6 +361,16 @@ Incomplete Input Validation for Manual Trips: Some invalid or inconsistent trip 
 - Observation:
 While basic validation exists, edge cases (such as inconsistent segment data) are not reliably detected, leading to unstable behavior rather than explicit validation errors.
 
+*AT21: Stability with multiple trip segments*
+- Precondition: User is recording a manual trip
+- Action: Add more than five path segments
+- Expected result: Application remains stable
+- Requirements verified: R9
+- Outcome: _Failed_
+- Defect Description:
+Application Instability Under Complex Trip Input: Creating a manual trip with multiple path segments leads to application crashes or forced navigation to the login screen.
+- Observation:
+The crash occurs after exceeding a limited number of segments and is reproducible. This suggests inadequate handling of complex trip data or memory/state management issues.
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \

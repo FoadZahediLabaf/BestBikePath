@@ -264,6 +264,20 @@ Authentication succeeds only when an email is provided. This indicates a mismatc
 - Requirements verified: R4
 - Outcome:  _Passed_
 
+*AT10: Signup with new credentials*
+- Precondition: No existing account with given credentials
+- Action: Sign up with new email and username
+- Expected result: Account is created and user is logged in
+- Requirements verified: R4
+- Outcome:  _Passed_
+
+*AT11: Signup with existing email or username*
+- Precondition: Account already exists
+- Action: Attempt signup using existing email or username
+- Expected result: Signup is rejected
+- Requirements verified: R4
+- Outcome:  _Passed_
+
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

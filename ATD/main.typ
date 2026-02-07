@@ -225,6 +225,12 @@ Valid Credential Rejection: The authentication mechanism rejects valid email–p
 - Observation:
 The failure is consistently reproducible across multiple accounts and sessions. The issue does not depend on input format or credential correctness, suggesting a defect in authentication request handling or backend response processing.
 
+*AT5: Login with invalid credentials*
+- Precondition: User account exists
+- Action: Enter wrong email or password
+- Expected result: Error notification is shown
+- Requirements verified: R3
+- Outcome:  _Passed_
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")

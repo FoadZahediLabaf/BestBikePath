@@ -386,6 +386,24 @@ The crash occurs after exceeding a limited number of segments and is reproducibl
 - Requirements verified: R10
 - Outcome:  _Passed_
 
+*AT24: Publish trip*
+- Precondition: User owns a saved trip
+- Action: Publish the trip via long press
+- Expected result: Trip becomes public
+- Requirements verified: R11
+- Outcome:  _Passed_
+
+*AT25: Unpublish trip*
+- Precondition: Trip is published
+- Action: Attempt to make trip private again
+- Expected result: Trip visibility can be reverted
+- Requirements verified: R11
+- Outcome: _Failed_
+- Defect Description:
+Irreversible Trip Publication: Once a trip is published, there is no available mechanism to revert its visibility to private.
+- Observation:
+The limitation is consistent across all tested trips and appears to be a missing feature rather than an intermittent malfunction.
+
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")
 *Sign Up Process & Validation* \
 *AT1*: Should register a new user with valid data \

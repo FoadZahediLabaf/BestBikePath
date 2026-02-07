@@ -350,6 +350,16 @@ The failure occurs consistently regardless of the selected locations. This indic
 - Requirements verified: R9
 - Outcome:  _Passed_
 
+*AT20: Manual trip validation*
+- Precondition: User is creating a trip
+- Action: Insert invalid values (negative speed, missing fields)
+- Expected result: Trip is not saved and error is shown
+- Requirements verified: R9
+- Outcome: _Partially Passed_
+- Defect Description:
+Incomplete Input Validation for Manual Trips: Some invalid or inconsistent trip data is accepted during manual trip creation.
+- Observation:
+While basic validation exists, edge cases (such as inconsistent segment data) are not reliably detected, leading to unstable behavior rather than explicit validation errors.
 
 
 #heading(level: 4, numbering: none,  outlined: false,  "Authentication Module")

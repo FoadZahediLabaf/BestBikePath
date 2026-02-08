@@ -342,7 +342,7 @@ Testing covered the following functional areas:
 #heading(level: 4, numbering: none,  outlined: false,  "Trip Publishing")
 *AT24*: Should publish multiple trips simultaneously \
 - *Precondition*: User has one or more "Unpublished" trips in their history. \
-- *Action*: User selects multiple trips (by long-pressing them) and click the "Publish" button. \
+- *Action*: User selects multiple trips (by long-pressing them) and clicks the "Publish" button. \
 - *Expected result*: The selected trips' status changes to "Published". \
 - *Requirements verified*: R26, R27 \
 - *Outcome*: _Passed_ \

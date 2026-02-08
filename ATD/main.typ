@@ -118,7 +118,7 @@ Testing covered the following functional areas:
 *AT1*: Should register a new user with valid data \
 - *Precondition*: App is installed and user is on the Sign Up screen. \
 - *Action*: User enters Name, Surname, unique Username, valid and unique Email, valid Password, and clicks Confirm. \
-- *Expected result*: The account is created successfully. The system initiates the verification process (if applicable) or logs the user in. \
+- *Expected result*: The account is created successfully and the user is logged into the app. \
 - *Requirements verified*: R1, R2, R3 \
 - *Outcome*: _Passed_ \
 

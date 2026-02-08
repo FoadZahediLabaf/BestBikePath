@@ -103,14 +103,12 @@ Unless otherwise specified in the individual test cases, the following baseline 
 == Scope of Testing
 Testing covered the following functional areas:
 - Application startup and overall stability \
-- Authentication and account management (login, signup, logout, account deletion) \
-- Session handling and permission management \
+- Authentication and account management (login, signup, logout) \
 - Map visualization and path search \
 - Manual trip creation and validation \
 - Trip storage and visualization \
 - Trip publishing and visibility management \
-- Profile-related features and user settings \
-- Error handling and crash behavior \
+- Profile-related features \
 - Whenever applicable, both registered and non-registered user flows were tested. \
 
 == Acceptance Test Cases
@@ -413,10 +411,10 @@ This creates an immediate obstacle for any new user, blocking access right after
 
 *Authentication Session persistence* \
 Although it is not explicitly specified in the implementation, the application does not preserve the authenticated session after being closed and reopened. \
-This results in the user to being redirected to the login screen after each application restart.
+This results in the user being redirected to the login screen after each application restart.
 
 *Path Finding Service* \
-The path finding feature demonstrates a non-deterministic behavior where paths randomly fail to appear in search results or don't incorporate new information when calculating the quality score, suggesting some error in the Backend that needs addressing.
+The path finding feature demonstrates a non-deterministic behavior where paths randomly fail to appear in search results or don't incorporate new information when calculating the quality score, suggesting some error in the backend that needs addressing.
 
 *Trip Length* \
 When creating a trip manually, the application fails to store trips containing a large number of segments (typically more than seven) in the database.

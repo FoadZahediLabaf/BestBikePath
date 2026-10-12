@@ -42,12 +42,12 @@ The [Design Document](DD/main.typ) also explores a broader service architecture 
 
 | Document | Contents |
 |---|---|
-| [Requirements and formal analysis](RASD/main.typ) | Use cases, requirements, and Alloy models/assertions |
-| [System design](DD/main.typ) | Architecture, interfaces, data models, and design decisions |
-| [Implementation and testing](ITD/main.typ) | Implemented features, test scenarios, and installation guidance |
-| [Acceptance testing](ATD/main.typ) | Acceptance scenarios and assessment |
+| [Requirements and formal analysis (PDF)](DeliveryFolder/RASDv2.pdf) | Use cases, requirements, and Alloy models/assertions |
+| [System design (PDF)](DeliveryFolder/DDv1.pdf) | Architecture, interfaces, data models, and design decisions |
+| [Implementation and testing (PDF)](DeliveryFolder/ITDv1.pdf) | Implemented features, test scenarios, and installation guidance |
+| [Acceptance testing (PDF)](DeliveryFolder/ATDv1.pdf) | Acceptance scenarios and assessment |
 
-The Alloy models are embedded in the requirements document. Tests include manager unit tests, Firestore security-rule tests, and backend integration tests.
+The delivered PDFs are linked above. Editable document sources are available in [RASD](RASD/main.typ), [DD](DD/main.typ), [ITD](ITD/main.typ), and [ATD](ATD/main.typ). The Alloy models are embedded in the requirements document. Tests include manager unit tests, Firestore security-rule tests, and backend integration tests.
 
 ## Backend: build and unit tests
 
